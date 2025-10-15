@@ -1,0 +1,8 @@
+agents:
+- technology_partnerships.yaml
+department: partnerships
+description: Coordinates all strategic outreach and partnerships agents.
+memory:
+  last_run: '2025-10-14T16:58:14.431665+00:00'
+  last_summary: ''
+name: Partnerships DM

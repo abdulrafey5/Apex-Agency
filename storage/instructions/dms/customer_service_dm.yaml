@@ -1,0 +1,10 @@
+agents:
+- customer_service_inbound_call.yaml
+- customer_service_inbound_email.yaml
+- customer_service_inbound_text.yaml
+department: customer_service
+description: Coordinates all customer service agents.
+memory:
+  last_run: '2025-10-14T16:58:14.404696+00:00'
+  last_summary: ''
+name: Customer Service DM

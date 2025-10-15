@@ -1,0 +1,13 @@
+body{font-family:Arial,Helvetica,sans-serif;background:#f7f8fb;padding:20px}
+.container{max-width:720px;margin:0 auto;background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+h2{margin-top:0}
+.msgs{min-height:120px;border:1px solid #eee;padding:10px;border-radius:6px;background:#fafafa;overflow:auto}
+.msg{margin:8px 0;padding:8px 10px;border-radius:8px;max-width:85%}
+.msg.user{background:#d9f7ef;margin-left:auto;text-align:left}
+.msg.bot{background:#eef2ff;margin-right:auto;text-align:left}
+textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ccc}
+button{margin-top:8px;padding:8px 12px;border:none;border-radius:6px;background:#2563eb;color:#fff;cursor:pointer}
+a.logout{display:inline-block;margin-top:10px;color:#666}
+small.note{display:block;margin-top:6px;color:#666}
+.content{white-space:pre-wrap} /* keep line breaks from messages */
+

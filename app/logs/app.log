@@ -1,0 +1,437 @@
+2025-10-09 07:11:48,097 - INFO - Health check / home endpoint accessed
+2025-10-09 07:11:52,147 - INFO - Redirecting to Cognito login
+2025-10-09 07:11:54,291 - INFO - Redirecting to Cognito login
+2025-10-09 07:11:55,984 - INFO - User successfully logged in via Cognito
+2025-10-09 07:12:31,217 - INFO - Health check / home endpoint accessed
+2025-10-09 07:12:34,873 - INFO - Health check / home endpoint accessed
+2025-10-09 07:15:24,172 - INFO - Health check / home endpoint accessed
+2025-10-09 08:19:00,357 - INFO - Health check / home endpoint accessed
+2025-10-09 08:19:01,758 - INFO - Health check / home endpoint accessed
+2025-10-09 09:07:01,685 - INFO - Health check / home endpoint accessed
+2025-10-09 09:07:06,171 - INFO - Redirecting to Cognito login
+2025-10-09 09:07:06,930 - INFO - Redirecting to Cognito login
+2025-10-09 09:07:22,891 - INFO - User successfully logged in via Cognito
+2025-10-09 09:07:31,556 - INFO - Received message for Grok: hi
+2025-10-09 09:07:31,737 - ERROR - Grok API request failed: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-09 09:28:04,522 - INFO - Health check / home endpoint accessed
+2025-10-09 09:28:08,365 - INFO - Redirecting to Cognito login
+2025-10-09 09:28:09,614 - INFO - Redirecting to Cognito login
+2025-10-09 09:28:11,826 - INFO - User successfully logged in via Cognito
+2025-10-09 09:28:27,660 - INFO - Received message for OpenAI: hi
+2025-10-09 09:28:27,660 - ERROR - OpenAI API request failed: 
+
+You tried to access openai.ChatCompletion, but this is no longer supported in openai>=1.0.0 - see the README at https://github.com/openai/openai-python for the API.
+
+You can run `openai migrate` to automatically upgrade your codebase to use the 1.0.0 interface. 
+
+Alternatively, you can pin your installation to the old version, e.g. `pip install openai==0.28`
+
+A detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742
+
+2025-10-09 09:31:18,468 - INFO - Health check / home endpoint accessed
+2025-10-09 09:31:21,427 - INFO - Redirecting to Cognito login
+2025-10-09 09:31:22,254 - INFO - Redirecting to Cognito login
+2025-10-09 09:31:23,662 - INFO - User successfully logged in via Cognito
+2025-10-09 09:31:28,633 - INFO - Received message for OpenAI: hello
+2025-10-09 09:31:31,612 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 09:31:31,672 - INFO - OpenAI reply: Hello! How can I assist you today?
+2025-10-09 09:32:00,510 - INFO - Received message for OpenAI: Hi, how many provinces are there in pakistan
+2025-10-09 09:32:01,874 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 09:32:01,878 - INFO - OpenAI reply: Pakistan has 4 provinces.
+2025-10-09 09:32:20,172 - INFO - Received message for OpenAI: Can you help e make a prod level project
+2025-10-09 09:32:22,884 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 09:32:22,894 - INFO - OpenAI reply: Sure, I can guide you on best practices, project management, and provide feedback or advice on specific issues. However, the actual creation and implementation of the project would be up to you.
+2025-10-09 10:17:53,375 - INFO - Received message for OpenAI: hi gwm
+2025-10-09 10:17:55,199 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 10:17:55,207 - INFO - OpenAI reply: Hello! How can I assist you today?
+2025-10-09 10:17:55,330 - INFO - Received message for OpenAI: hi gwm
+2025-10-09 10:17:56,587 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 10:17:56,590 - INFO - OpenAI reply: Hello! How can I assist you today?
+2025-10-09 10:18:17,529 - INFO - Received message for OpenAI: hi do you arbaz butt shandar mobile jhang is
+2025-10-09 10:18:18,639 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 10:18:18,643 - INFO - OpenAI reply: Sorry, I couldn't understand your request. Could you please provide more details?
+2025-10-09 10:18:45,418 - INFO - Received message for OpenAI: hello how many provinces are there in usa
+2025-10-09 10:18:47,573 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 10:18:47,574 - INFO - OpenAI reply: The USA does not have provinces. It has 50 states and 1 federal district, Washington D.C. The term "province" is often used to refer to regions within countries like Canada or China.
+2025-10-09 10:18:47,749 - INFO - Received message for OpenAI: hello how many provinces are there in usa
+2025-10-09 10:18:49,739 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 10:18:49,745 - INFO - OpenAI reply: The USA doesn't have provinces, it has 50 states.
+2025-10-09 10:24:02,707 - INFO - Health check / home endpoint accessed
+2025-10-09 10:29:04,978 - INFO - Received message for OpenAI: hi, tell me a joke
+2025-10-09 10:29:07,097 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 10:29:07,106 - INFO - OpenAI reply: Sure, here's one for you: Why don't scientists trust atoms? Because they make up everything!
+2025-10-09 10:52:19,445 - INFO - Health check / home endpoint accessed
+2025-10-09 10:52:24,731 - INFO - Redirecting to Cognito login
+2025-10-09 10:52:27,013 - INFO - Redirecting to Cognito login
+2025-10-09 11:07:21,296 - INFO - Health check / home endpoint accessed
+2025-10-09 11:08:18,225 - INFO - Redirecting to Cognito login
+2025-10-09 11:08:19,545 - INFO - Redirecting to Cognito login
+2025-10-09 11:08:48,768 - INFO - User successfully logged in via Cognito
+2025-10-09 11:09:02,129 - INFO - Received message for OpenAI: tell me a joke
+2025-10-09 11:09:03,889 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 11:09:03,900 - INFO - OpenAI reply: Why don't scientists trust atoms? Because they make up everything!
+2025-10-09 11:27:50,628 - INFO - Health check / home endpoint accessed
+2025-10-09 11:28:48,992 - INFO - Health check / home endpoint accessed
+2025-10-09 11:37:00,543 - INFO - Received message for OpenAI: how you can guide agents beneath you what python logic should i implement as i am doing project of making agents and dept at runtime
+2025-10-09 11:37:10,424 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 11:37:10,425 - INFO - OpenAI reply: As a CEA, I'd suggest the following Python logic:
+
+1. Define your Agent and Department classes with necessary attributes and methods.
+2. For creating agents at runtime, you could use a factory pattern. The factory function can take parameters to decide which type of agent to create.
+3. Each agent can have a method to perform their specific task. You can also have a higher-level function to manage the agents and their tasks.
+4. Department class can maintain a list of its agents. Add methods to add or remove agents dynamically.
+5. You can create agents and assign them to departments at runtime based on your project requirements.
+
+Here's a rough idea of how the classes could look:
+
+```python
+class Agent:
+    def __init__(self, name, type):
+        self.name = name
+        self.type = type
+    def perform_task(self):
+        pass
+
+class Department:
+    def __init__(self):
+        self.agents = []
+    def add_agent(self, agent):
+        self.agents.append(agent)
+    def remove_agent(self, agent):
+        self.agents.remove(agent)
+    def manage_agents(self):
+        for agent in self.agents:
+            agent.perform_task()
+```
+Remember to replace the pass statement with your own logic for the agent's task.
+
+When you need to create agents or departments at runtime, you can simply create new instances of these classes.
+2025-10-09 11:38:12,337 - INFO - Received message for OpenAI: ok so creating agents also require ebs storage and then sample json in each agent
+2025-10-09 11:38:18,146 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-09 11:38:18,150 - INFO - OpenAI reply: No, creating agents doesn't necessarily require EBS storage or sample JSON in each agent. Agents can be created and operated from a variety of sources and storage solutions, depending on the specific needs of the application. JSON files or other data formats can be used to configure and train agents, but this is not a strict requirement. The details would vary based on the specific agent creation platform or framework you're using.
+2025-10-09 11:58:18,031 - INFO - Health check / home endpoint accessed
+2025-10-09 12:05:00,611 - INFO - Health check / home endpoint accessed
+2025-10-09 15:21:48,170 - INFO - Health check / home endpoint accessed
+2025-10-09 15:24:29,569 - INFO - Health check / home endpoint accessed
+2025-10-09 15:24:29,941 - INFO - Health check / home endpoint accessed
+2025-10-09 15:57:38,499 - INFO - Health check / home endpoint accessed
+2025-10-09 16:26:02,446 - INFO - Health check / home endpoint accessed
+2025-10-09 18:01:44,754 - INFO - Health check / home endpoint accessed
+2025-10-09 18:01:50,863 - INFO - Health check / home endpoint accessed
+2025-10-09 18:24:28,556 - INFO - Health check / home endpoint accessed
+2025-10-09 18:44:03,754 - INFO - Health check / home endpoint accessed
+2025-10-09 18:51:29,145 - INFO - Health check / home endpoint accessed
+2025-10-09 19:13:47,635 - INFO - Health check / home endpoint accessed
+2025-10-09 20:32:43,478 - INFO - Health check / home endpoint accessed
+2025-10-09 20:36:52,635 - INFO - Health check / home endpoint accessed
+2025-10-09 20:40:27,530 - INFO - Health check / home endpoint accessed
+2025-10-09 20:54:10,205 - INFO - Health check / home endpoint accessed
+2025-10-09 21:00:59,580 - INFO - Health check / home endpoint accessed
+2025-10-09 21:59:24,505 - INFO - Health check / home endpoint accessed
+2025-10-09 22:08:49,843 - INFO - Health check / home endpoint accessed
+2025-10-09 22:41:02,167 - INFO - Health check / home endpoint accessed
+2025-10-10 00:30:29,581 - INFO - Health check / home endpoint accessed
+2025-10-10 01:09:09,249 - INFO - Health check / home endpoint accessed
+2025-10-10 01:48:06,044 - INFO - Health check / home endpoint accessed
+2025-10-10 01:50:03,521 - INFO - Health check / home endpoint accessed
+2025-10-10 02:02:28,270 - INFO - Health check / home endpoint accessed
+2025-10-10 02:57:59,151 - INFO - Health check / home endpoint accessed
+2025-10-10 04:21:47,212 - INFO - Health check / home endpoint accessed
+2025-10-10 05:53:07,397 - INFO - Redirecting to Cognito login
+2025-10-10 06:19:28,589 - INFO - User logged out
+2025-10-10 06:19:29,473 - INFO - Health check / home endpoint accessed
+2025-10-10 06:43:07,787 - INFO - Health check / home endpoint accessed
+2025-10-10 06:43:37,968 - INFO - Health check / home endpoint accessed
+2025-10-10 06:51:43,960 - INFO - Health check / home endpoint accessed
+2025-10-10 06:56:43,748 - INFO - Health check / home endpoint accessed
+2025-10-10 06:59:28,890 - INFO - Health check / home endpoint accessed
+2025-10-10 06:59:36,257 - INFO - Redirecting to Cognito login
+2025-10-10 07:03:34,615 - INFO - Redirecting to Cognito login
+2025-10-10 07:03:35,702 - INFO - User successfully logged in via Cognito
+2025-10-10 07:03:55,865 - INFO - Health check / home endpoint accessed
+2025-10-10 07:04:02,775 - INFO - User logged out
+2025-10-10 07:04:03,266 - INFO - Health check / home endpoint accessed
+2025-10-10 07:04:09,361 - INFO - Redirecting to Cognito login
+2025-10-10 07:04:20,614 - INFO - User successfully logged in via Cognito
+2025-10-10 07:04:29,202 - INFO - Received message for OpenAI: hi how r u
+2025-10-10 07:04:31,482 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-10 07:04:31,490 - INFO - OpenAI reply: I'm an artificial intelligence and don't have feelings, but I'm here and ready to assist you. How can I help you today?
+2025-10-10 07:13:54,306 - INFO - Health check / home endpoint accessed
+2025-10-10 12:40:00,100 - ERROR - Demo CloudWatch metric trigger
+2025-10-10 08:07:10,056 - INFO - Health check / home endpoint accessed
+2025-10-10 08:07:25,434 - INFO - Health check / home endpoint accessed
+2025-10-10 09:21:11,366 - INFO - Health check / home endpoint accessed
+2025-10-10 09:52:02,267 - INFO - Health check / home endpoint accessed
+2025-10-10 09:52:07,090 - INFO - Redirecting to Cognito login
+2025-10-10 09:52:07,665 - INFO - Redirecting to Cognito login
+2025-10-10 09:52:20,420 - INFO - User successfully logged in via Cognito
+2025-10-10 09:52:37,000 - INFO - Received message for OpenAI: hello how are you doing?
+2025-10-10 09:52:40,074 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-10 09:52:40,088 - INFO - OpenAI reply: As an artificial intelligence, I don't have feelings, but I'm here and ready to assist you. How can I help you today?
+2025-10-10 10:00:07,045 - INFO - Redirecting to Cognito login
+2025-10-10 10:00:10,642 - INFO - User logged out
+2025-10-10 10:00:11,919 - INFO - Health check / home endpoint accessed
+2025-10-10 10:01:42,762 - INFO - Health check / home endpoint accessed
+2025-10-10 10:42:52,271 - INFO - Redirecting to Cognito login
+2025-10-10 10:43:40,780 - INFO - User successfully logged in via Cognito
+2025-10-10 10:43:57,825 - INFO - Received message for OpenAI: tell me a joke
+2025-10-10 10:43:59,261 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-10 10:43:59,287 - INFO - OpenAI reply: Why don't scientists trust atoms? Because they make up everything!
+2025-10-10 10:47:58,163 - INFO - Redirecting to Cognito login
+2025-10-10 10:47:59,442 - INFO - User logged out
+2025-10-10 10:48:00,733 - INFO - Health check / home endpoint accessed
+2025-10-10 10:57:33,950 - INFO - Redirecting to Cognito login
+2025-10-10 10:57:34,279 - INFO - Redirecting to Cognito login
+2025-10-10 10:57:53,681 - INFO - Health check / home endpoint accessed
+2025-10-10 10:57:58,847 - INFO - Health check / home endpoint accessed
+2025-10-10 10:58:17,955 - INFO - Redirecting to Cognito login
+2025-10-10 11:06:02,361 - INFO - Health check / home endpoint accessed
+2025-10-10 11:42:12,085 - INFO - Health check / home endpoint accessed
+2025-10-10 12:20:24,026 - INFO - Health check / home endpoint accessed
+2025-10-10 12:20:38,553 - INFO - Redirecting to Cognito login
+2025-10-10 12:21:07,665 - INFO - User successfully logged in via Cognito
+2025-10-10 13:15:29,814 - INFO - User successfully logged in via Cognito
+2025-10-10 13:22:16,064 - INFO - Health check / home endpoint accessed
+2025-10-10 13:41:34,178 - INFO - Health check / home endpoint accessed
+2025-10-10 14:23:20,380 - INFO - Health check / home endpoint accessed
+2025-10-10 14:30:25,492 - INFO - Health check / home endpoint accessed
+2025-10-10 14:44:05,019 - INFO - Health check / home endpoint accessed
+2025-10-10 15:46:21,125 - INFO - Health check / home endpoint accessed
+2025-10-10 16:22:52,489 - INFO - Health check / home endpoint accessed
+2025-10-10 16:22:58,949 - INFO - Redirecting to Cognito login
+2025-10-10 17:19:08,976 - INFO - Health check / home endpoint accessed
+2025-10-10 17:33:56,616 - INFO - Health check / home endpoint accessed
+2025-10-10 18:07:31,413 - INFO - Health check / home endpoint accessed
+2025-10-10 18:16:44,346 - INFO - Health check / home endpoint accessed
+2025-10-10 18:24:39,442 - INFO - Health check / home endpoint accessed
+2025-10-10 18:35:12,090 - INFO - Health check / home endpoint accessed
+2025-10-10 18:37:26,761 - INFO - Health check / home endpoint accessed
+2025-10-10 18:37:35,584 - INFO - Health check / home endpoint accessed
+2025-10-10 18:52:53,433 - INFO - Health check / home endpoint accessed
+2025-10-10 18:58:53,656 - INFO - Health check / home endpoint accessed
+2025-10-10 20:00:11,185 - INFO - Health check / home endpoint accessed
+2025-10-10 20:36:05,394 - INFO - Health check / home endpoint accessed
+2025-10-10 20:40:25,986 - INFO - Health check / home endpoint accessed
+2025-10-10 21:21:36,033 - INFO - Health check / home endpoint accessed
+2025-10-10 21:30:36,129 - INFO - Health check / home endpoint accessed
+2025-10-10 21:33:10,374 - INFO - Health check / home endpoint accessed
+2025-10-10 21:37:07,794 - INFO - Health check / home endpoint accessed
+2025-10-10 22:01:26,102 - INFO - Health check / home endpoint accessed
+2025-10-10 22:16:43,698 - INFO - Health check / home endpoint accessed
+2025-10-10 22:51:43,187 - INFO - Health check / home endpoint accessed
+2025-10-10 23:52:38,518 - INFO - Health check / home endpoint accessed
+2025-10-11 00:18:14,433 - INFO - Health check / home endpoint accessed
+2025-10-11 00:30:15,792 - INFO - Health check / home endpoint accessed
+2025-10-11 00:41:59,879 - INFO - Health check / home endpoint accessed
+2025-10-11 02:36:13,178 - INFO - Health check / home endpoint accessed
+2025-10-11 03:10:21,312 - INFO - Health check / home endpoint accessed
+2025-10-11 03:36:53,282 - INFO - Health check / home endpoint accessed
+2025-10-11 05:37:29,446 - INFO - Health check / home endpoint accessed
+2025-10-11 07:03:45,181 - INFO - Health check / home endpoint accessed
+2025-10-11 08:48:44,151 - INFO - Health check / home endpoint accessed
+2025-10-11 09:17:36,403 - INFO - Health check / home endpoint accessed
+2025-10-11 09:18:10,981 - INFO - Health check / home endpoint accessed
+2025-10-11 09:42:31,005 - INFO - Health check / home endpoint accessed
+2025-10-11 09:46:19,067 - INFO - Health check / home endpoint accessed
+2025-10-11 09:51:55,023 - INFO - Health check / home endpoint accessed
+2025-10-11 10:15:46,826 - INFO - Health check / home endpoint accessed
+2025-10-11 10:15:52,042 - INFO - Redirecting to Cognito login
+2025-10-11 10:15:53,398 - INFO - Redirecting to Cognito login
+2025-10-11 10:16:11,259 - INFO - User successfully logged in via Cognito
+2025-10-11 10:16:18,448 - INFO - Received message for Grok: hello
+2025-10-11 10:16:20,285 - INFO - Grok reply extracted: Hello! I'm CEA. How can I help?
+2025-10-11 10:17:09,044 - INFO - Debug Grok successful
+2025-10-11 10:21:01,519 - INFO - Health check / home endpoint accessed
+2025-10-11 10:48:08,685 - INFO - Health check / home endpoint accessed
+2025-10-11 10:57:10,768 - INFO - Health check / home endpoint accessed
+2025-10-11 11:37:06,324 - INFO - Grok reply: Hello! I'm doing great, thanks—always ready for a chat. How about you? What's on your mind today?
+2025-10-11 11:51:09,143 - ERROR - Grok failed: [Errno 36] File name too long: '/data/inception/app/chat_history/eyJraWQiOiJzdWd3U0RZSmZ4aHlkT0FFZEY4RElmWVVcL2I1NjZhU2lNbFl5TzBFT1FLYz0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoielV1bXRlM1htUUlzN1ZYUVp5eE9rUSIsInN1YiI6IjYwMWNhOWJjLTEwYTEtNzAwNC03MzAyLTE0MjNhYTg3YjJkZCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtbm9ydGgtMS5hbWF6b25hd3MuY29tXC9ldS1ub3J0aC0xX0hWdFVwa3h4OSIsImNvZ25pdG86dXNlcm5hbWUiOiI2MDFjYTliYy0xMGExLTcwMDQtNzMwMi0xNDIzYWE4N2IyZGQiLCJvcmlnaW5fanRpIjoiMThkZjBjMzAtZDVkOS00MWU3LTgzODYtY2I1MmIyYWQyNjE2IiwiYXVkIjoiM3VwZWFydWczYzNna21tcmh1Nm4xbDNlbWUiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc2MDE4MzQ0OCwiZXhwIjoxNzYwMTg3MDQ4LCJpYXQiOjE3NjAxODM0NDgsImp0aSI6IjgxODQ4OTM2LTE3OWUtNGY4NS1hNDhhLTAzNTQ2M2UwNzUyYyIsImVtYWlsIjoiYWJkdWxyYWZleTE3MzNAZ21haWwuY29tIn0.ej4zIbOnvbvBtSfAXdnmMUFrm-lUyCBo-eXrE0Da2y-hTZsPS6RlytO7h2kAu9h6yRK4E_m4iThO657gtAdm6PWvtnkbtlIzF4FOABLp2mjhckg4RH4VFsc_Y-Zzoid33v0jD_TjCGNZPRfPGIhZgzCqS6RIL8PWFKctJLV6aMta9Jh1SU8yIHDu_3Z_69qm_OBd2MjobWusRG-MuFk-KIL-Hl8H0ccWMN3Kbk_hukiL52RSp_1cGOvvNzsl40ZlJUIINF0UTNkcXgpJXcke27fQM6z-zNlHUYsBNEIr_wJyAFCjIvf3X2TX_B2wx0rQe-7VWFUYkHm34dNfrI4O_w.json'
+2025-10-11 12:03:24,438 - INFO - User logged in via Cognito
+2025-10-11 12:03:46,933 - INFO - User logged in via Cognito
+2025-10-11 12:03:57,333 - INFO - Grok reply for 278ca6bd119ac1d7d9ab1ac6: I'm doing well, thanks! How about you?
+2025-10-11 12:04:28,443 - INFO - Grok reply for 278ca6bd119ac1d7d9ab1ac6: Why don't scientists trust atoms? Because they make up everything!
+2025-10-11 12:05:06,731 - INFO - Grok reply for 278ca6bd119ac1d7d9ab1ac6: Why did the bicycle fall over? It was two-tired!
+2025-10-11 12:05:39,477 - INFO - User logged in via Cognito
+2025-10-11 12:10:14,509 - INFO - User logged in via Cognito
+2025-10-11 12:10:31,118 - INFO - Grok reply for shared_global_thread: I'm doing well, thanks! How about you?
+2025-10-11 12:10:45,459 - INFO - Grok reply for shared_global_thread: Hello! What's up?
+2025-10-11 12:19:09,483 - INFO - User logged in via Cognito
+2025-10-11 12:19:21,338 - INFO - Grok reply for b41975ed44a99f5f9d39ae85: Hi! I'm great, thanks. How are you?
+2025-10-11 12:27:07,665 - INFO - User logged in via Cognito
+2025-10-11 12:27:45,434 - INFO - Grok reply for shared_global_thread: The United States has 50 states.
+2025-10-11 12:28:28,330 - INFO - Grok reply for shared_global_thread: The time difference between the US and Pakistan (PKT, UTC+5) varies by US region due to multiple time zones:
+
+- Eastern Time (e.g., New York): 10 hours behind Pakistan.
+- Central Time (e.g., Chicago):
+2025-10-11 12:29:16,647 - INFO - User logged in via Cognito
+2025-10-11 12:29:51,995 - INFO - Grok reply for shared_global_thread: Alaska is the coldest state in the US, with an average annual temperature of about 26°F (-3°C). For the contiguous US, North Dakota holds that title at around 42°F (6°C).
+2025-10-11 14:24:16,575 - INFO - User logged in via Cognito
+2025-10-11 14:24:35,123 - INFO - Grok reply for shared_global_thread: Hi! How can I help?
+2025-10-11 14:25:02,823 - INFO - Grok reply for shared_global_thread: Pakistan has 4 provinces: Punjab, Sindh, Khyber Pakhtunkhwa, and Balochistan.
+2025-10-11 14:26:04,906 - INFO - User logged in via Cognito
+2025-10-11 14:26:23,247 - INFO - Grok reply for shared_global_thread: Punjab.
+2025-10-13 07:15:40,537 - INFO - User logged in via Cognito
+2025-10-13 07:15:40,872 - ERROR - Exception on /chat-ui [GET]
+Traceback (most recent call last):
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/app.py", line 168, in chat_ui
+    return render_template("chat.html", messages=messages, note=note)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: chat.html
+2025-10-13 08:13:10,260 - INFO - Starting Inception backend... SHARED_THREAD=False
+2025-10-13 08:13:10,264 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-13 08:13:10,265 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 08:13:18,350 - INFO - 39.63.62.138 - - [13/Oct/2025 08:13:18] "GET / HTTP/1.0" 200 -
+2025-10-13 08:13:23,645 - ERROR - Cognito not configured
+2025-10-13 08:13:23,645 - INFO - 39.63.62.138 - - [13/Oct/2025 08:13:23] "[35m[1mGET /login HTTP/1.0[0m" 500 -
+2025-10-13 08:13:25,118 - ERROR - Cognito not configured
+2025-10-13 08:13:25,119 - INFO - 39.63.62.138 - - [13/Oct/2025 08:13:25] "[35m[1mGET /login HTTP/1.0[0m" 500 -
+2025-10-13 08:22:59,844 - INFO - Starting Inception backend... SHARED_THREAD=False
+2025-10-13 08:22:59,847 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-13 08:22:59,848 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 08:23:11,561 - ERROR - Cognito not configured
+2025-10-13 08:23:11,562 - INFO - 39.63.62.138 - - [13/Oct/2025 08:23:11] "[35m[1mGET /login HTTP/1.0[0m" 500 -
+2025-10-13 08:24:31,531 - INFO - Starting Inception backend... SHARED_THREAD=False
+2025-10-13 08:24:31,534 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-13 08:24:31,534 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 08:24:46,144 - ERROR - Cognito not configured
+2025-10-13 08:24:46,144 - INFO - 39.63.62.138 - - [13/Oct/2025 08:24:46] "[35m[1mGET /login HTTP/1.0[0m" 500 -
+2025-10-13 08:24:46,704 - INFO - 176.65.141.86 - - [13/Oct/2025 08:24:46] "[33mGET /cgi-bin/luci/;stok=/locale HTTP/1.0[0m" 404 -
+2025-10-13 08:24:50,458 - ERROR - Cognito not configured
+2025-10-13 08:24:50,458 - INFO - 39.63.62.138 - - [13/Oct/2025 08:24:50] "[35m[1mGET /login HTTP/1.0[0m" 500 -
+2025-10-13 08:27:55,627 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-13 08:27:55,630 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-13 08:27:55,630 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 08:28:04,075 - INFO - 39.63.62.138 - - [13/Oct/2025 08:28:04] "[32mGET /login HTTP/1.0[0m" 302 -
+2025-10-13 08:28:15,721 - INFO - User logged in via Cognito
+2025-10-13 08:28:15,723 - INFO - 39.63.62.138 - - [13/Oct/2025 08:28:15] "[32mGET /callback?code=434137c0-9f98-4fc5-9e52-5018b105ce22 HTTP/1.0[0m" 302 -
+2025-10-13 08:28:16,087 - ERROR - Exception on /chat-ui [GET]
+Traceback (most recent call last):
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/routes/chat.py", line 22, in chat_ui
+    return render_template("chat.html", messages=messages, note=note)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: chat.html
+2025-10-13 08:28:16,095 - INFO - 39.63.62.138 - - [13/Oct/2025 08:28:16] "[35m[1mGET /chat-ui HTTP/1.0[0m" 500 -
+2025-10-13 08:31:48,877 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-13 08:31:48,880 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-13 08:31:48,880 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 08:31:52,946 - INFO - 39.63.62.138 - - [13/Oct/2025 08:31:52] "GET /chat-ui HTTP/1.0" 200 -
+2025-10-13 08:31:53,331 - INFO - 39.63.62.138 - - [13/Oct/2025 08:31:53] "GET /static/css/chat.css HTTP/1.0" 200 -
+2025-10-13 08:32:15,627 - INFO - Grok reply for shared_global_thread: 50.
+2025-10-13 08:32:15,628 - INFO - 39.63.62.138 - - [13/Oct/2025 08:32:15] "[32mPOST /chat HTTP/1.0[0m" 302 -
+2025-10-13 08:32:15,962 - INFO - 39.63.62.138 - - [13/Oct/2025 08:32:15] "GET /chat-ui HTTP/1.0" 200 -
+2025-10-13 08:32:55,091 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-13 08:32:55,094 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-13 08:32:55,094 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-13 08:33:02,765 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:02] "[31m[1mGET /chat HTTP/1.0[0m" 405 -
+2025-10-13 08:33:05,941 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:05] "[31m[1mGET /chat HTTP/1.0[0m" 405 -
+2025-10-13 08:33:08,538 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:08] "GET / HTTP/1.0" 200 -
+2025-10-13 08:33:12,626 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:12] "[32mGET /login HTTP/1.0[0m" 302 -
+2025-10-13 08:33:13,905 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:13] "[32mGET /login HTTP/1.0[0m" 302 -
+2025-10-13 08:33:15,183 - INFO - User logged in via Cognito
+2025-10-13 08:33:15,185 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:15] "[32mGET /callback?code=90384555-8c9b-4087-a5d7-a0af1f557cb5 HTTP/1.0[0m" 302 -
+2025-10-13 08:33:15,523 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:15] "GET /chat-ui HTTP/1.0" 200 -
+2025-10-13 08:33:27,592 - INFO - Grok reply for shared_global_thread: Alaska.
+2025-10-13 08:33:27,592 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:27] "[32mPOST /chat HTTP/1.0[0m" 302 -
+2025-10-13 08:33:27,958 - INFO - 39.63.62.138 - - [13/Oct/2025 08:33:27] "GET /chat-ui HTTP/1.0" 200 -
+2025-10-13 08:42:45,358 - INFO - User logged in via Cognito
+2025-10-13 08:43:05,358 - INFO - User logged in via Cognito
+2025-10-13 13:10:07,425 - INFO - User logged in via Cognito
+2025-10-13 13:10:32,888 - INFO - User logged in via Cognito
+2025-10-14 08:14:12,770 - INFO - User logged in via Cognito
+2025-10-14 08:14:13,328 - ERROR - Exception on /chat-ui [GET]
+Traceback (most recent call last):
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/routes/chat.py", line 24, in chat_ui
+    if not template_path or not (Path(template_path) / "chat.html").exists():
+                                 ^^^^
+NameError: name 'Path' is not defined
+2025-10-14 08:17:38,081 - INFO - Grok reply for shared_global_thread: GITEX Global is the world's largest technology and innovation exhibition and conference, held annually in Dubai, UAE. It showcases emerging tech, startups, AI, cybersecurity, and more, attracting glob
+2025-10-14 08:38:50,774 - INFO - User logged in via Cognito
+2025-10-14 08:39:20,875 - INFO - Grok reply for shared_global_thread: I'm doing great, thanks—always ready for a cosmic chat or a quick wit. How about you?
+2025-10-14 08:59:10,527 - INFO - Grok reply for shared_global_thread: GITEX Global is one of the world's largest technology exhibitions and conferences, held annually in Dubai, United Arab Emirates. Organized by the Dubai World Trade Centre, it brings together global le
+2025-10-14 09:13:57,648 - INFO - User logged in via Cognito
+2025-10-14 09:14:38,764 - INFO - Grok reply for shared_global_thread: ### Umbrella Waterfall, Sajjikot
+
+Umbrella Waterfall is a stunning natural wonder located in the village of Sajjikot, in the Tehsil of Pind Dadan Khan, Jhelum District, Punjab Province, Pakistan. Nest
+2025-10-14 11:47:10,795 - INFO - User logged in via Cognito

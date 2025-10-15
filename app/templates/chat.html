@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CEA Chat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>🤖 Chat with CEA</h2>
+    <small class="note">{{ note }}</small>
+
+    <div class="msgs" id="msgs">
+      {% if messages %}
+        {% for m in messages %}
+          {% set cls = 'user' if m.role == 'user' else 'bot' %}
+          <div class="msg {{ cls }}">
+            <b>{{ m.role|capitalize }}:</b>
+            <span class="content">{{ m.content|e }}</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        <i>No messages yet.</i>
+      {% endif %}
+    </div>
+
+    <form action="/chat" method="post" id="chatForm">
+      <textarea name="message" rows="3" placeholder="Type your message..." required></textarea><br>
+      <button>Send</button>
+    </form>
+
+    <a class="logout" href="/logout">Logout</a>
+  </div>
+
+  <!-- Optional: auto-scroll to bottom -->
+  <script>
+    (function() {
+      var msgs = document.getElementById('msgs');
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    })();
+  </script>
+</body>
+</html>
+

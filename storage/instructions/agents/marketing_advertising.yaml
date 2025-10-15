@@ -1,0 +1,14 @@
+department: marketing
+description: Handles daily ad performance reviews and reports findings to CEA.
+memory:
+  last_run: '2025-10-14T13:52:00.723749+00:00'
+  last_summary: ''
+name: Marketing Advertising Agent
+schedule:
+  time: '10:00'
+  type: daily
+tasks:
+- action: summarize_ads
+  description: Fetch and summarize ad campaign performance.
+  enabled: true
+  id: check_ads

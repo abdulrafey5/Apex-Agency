@@ -1,0 +1,14 @@
+agents:
+- marketing_advertising.yaml
+- marketing_copywriting.yaml
+- marketing_social_media.yaml
+- marketing_influencer_team.yaml
+- marketing_newsletter_team.yaml
+- marketing_video_team.yaml
+- marketing_content_creation.yaml
+department: marketing
+description: Coordinates all marketing agents for tasks assigned by CEA.
+memory:
+  last_run: '2025-10-14T16:58:14.468372+00:00'
+  last_summary: ''
+name: Marketing DM

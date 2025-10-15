@@ -1,0 +1,957 @@
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 8, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 15, in <module>
+    logging.basicConfig(
+  File "/usr/lib/python3.12/logging/__init__.py", line 2118, in basicConfig
+    h = FileHandler(filename, mode,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1231, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/logging/__init__.py", line 1263, in _open
+    return open_func(self.baseFilename, self.mode,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/data/inception/app/logs/agentzero.log'
+2025-10-14 13:10:00,290 [INFO] 🚀 Agent Zero runner started.
+/data/inception/app/services/agent_zero_runner.py:33: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.utcnow()
+2025-10-14 13:10:00,307 [INFO] 🤖 Executing Marketing Advertising Agent tasks...
+2025-10-14 13:10:00,309 [INFO] 🧩 Running task: check_ads — Fetch and summarize ad campaign performance.
+2025-10-14 13:10:02,310 [INFO] ✅ Completed Marketing Advertising Agent cycle.
+/data/inception/app/services/agent_zero_runner.py:68: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  agent.setdefault("memory", {})["last_run"] = datetime.utcnow().isoformat()
+2025-10-14 13:10:02,312 [INFO] 🕓 Updated last_run for marketing_advertising.yaml
+2025-10-14 13:10:04,300 [INFO] 🚀 Agent Zero runner started.
+/data/inception/app/services/agent_zero_runner.py:33: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.utcnow()
+2025-10-14 13:31:01,989 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 13:31:01,997 [ERROR] ❌ Error in Agent Zero runner loop: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 97, in main
+    if should_run(schedule, last_run):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/services/agent_zero_runner.py", line 53, in should_run
+    if last_run is None or now > last_run + timedelta(days=1):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: can't compare offset-naive and offset-aware datetimes
+2025-10-14 13:32:02,034 [ERROR] ❌ Error in Agent Zero runner loop: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 97, in main
+    if should_run(schedule, last_run):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/services/agent_zero_runner.py", line 53, in should_run
+    if last_run is None or now > last_run + timedelta(days=1):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: can't compare offset-naive and offset-aware datetimes
+2025-10-14 13:33:02,044 [ERROR] ❌ Error in Agent Zero runner loop: can't compare offset-naive and offset-aware datetimes
+Traceback (most recent call last):
+  File "/data/inception/app/services/agent_zero_runner.py", line 97, in main
+    if should_run(schedule, last_run):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/inception/app/services/agent_zero_runner.py", line 53, in should_run
+    if last_run is None or now > last_run + timedelta(days=1):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: can't compare offset-naive and offset-aware datetimes
+2025-10-14 13:33:48,456 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 13:43:27,392 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 13:47:17,022 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 13:47:58,672 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 13:51:58,723 [INFO] 🤖 Executing Marketing Advertising Agent tasks...
+2025-10-14 13:51:58,723 [INFO] 🧩 Running task: check_ads — Fetch and summarize ad campaign performance.
+2025-10-14 13:52:00,723 [INFO] ✅ Completed Marketing Advertising Agent cycle.
+2025-10-14 13:52:00,724 [INFO] 🕓 Updated last_run for marketing_advertising.yaml
+2025-10-14 13:52:06,498 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 16:58:14,372 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 16:58:14,404 [INFO] 👔 Executing DM tasks for Customer Service DM...
+2025-10-14 16:58:14,404 [INFO] ✅ DM Customer Service DM completed cycle.
+2025-10-14 16:58:14,411 [INFO] 👔 Executing DM tasks for Finance DM...
+2025-10-14 16:58:14,412 [INFO] ✅ DM Finance DM completed cycle.
+2025-10-14 16:58:14,418 [INFO] 👔 Executing DM tasks for Product Service DM...
+2025-10-14 16:58:14,421 [INFO] ✅ DM Product Service DM completed cycle.
+2025-10-14 16:58:14,423 [INFO] 👔 Executing DM tasks for Sales DM...
+2025-10-14 16:58:14,424 [INFO] ✅ DM Sales DM completed cycle.
+2025-10-14 16:58:14,431 [INFO] 👔 Executing DM tasks for Partnerships DM...
+2025-10-14 16:58:14,431 [INFO] ✅ DM Partnerships DM completed cycle.
+2025-10-14 16:58:14,436 [INFO] 👔 Executing DM tasks for BI DM...
+2025-10-14 16:58:14,439 [INFO] ✅ DM BI DM completed cycle.
+2025-10-14 16:58:14,444 [INFO] 👔 Executing DM tasks for Technology DM...
+2025-10-14 16:58:14,447 [INFO] ✅ DM Technology DM completed cycle.
+2025-10-14 16:58:14,451 [INFO] 👔 Executing DM tasks for Legal DM...
+2025-10-14 16:58:14,452 [INFO] ✅ DM Legal DM completed cycle.
+2025-10-14 16:58:14,460 [INFO] 👔 Executing DM tasks for Marketing DM...
+2025-10-14 16:58:14,468 [INFO] ✅ DM Marketing DM completed cycle.
+2025-10-14 16:58:14,475 [INFO] 👔 Executing DM tasks for HR DM...
+2025-10-14 16:58:14,476 [INFO] ✅ DM HR DM completed cycle.
+2025-10-14 16:58:39,445 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 16:58:39,770 [INFO] 🚀 Agent Zero runner started.
+2025-10-14 16:58:51,909 [INFO] 🚀 Agent Zero runner started.

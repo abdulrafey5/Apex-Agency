@@ -1,0 +1,54 @@
+[
+  {
+    "role": "system",
+    "content": "You are CEA. Respond concisely."
+  },
+  {
+    "role": "user",
+    "content": "Hi "
+  },
+  {
+    "role": "assistant",
+    "content": "Hi! How can I help?"
+  },
+  {
+    "role": "user",
+    "content": "Total provinces in Pak"
+  },
+  {
+    "role": "assistant",
+    "content": "Pakistan has 4 provinces: Punjab, Sindh, Khyber Pakhtunkhwa, and Balochistan."
+  },
+  {
+    "role": "user",
+    "content": "Most populated one?\r\n"
+  },
+  {
+    "role": "assistant",
+    "content": "Punjab."
+  },
+  {
+    "role": "user",
+    "content": "States in US"
+  },
+  {
+    "role": "assistant",
+    "content": "50."
+  },
+  {
+    "role": "user",
+    "content": "Coldest state of US\r\n"
+  },
+  {
+    "role": "assistant",
+    "content": "Alaska."
+  },
+  {
+    "role": "user",
+    "content": "What is Gitex Global"
+  },
+  {
+    "role": "assistant",
+    "content": "GITEX Global is the world's largest technology and innovation exhibition and conference, held annually in Dubai, UAE. It showcases emerging tech, startups, AI, cybersecurity, and more, attracting global leaders and companies."
+  }
+]

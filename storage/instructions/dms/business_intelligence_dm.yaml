@@ -1,0 +1,13 @@
+agents:
+- business_intelligence_competitive_analysis.yaml
+- business_intelligence_customer_insights.yaml
+- business_intelligence_dashboarding.yaml
+- business_intelligence_funnel_analysis.yaml
+- business_intelligence_kpi_data_analysis.yaml
+- business_intelligence_market_intelligence.yaml
+department: business_intelligence
+description: Coordinates all business intelligence agents.
+memory:
+  last_run: '2025-10-14T16:58:14.439465+00:00'
+  last_summary: ''
+name: BI DM

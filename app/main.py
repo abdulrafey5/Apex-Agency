@@ -54,7 +54,7 @@ app.config["GROK"] = {
 }
 
 app.config["SHARED_THREAD"] = (
-    os.getenv("SHARED_THREAD", "false").strip().lower() in ("1", "true", "yes")
+    os.getenv("SHARED_THREAD", "true").strip().lower() in ("1", "true", "yes")
 )
 app.config.update(
     CHAT_DIR=str(CHAT_DIR),

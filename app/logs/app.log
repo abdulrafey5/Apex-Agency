@@ -582,3 +582,246 @@ Umbrella Waterfall is a stunning natural wonder located in the village of Sajjik
 2025-10-15 14:26:21,247 - INFO - CEA directly delegated complex marketing task task_20251015_092621 to 3 agents
 2025-10-15 14:26:21,249 - INFO - 127.0.0.1 - - [15/Oct/2025 14:26:21] "GET /debug-delegation HTTP/1.1" 200 -
 2025-10-15 14:26:35,129 - INFO - 127.0.0.1 - - [15/Oct/2025 14:26:35] "[32mGET /login HTTP/1.1[0m" 302 -
+2025-10-15 15:09:05,758 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:09:05,781 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:09:05,781 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:09:11,948 - INFO - 127.0.0.1 - - [15/Oct/2025 15:09:11] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:09:12,045 - INFO - 127.0.0.1 - - [15/Oct/2025 15:09:12] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:09:12,077 - INFO - 127.0.0.1 - - [15/Oct/2025 15:09:12] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:09:14,895 - INFO - 127.0.0.1 - - [15/Oct/2025 15:09:14] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:09:14,920 - INFO - 127.0.0.1 - - [15/Oct/2025 15:09:14] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:09:20,279 - INFO - 127.0.0.1 - - [15/Oct/2025 15:09:20] "GET / HTTP/1.1" 200 -
+2025-10-15 15:09:25,677 - INFO - 127.0.0.1 - - [15/Oct/2025 15:09:25] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:09:25,717 - INFO - 127.0.0.1 - - [15/Oct/2025 15:09:25] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:10:30,052 - INFO - === TESTING FULL DELEGATION FLOW ===
+2025-10-15 15:10:30,055 - INFO - CEA directly delegated complex marketing task task_20251015_101030 to 3 agents
+2025-10-15 15:10:30,140 - ERROR - Agent marketing_content_creation.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 15:10:30,140 - ERROR - Agent marketing_social_media.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 15:10:30,141 - ERROR - Agent marketing_advertising.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 15:10:30,141 - ERROR - Agent marketing_content_creation.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 15:10:30,142 - ERROR - Agent marketing_social_media.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 15:10:30,142 - ERROR - Agent marketing_advertising.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 15:10:30,143 - ERROR - Agent marketing_content_creation.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 15:10:30,143 - ERROR - Agent marketing_social_media.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 15:10:30,143 - ERROR - Agent marketing_advertising.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 15:10:30,144 - ERROR - Failed to synthesize final response: Grok API key not configured
+2025-10-15 15:10:30,145 - INFO - 127.0.0.1 - - [15/Oct/2025 15:10:30] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 15:13:42,605 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:13:42,633 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:13:42,633 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:13:56,948 - INFO - === TESTING FULL DELEGATION FLOW ===
+2025-10-15 15:13:56,954 - INFO - CEA directly delegated complex marketing task task_20251015_101356 to 3 agents
+2025-10-15 15:13:57,002 - ERROR - Agent marketing_content_creation.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 15:13:57,002 - ERROR - Agent marketing_social_media.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 15:13:57,003 - ERROR - Agent marketing_advertising.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 15:13:57,004 - ERROR - Agent marketing_content_creation.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 15:13:57,004 - ERROR - Agent marketing_social_media.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 15:13:57,005 - ERROR - Agent marketing_advertising.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 15:13:57,006 - ERROR - Agent marketing_content_creation.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 15:13:57,006 - ERROR - Agent marketing_social_media.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 15:13:57,007 - ERROR - Agent marketing_advertising.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 15:13:57,008 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-15 15:13:57,010 - INFO - 127.0.0.1 - - [15/Oct/2025 15:13:57] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 15:20:39,774 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:20:39,806 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:20:39,807 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:20:43,393 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:20:43,420 - INFO - 127.0.0.1 - - [15/Oct/2025 15:20:43] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:20:52,268 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:20:52,272 - INFO - 127.0.0.1 - - [15/Oct/2025 15:20:52] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:20:54,268 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:20:54,270 - INFO - 127.0.0.1 - - [15/Oct/2025 15:20:54] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:20:58,821 - INFO - 127.0.0.1 - - [15/Oct/2025 15:20:58] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:20:58,907 - INFO - 127.0.0.1 - - [15/Oct/2025 15:20:58] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:23:03,244 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:23:03,271 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:23:03,271 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:23:07,110 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:23:07,115 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:07] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:23:08,915 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:23:08,918 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:08] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:23:08,981 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:08] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:23:10,363 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:23:10,365 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:10] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:23:10,427 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:23:10,608 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:23:10,612 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:10] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:23:10,657 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:23:10,803 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:23:10,806 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:10] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:23:10,856 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:23:10,958 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:23:10,961 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:10] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:23:11,002 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:11] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:23:40,655 - INFO - CEA analyzing task: hello...
+2025-10-15 15:23:40,656 - ERROR - Failed to analyze and delegate task task_20251015_102340: Grok API key not configured
+2025-10-15 15:23:40,687 - INFO - CEA reply for shared_global_thread: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+2025-10-15 15:23:40,689 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:40] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 15:23:40,741 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:40] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:23:40,830 - INFO - 127.0.0.1 - - [15/Oct/2025 15:23:40] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:24:31,817 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {"model": "grok-4-fast"})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 7, in grok_chat
+    raise RuntimeError("Grok API key not configured")
+RuntimeError: Grok API key not configured
+2025-10-15 15:24:31,822 - INFO - 127.0.0.1 - - [15/Oct/2025 15:24:31] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:27:45,838 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:27:45,868 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:27:45,868 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:27:55,261 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 21, in grok_chat
+    r.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\dell\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:27:55,293 - INFO - 127.0.0.1 - - [15/Oct/2025 15:27:55] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:28:37,532 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 21, in grok_chat
+    r.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\dell\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:28:37,537 - INFO - 127.0.0.1 - - [15/Oct/2025 15:28:37] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:30:15,885 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:30:15,917 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:30:15,918 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:30:21,167 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 21, in grok_chat
+    r.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\dell\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:30:21,174 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:21] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:30:25,494 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 21, in grok_chat
+    r.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\dell\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:30:25,498 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:25] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:30:25,548 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:30:28,496 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:28] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:30:28,589 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:28] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-15 15:30:28,655 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:28] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:30:36,358 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:36] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:30:36,394 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:36] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -

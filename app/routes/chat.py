@@ -89,17 +89,25 @@ def debug_grok():
 def debug_delegation():
     """Test CEA delegation system."""
     try:
-        from services.cea_delegation_service import analyze_and_delegate, delegate_cea_task
-        # Test with a more complex request that should trigger delegation
+        from services.grok_service import grok_chat
+
+        # First test direct Grok call
+        test_agent = grok_chat([
+            {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+            {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+        ], {})
+
+        # Then test full delegation flow
+        from services.cea_delegation_service import delegate_cea_task
         test_message = "Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new article, and a facebook ad with a static image to promote it."
 
-        # Test full delegation flow
         logging.info("=== TESTING FULL DELEGATION FLOW ===")
         result = delegate_cea_task(test_message, [])
 
         return jsonify({
             "status": "success",
             "test_message": test_message,
+            "direct_grok_test": test_agent[:200] + "..." if len(test_agent) > 200 else test_agent,
             "response": result[:500] + "..." if len(result) > 500 else result,
             "flow_completed": True
         })

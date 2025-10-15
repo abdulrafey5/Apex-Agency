@@ -1,3 +1,4 @@
+name: Marketing Content Creation Agent
 role: Content Creation Specialist
 department: marketing
 purpose: Create engaging content for various marketing channels and campaigns
@@ -25,3 +26,14 @@ capabilities:
 - Content calendar planning
 - Visual content conceptualization
 - Performance content analysis
+schedule:
+  time: '09:00'
+  type: daily
+tasks:
+- action: create_content
+  description: Generate new blog content and social media posts.
+  enabled: true
+  id: daily_content
+memory:
+  last_run: '2025-10-14T09:00:00.000000+00:00'
+  last_summary: ''

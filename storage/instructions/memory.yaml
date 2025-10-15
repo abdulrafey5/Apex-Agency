@@ -55,4 +55,55 @@ conversation:
   content: hello
 - role: assistant
   content: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+- role: user
+  content: What is most popular name
+- role: assistant
+  content: I understand you're asking about 'What is most popular name'. I'm here to help with business tasks, project coordination,
+    and strategic planning. What specific assistance do you need?
+- role: user
+  content: "Ok give me a sample prompt i can give you to ask these type of questions\r\n"
+- role: assistant
+  content: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+- role: user
+  content: number of cities in pakistan
+- role: assistant
+  content: I understand you're asking about 'number of cities in pakistan'. I'm here to help with business tasks, project
+    coordination, and strategic planning. What specific assistance do you need?
+- role: user
+  content: Total number of cities in pakistan?
+- role: assistant
+  content: I understand you're asking about 'Total number of cities in pakistan?'. I'm here to help with business tasks, project
+    coordination, and strategic planning. What specific assistance do you need?
+- role: user
+  content: "Ok give me a sample prompt i can give you to ask these type of questions\r\n"
+- role: assistant
+  content: "I understand you're asking about 'Ok give me a sample prompt i can give you to ask these type of questions\r\n\
+    '. I'm here to help with business tasks, project coordination, and strategic planning. What specific assistance do you\
+    \ need?"
+- role: user
+  content: '"What is the capital of Pakistan?"'
+- role: assistant
+  content: I understand you're asking about '"What is the capital of Pakistan?"'. I'm here to help with business tasks, project
+    coordination, and strategic planning. What specific assistance do you need?
+- role: user
+  content: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters,
+    and advertising banners.
+- role: assistant
+  content: I understand you're asking about 'Create a comprehensive marketing campaign for our new product launch including
+    social media posts, email newsletters, and advertising banners.'. I'm here to help with business tasks, project coordination,
+    and strategic planning. What specific assistance do you need?
+- role: user
+  content: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters,
+    and advertising banners.
+- role: assistant
+  content: I understand you're asking about 'Create a comprehensive marketing campaign for our new product launch including
+    social media posts, email newsletters, and advertising banners.'. I'm here to help with business tasks, project coordination,
+    and strategic planning. What specific assistance do you need?
+- role: user
+  content: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters,
+    and advertising banners.
+- role: assistant
+  content: I understand you're asking about 'Create a comprehensive marketing campaign for our new product launch including
+    social media posts, email newsletters, and advertising banners.'. I'm here to help with business tasks, project coordination,
+    and strategic planning. What specific assistance do you need?
 shared_context: {}

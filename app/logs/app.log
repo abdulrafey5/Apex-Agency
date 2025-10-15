@@ -825,3 +825,133 @@ requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://api.
 2025-10-15 15:30:28,655 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:28] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
 2025-10-15 15:30:36,358 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:36] "GET /chat-ui HTTP/1.1" 200 -
 2025-10-15 15:30:36,394 - INFO - 127.0.0.1 - - [15/Oct/2025 15:30:36] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:44:28,332 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:44:28,359 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:44:28,360 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:44:30,912 - INFO - 127.0.0.1 - - [15/Oct/2025 15:44:30] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:44:31,061 - INFO - 127.0.0.1 - - [15/Oct/2025 15:44:31] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:44:37,029 - INFO - CEA determined simple message, no delegation needed: hi
+
+2025-10-15 15:44:38,340 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:44:38,360 - INFO - CEA reply for shared_global_thread: Hello! I'm CEA, your Chief Executive Agent. How can I help you today?
+2025-10-15 15:44:38,363 - INFO - 127.0.0.1 - - [15/Oct/2025 15:44:38] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 15:44:38,439 - INFO - 127.0.0.1 - - [15/Oct/2025 15:44:38] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:44:38,480 - INFO - 127.0.0.1 - - [15/Oct/2025 15:44:38] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:45:41,195 - INFO - CEA analyzing task: Sacred place of Muslims
+...
+2025-10-15 15:45:42,417 - ERROR - Failed to analyze and delegate task task_20251015_104541: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:45:42,439 - INFO - CEA reply for shared_global_thread: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+2025-10-15 15:45:42,441 - INFO - 127.0.0.1 - - [15/Oct/2025 15:45:42] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 15:45:42,508 - INFO - 127.0.0.1 - - [15/Oct/2025 15:45:42] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:45:42,559 - INFO - 127.0.0.1 - - [15/Oct/2025 15:45:42] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:46:02,408 - INFO - CEA analyzing task: Coldest state of US...
+2025-10-15 15:46:04,102 - ERROR - Failed to analyze and delegate task task_20251015_104602: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:46:04,127 - INFO - CEA reply for shared_global_thread: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+2025-10-15 15:46:04,129 - INFO - 127.0.0.1 - - [15/Oct/2025 15:46:04] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 15:46:04,219 - INFO - 127.0.0.1 - - [15/Oct/2025 15:46:04] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:46:04,263 - INFO - 127.0.0.1 - - [15/Oct/2025 15:46:04] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:53:27,598 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:53:27,639 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:53:27,639 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:53:30,642 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:30] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:53:30,823 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:30] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:53:35,015 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:35] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:53:35,051 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:35] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-15 15:53:35,077 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:35] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 15:53:37,265 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:37] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:53:37,288 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:37] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:53:50,782 - INFO - CEA determined conversational query, no delegation needed: What is most popular name
+2025-10-15 15:53:51,929 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:53:51,951 - INFO - CEA reply for shared_global_thread: I understand you're asking about 'What is most popular name'. I'm here to help with business tasks, project coordination, and strategic planning. What specific assistance do you need?
+2025-10-15 15:53:51,952 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:51] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 15:53:52,004 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:52] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:53:52,035 - INFO - 127.0.0.1 - - [15/Oct/2025 15:53:52] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:54:31,936 - INFO - CEA analyzing task: Ok give me a sample prompt i can give you to ask these type of questions
+...
+2025-10-15 15:54:33,181 - ERROR - Failed to analyze and delegate task task_20251015_105431: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:54:33,203 - INFO - CEA reply for shared_global_thread: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+2025-10-15 15:54:33,208 - INFO - 127.0.0.1 - - [15/Oct/2025 15:54:33] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 15:54:33,282 - INFO - 127.0.0.1 - - [15/Oct/2025 15:54:33] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:54:33,319 - INFO - 127.0.0.1 - - [15/Oct/2025 15:54:33] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:59:04,590 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 15:59:04,616 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 15:59:04,617 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 15:59:11,490 - ERROR - Debug delegation failed
+Traceback (most recent call last):
+  File "C:\Users\dell\Apex-Agency\app\routes\chat.py", line 95, in debug_delegation
+    test_agent = grok_chat([
+        {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
+        {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
+    ], {})
+  File "C:\Users\dell\Apex-Agency\app\services\grok_service.py", line 21, in grok_chat
+    r.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\dell\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:59:11,496 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:11] "[35m[1mGET /debug-delegation HTTP/1.1[0m" 500 -
+2025-10-15 15:59:14,948 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:14] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:59:15,028 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:15] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:59:34,629 - INFO - CEA will respond directly to: number of cities in pakistan
+2025-10-15 15:59:36,328 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:59:36,353 - INFO - CEA reply for shared_global_thread: I understand you're asking about 'number of cities in pakistan'. I'm here to help with business tasks, project coordination, and strategic planning. What specific assistance do you need?
+2025-10-15 15:59:36,354 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:36] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 15:59:36,432 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:36] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:59:36,468 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:36] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 15:59:54,752 - INFO - CEA will respond directly to: Total number of cities in pakistan?
+2025-10-15 15:59:55,955 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 15:59:55,987 - INFO - CEA reply for shared_global_thread: I understand you're asking about 'Total number of cities in pakistan?'. I'm here to help with business tasks, project coordination, and strategic planning. What specific assistance do you need?
+2025-10-15 15:59:55,988 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:55] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 15:59:56,058 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:56] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 15:59:56,090 - INFO - 127.0.0.1 - - [15/Oct/2025 15:59:56] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 16:00:12,028 - INFO - CEA will respond directly to: Ok give me a sample prompt i can give you to ask these type of questions
+
+2025-10-15 16:00:13,209 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 16:00:13,236 - INFO - CEA reply for shared_global_thread: I understand you're asking about 'Ok give me a sample prompt i can give you to ask these type of questions
+'. I'm here to help with business tasks, project coordination, and strategic planning. What 
+2025-10-15 16:00:13,236 - INFO - 127.0.0.1 - - [15/Oct/2025 16:00:13] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 16:00:13,313 - INFO - 127.0.0.1 - - [15/Oct/2025 16:00:13] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 16:00:13,348 - INFO - 127.0.0.1 - - [15/Oct/2025 16:00:13] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 16:01:38,895 - INFO - CEA will respond directly to: "What is the capital of Pakistan?"
+2025-10-15 16:01:40,025 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 16:01:40,054 - INFO - CEA reply for shared_global_thread: I understand you're asking about '"What is the capital of Pakistan?"'. I'm here to help with business tasks, project coordination, and strategic planning. What specific assistance do you need?
+2025-10-15 16:01:40,056 - INFO - 127.0.0.1 - - [15/Oct/2025 16:01:40] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 16:01:40,128 - INFO - 127.0.0.1 - - [15/Oct/2025 16:01:40] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 16:01:40,164 - INFO - 127.0.0.1 - - [15/Oct/2025 16:01:40] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 16:02:12,338 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-15 16:02:13,491 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 16:02:13,520 - INFO - CEA reply for shared_global_thread: I understand you're asking about 'Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.'. I'm here to help with
+2025-10-15 16:02:13,521 - INFO - 127.0.0.1 - - [15/Oct/2025 16:02:13] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 16:02:13,585 - INFO - 127.0.0.1 - - [15/Oct/2025 16:02:13] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 16:02:13,615 - INFO - 127.0.0.1 - - [15/Oct/2025 16:02:13] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 16:03:10,412 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 16:03:10,453 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 16:03:10,461 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 16:03:13,021 - INFO - 127.0.0.1 - - [15/Oct/2025 16:03:13] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 16:03:13,170 - INFO - 127.0.0.1 - - [15/Oct/2025 16:03:13] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 16:03:20,700 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-15 16:03:22,618 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 16:03:22,679 - INFO - CEA reply for shared_global_thread: I understand you're asking about 'Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.'. I'm here to help with
+2025-10-15 16:03:22,680 - INFO - 127.0.0.1 - - [15/Oct/2025 16:03:22] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 16:03:22,797 - INFO - 127.0.0.1 - - [15/Oct/2025 16:03:22] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 16:03:22,854 - INFO - 127.0.0.1 - - [15/Oct/2025 16:03:22] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 16:04:13,810 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 16:04:13,832 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 16:04:13,833 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 16:04:18,581 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-15 16:04:19,766 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 16:04:19,770 - INFO - 127.0.0.1 - - [15/Oct/2025 16:04:19] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 16:04:20,786 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-15 16:04:21,933 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 16:04:21,937 - INFO - 127.0.0.1 - - [15/Oct/2025 16:04:21] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 16:04:52,492 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-15 16:04:53,666 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 16:04:53,704 - INFO - CEA reply for shared_global_thread: I understand you're asking about 'Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.'. I'm here to help with
+2025-10-15 16:04:53,705 - INFO - 127.0.0.1 - - [15/Oct/2025 16:04:53] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 16:04:53,805 - INFO - 127.0.0.1 - - [15/Oct/2025 16:04:53] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 16:04:53,880 - INFO - 127.0.0.1 - - [15/Oct/2025 16:04:53] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -

@@ -3,6 +3,15 @@ import logging
 
 
 def grok_chat(messages, grok_config):
+    # Try to get config from environment if not provided
+    if not grok_config:
+        import os
+        grok_config = {
+            "key": os.getenv("GROK_API_KEY"),
+            "url": os.getenv("GROK_API_URL", "https://api.x.ai/v1/chat/completions"),
+            "model": os.getenv("GROK_MODEL", "grok-4-fast")
+        }
+
     if not grok_config or not grok_config.get("key"):
         raise RuntimeError("Grok API key not configured")
 

@@ -435,3 +435,150 @@ NameError: name 'Path' is not defined
 
 Umbrella Waterfall is a stunning natural wonder located in the village of Sajjikot, in the Tehsil of Pind Dadan Khan, Jhelum District, Punjab Province, Pakistan. Nest
 2025-10-14 11:47:10,795 - INFO - User logged in via Cognito
+2025-10-15 13:17:50,062 - INFO - Starting Inception backend... SHARED_THREAD=False
+2025-10-15 13:17:50,113 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 13:17:50,113 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 13:23:19,833 - ERROR - Failed to analyze and delegate task task_20251015_082319: Grok API key not configured
+2025-10-15 13:23:19,841 - INFO - 127.0.0.1 - - [15/Oct/2025 13:23:19] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:23:20,018 - INFO - 127.0.0.1 - - [15/Oct/2025 13:23:20] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:23:52,608 - INFO - 127.0.0.1 - - [15/Oct/2025 13:23:52] "[35m[1mGET /debug-grok HTTP/1.1[0m" 500 -
+2025-10-15 13:24:11,118 - INFO - 127.0.0.1 - - [15/Oct/2025 13:24:11] "GET /healthz HTTP/1.1" 200 -
+2025-10-15 13:24:18,982 - INFO - 127.0.0.1 - - [15/Oct/2025 13:24:18] "[32mGET /chat-ui HTTP/1.1[0m" 302 -
+2025-10-15 13:24:19,007 - INFO - 127.0.0.1 - - [15/Oct/2025 13:24:19] "[32mGET /login HTTP/1.1[0m" 302 -
+2025-10-15 13:28:07,952 - INFO - Starting Inception backend... SHARED_THREAD=False
+2025-10-15 13:28:07,972 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 13:28:07,972 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 13:28:15,630 - ERROR - Failed to analyze and delegate task task_20251015_082815: Grok API key not configured
+2025-10-15 13:28:15,632 - INFO - 127.0.0.1 - - [15/Oct/2025 13:28:15] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:28:19,942 - INFO - 127.0.0.1 - - [15/Oct/2025 13:28:19] "[35m[1mGET /debug-grok HTTP/1.1[0m" 500 -
+2025-10-15 13:28:23,852 - INFO - 127.0.0.1 - - [15/Oct/2025 13:28:23] "GET /healthz HTTP/1.1" 200 -
+2025-10-15 13:28:25,670 - INFO - 127.0.0.1 - - [15/Oct/2025 13:28:25] "GET /healthz HTTP/1.1" 200 -
+2025-10-15 13:30:10,473 - ERROR - Failed to analyze and delegate task task_20251015_083010: Grok API key not configured
+2025-10-15 13:30:10,474 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:10] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:30:10,541 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:12,886 - ERROR - Failed to analyze and delegate task task_20251015_083012: Grok API key not configured
+2025-10-15 13:30:12,887 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:12] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:30:12,941 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:12] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:14,395 - ERROR - Failed to analyze and delegate task task_20251015_083014: Grok API key not configured
+2025-10-15 13:30:14,396 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:14] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:30:14,450 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:14] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:15,112 - ERROR - Failed to analyze and delegate task task_20251015_083015: Grok API key not configured
+2025-10-15 13:30:15,113 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:15] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:30:15,161 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:15,386 - ERROR - Failed to analyze and delegate task task_20251015_083015: Grok API key not configured
+2025-10-15 13:30:15,386 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:15] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:30:15,439 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:15,550 - ERROR - Failed to analyze and delegate task task_20251015_083015: Grok API key not configured
+2025-10-15 13:30:15,551 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:15] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:30:15,600 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:15,708 - ERROR - Failed to analyze and delegate task task_20251015_083015: Grok API key not configured
+2025-10-15 13:30:15,709 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:15] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 13:30:15,754 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:20,270 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:20] "[35m[1mGET /debug-grok HTTP/1.1[0m" 500 -
+2025-10-15 13:30:20,324 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:20] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:28,121 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:28] "GET /healthz HTTP/1.1" 200 -
+2025-10-15 13:30:28,176 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:28] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 13:30:29,872 - INFO - 127.0.0.1 - - [15/Oct/2025 13:30:29] "GET /healthz HTTP/1.1" 200 -
+2025-10-15 14:06:43,007 - INFO - Starting Inception backend... SHARED_THREAD=False
+2025-10-15 14:06:43,109 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 14:06:43,110 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 14:06:56,483 - INFO - CEA analyzing task: Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new artic...
+2025-10-15 14:06:56,484 - ERROR - Failed to analyze and delegate task task_20251015_090656: Grok API key not configured
+2025-10-15 14:06:56,487 - INFO - 127.0.0.1 - - [15/Oct/2025 14:06:56] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:06:56,716 - INFO - 127.0.0.1 - - [15/Oct/2025 14:06:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 14:08:10,022 - INFO - 127.0.0.1 - - [15/Oct/2025 14:08:10] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-15 14:08:14,752 - INFO - CEA analyzing task: Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new artic...
+2025-10-15 14:08:14,801 - ERROR - Failed to analyze and delegate task task_20251015_090814: Grok API key not configured
+2025-10-15 14:08:14,965 - INFO - 127.0.0.1 - - [15/Oct/2025 14:08:14] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:08:16,103 - INFO - 127.0.0.1 - - [15/Oct/2025 14:08:16] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-15 14:12:31,425 - INFO - 127.0.0.1 - - [15/Oct/2025 14:12:31] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:12:31,588 - INFO - 127.0.0.1 - - [15/Oct/2025 14:12:31] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-15 14:12:31,665 - INFO - 127.0.0.1 - - [15/Oct/2025 14:12:31] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 14:12:53,110 - INFO - 127.0.0.1 - - [15/Oct/2025 14:12:53] "[32mGET /login HTTP/1.1[0m" 302 -
+2025-10-15 14:13:09,771 - INFO - 127.0.0.1 - - [15/Oct/2025 14:13:09] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:13:09,835 - INFO - 127.0.0.1 - - [15/Oct/2025 14:13:09] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 14:13:09,895 - INFO - 127.0.0.1 - - [15/Oct/2025 14:13:09] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 14:14:02,513 - INFO - CEA analyzing task: “Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new arti...
+2025-10-15 14:14:02,515 - ERROR - Failed to analyze and delegate task task_20251015_091402: Grok API key not configured
+2025-10-15 14:14:02,519 - INFO - CEA reply for d3c8e1881d0fd11cfb54482f: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+2025-10-15 14:14:02,522 - INFO - 127.0.0.1 - - [15/Oct/2025 14:14:02] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 14:14:02,563 - INFO - 127.0.0.1 - - [15/Oct/2025 14:14:02] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:14:02,596 - INFO - 127.0.0.1 - - [15/Oct/2025 14:14:02] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 14:17:05,490 - INFO - CEA analyzing task: Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new artic...
+2025-10-15 14:17:05,503 - ERROR - Failed to analyze and delegate task task_20251015_091705: Grok API key not configured
+2025-10-15 14:17:05,591 - INFO - 127.0.0.1 - - [15/Oct/2025 14:17:05] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:17:21,025 - INFO - CEA analyzing task:  “Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new art...
+2025-10-15 14:17:21,026 - ERROR - Failed to analyze and delegate task task_20251015_091721: Grok API key not configured
+2025-10-15 14:17:21,028 - INFO - CEA reply for d3c8e1881d0fd11cfb54482f: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+2025-10-15 14:17:21,030 - INFO - 127.0.0.1 - - [15/Oct/2025 14:17:21] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 14:17:21,072 - INFO - 127.0.0.1 - - [15/Oct/2025 14:17:21] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:17:21,106 - INFO - 127.0.0.1 - - [15/Oct/2025 14:17:21] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 14:17:36,202 - INFO - CEA analyzing task: Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new artic...
+2025-10-15 14:17:36,202 - ERROR - Failed to analyze and delegate task task_20251015_091736: Grok API key not configured
+2025-10-15 14:17:36,203 - INFO - 127.0.0.1 - - [15/Oct/2025 14:17:36] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:17:56,363 - INFO - Starting Inception backend... SHARED_THREAD=False
+2025-10-15 14:17:56,391 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 14:17:56,391 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 14:18:00,998 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:00] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:18:01,111 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:01] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 14:18:03,108 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:03] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:18:03,134 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:03] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-15 14:18:03,166 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:03] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-15 14:18:07,733 - INFO - CEA directly delegated complex marketing task task_20251015_091807 to 3 agents
+2025-10-15 14:18:07,818 - ERROR - Agent marketing_content_creation.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 14:18:07,820 - ERROR - Agent marketing_social_media.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 14:18:07,821 - ERROR - Agent marketing_advertising.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 14:18:07,821 - ERROR - Agent marketing_content_creation.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 14:18:07,822 - ERROR - Agent marketing_social_media.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 14:18:07,823 - ERROR - Agent marketing_advertising.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 14:18:07,823 - ERROR - Agent marketing_content_creation.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 14:18:07,824 - ERROR - Agent marketing_social_media.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 14:18:07,825 - ERROR - Agent marketing_advertising.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 14:18:07,826 - ERROR - Failed to synthesize final response: Grok API key not configured
+2025-10-15 14:18:07,828 - INFO - CEA reply for d3c8e1881d0fd11cfb54482f: Task completed with some results, but final synthesis failed: {'marketing': {'marketing_content_creation.yaml': {'status': 'failed', 'error': 'Max iterations (3) reached', 'iterations': 3, 'feedback_h
+2025-10-15 14:18:07,829 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:07] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 14:18:07,855 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:07] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:18:07,879 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:07] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 14:18:12,016 - INFO - CEA directly delegated complex marketing task task_20251015_091812 to 3 agents
+2025-10-15 14:18:12,017 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:12] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:18:13,691 - INFO - CEA directly delegated complex marketing task task_20251015_091813 to 3 agents
+2025-10-15 14:18:13,692 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:13] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:18:54,818 - INFO - CEA analyzing task: “Create a new post for the Sleep section of the blog every day at 9am and send word about it through...
+2025-10-15 14:18:54,821 - ERROR - Failed to analyze and delegate task task_20251015_091854: Grok API key not configured
+2025-10-15 14:18:54,833 - INFO - CEA reply for d3c8e1881d0fd11cfb54482f: I apologize, but I couldn't analyze your request properly. Please try rephrasing.
+2025-10-15 14:18:54,837 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:54] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 14:18:54,871 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:54] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:18:54,910 - INFO - 127.0.0.1 - - [15/Oct/2025 14:18:54] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 14:21:16,456 - INFO - Starting Inception backend... SHARED_THREAD=False
+2025-10-15 14:21:16,478 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 14:21:16,478 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 14:21:22,050 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:22] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:21:22,139 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:22] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 14:21:26,217 - INFO - CEA delegated recurring automation task task_20251015_092126 to 2 agents
+2025-10-15 14:21:26,240 - ERROR - Agent marketing_content_creation.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 14:21:26,241 - ERROR - Agent marketing_social_media.yaml failed on iteration 1: Grok API key not configured
+2025-10-15 14:21:26,241 - ERROR - Agent marketing_content_creation.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 14:21:26,242 - ERROR - Agent marketing_social_media.yaml failed on iteration 2: Grok API key not configured
+2025-10-15 14:21:26,243 - ERROR - Agent marketing_content_creation.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 14:21:26,243 - ERROR - Agent marketing_social_media.yaml failed on iteration 3: Grok API key not configured
+2025-10-15 14:21:26,244 - ERROR - Failed to synthesize final response: Grok API key not configured
+2025-10-15 14:21:26,246 - INFO - CEA reply for d3c8e1881d0fd11cfb54482f: Task completed with some results, but final synthesis failed: {'marketing': {'marketing_content_creation.yaml': {'status': 'failed', 'error': 'Max iterations (3) reached', 'iterations': 3, 'feedback_h
+2025-10-15 14:21:26,251 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:26] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-15 14:21:26,279 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:26] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-15 14:21:26,309 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:26] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 14:21:34,293 - INFO - CEA directly delegated complex marketing task task_20251015_092134 to 3 agents
+2025-10-15 14:21:34,295 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:34] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:21:41,940 - INFO - CEA directly delegated complex marketing task task_20251015_092141 to 3 agents
+2025-10-15 14:21:41,942 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:41] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:21:49,158 - INFO - CEA directly delegated complex marketing task task_20251015_092149 to 3 agents
+2025-10-15 14:21:49,159 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:49] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:21:50,640 - INFO - CEA directly delegated complex marketing task task_20251015_092150 to 3 agents
+2025-10-15 14:21:50,643 - INFO - 127.0.0.1 - - [15/Oct/2025 14:21:50] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:26:21,247 - INFO - CEA directly delegated complex marketing task task_20251015_092621 to 3 agents
+2025-10-15 14:26:21,249 - INFO - 127.0.0.1 - - [15/Oct/2025 14:26:21] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-15 14:26:35,129 - INFO - 127.0.0.1 - - [15/Oct/2025 14:26:35] "[32mGET /login HTTP/1.1[0m" 302 -

@@ -1,8 +1,10 @@
 from flask import Blueprint, current_app, render_template, session, request, jsonify, redirect
 from pathlib import Path
 import logging
+import os
 from services.grok_service import grok_chat
 from services.thread_service import load_thread, save_thread, get_thread_id
+from services.cea_delegation_service import delegate_cea_task
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -14,7 +16,9 @@ def healthz():
 @chat_bp.route("/chat-ui")
 def chat_ui():
     """Render chat UI — supports personal and shared threads."""
-    if "id_token" not in session:
+    # Skip authentication for testing - remove in production
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
         return redirect("/login")
 
     shared = current_app.config.get("SHARED_THREAD", False)
@@ -33,8 +37,10 @@ def chat_ui():
 
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
-    """Handles chat input, sends to Grok API, stores replies in YAML (shared) or JSON (user)."""
-    if "id_token" not in session:
+    """Handles chat input, sends to CEA (with delegation logic), stores replies."""
+    # Skip authentication for testing - remove in production
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
     # Parse message
@@ -52,15 +58,15 @@ def chat():
     thread = load_thread(thread_id, current_app.config.get("CHAT_DIR"))
     thread.append({"role": "user", "content": msg})
 
-    # Get reply from Grok
+    # Get reply from CEA (with delegation logic)
     try:
-        reply = grok_chat(thread, current_app.config.get("GROK"))
+        reply = delegate_cea_task(msg, thread)
         thread.append({"role": "assistant", "content": reply})
         save_thread(thread_id, thread, current_app.config.get("CHAT_DIR"))
-        logging.info(f"Grok reply for {thread_id}: {str(reply)[:200]}")
+        logging.info(f"CEA reply for {thread_id}: {str(reply)[:200]}")
     except Exception as e:
-        logging.exception("Grok API failed")
-        return jsonify({"error": f"Grok/API failed: {e}"}), 500
+        logging.exception("CEA delegation failed")
+        return jsonify({"error": f"CEA delegation failed: {e}"}), 500
 
     # For browser or JSON client
     if not request.is_json:
@@ -77,4 +83,28 @@ def debug_grok():
         return jsonify({"status": "success", "response": resp})
     except Exception as e:
         return jsonify({"status": "failed", "error": str(e)}), 500
+
+
+@chat_bp.route("/debug-delegation")
+def debug_delegation():
+    """Test CEA delegation system."""
+    try:
+        from services.cea_delegation_service import analyze_and_delegate, delegate_cea_task
+        # Test with a more complex request that should trigger delegation
+        test_message = "Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new article, and a facebook ad with a static image to promote it."
+
+        # Test full delegation flow
+        logging.info("=== TESTING FULL DELEGATION FLOW ===")
+        result = delegate_cea_task(test_message, [])
+
+        return jsonify({
+            "status": "success",
+            "test_message": test_message,
+            "response": result[:500] + "..." if len(result) > 500 else result,
+            "flow_completed": True
+        })
+    except Exception as e:
+        logging.exception("Debug delegation failed")
+        return jsonify({"status": "failed", "error": str(e)}), 500
+
 

@@ -1,0 +1,10 @@
+agents:
+- product_service_fulfillment.yaml
+- product_service_rnd.yaml
+- product_service_strategy.yaml
+department: product_service
+description: Coordinates all product/service agents.
+memory:
+  last_run: '2025-10-14T16:58:14.421101+00:00'
+  last_summary: ''
+name: Product Service DM

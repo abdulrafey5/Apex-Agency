@@ -91,25 +91,29 @@ def debug_delegation():
     try:
         from services.grok_service import grok_chat
 
-        # First test direct Grok call
-        test_agent = grok_chat([
-            {"role": "system", "content": "You are a Content Creation Specialist. Create a blog post about mindfulness. Respond with JSON: {\"status\": \"completed\", \"output\": \"your content here\", \"confidence\": 0.9}"},
-            {"role": "user", "content": "Write a short blog post about mindfulness for beginners"}
-        ], {})
+        # Test 1: Direct Grok API call
+        try:
+            direct_test = grok_chat([
+                {"role": "user", "content": "What is 2+2? Answer in one word."}
+            ], {})
+            api_working = "API Working" in direct_test or "4" in direct_test
+        except Exception as e:
+            direct_test = f"API Failed: {str(e)}"
+            api_working = False
 
-        # Then test full delegation flow
+        # Test 2: Simple CEA response
         from services.cea_delegation_service import delegate_cea_task
-        test_message = "Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new article, and a facebook ad with a static image to promote it."
+        simple_test = delegate_cea_task("What is the capital of Pakistan?", [])
 
-        logging.info("=== TESTING FULL DELEGATION FLOW ===")
-        result = delegate_cea_task(test_message, [])
+        # Test 3: Complex delegation
+        complex_test = delegate_cea_task("Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new article, and a facebook ad with a static image to promote it.", [])
 
         return jsonify({
-            "status": "success",
-            "test_message": test_message,
-            "direct_grok_test": test_agent[:200] + "..." if len(test_agent) > 200 else test_agent,
-            "response": result[:500] + "..." if len(result) > 500 else result,
-            "flow_completed": True
+            "api_status": "working" if api_working else "failed",
+            "direct_grok_test": direct_test[:200] + "..." if len(direct_test) > 200 else direct_test,
+            "simple_cea_test": simple_test[:200] + "..." if len(simple_test) > 200 else simple_test,
+            "complex_delegation_test": complex_test[:300] + "..." if len(complex_test) > 300 else complex_test,
+            "tests_completed": True
         })
     except Exception as e:
         logging.exception("Debug delegation failed")

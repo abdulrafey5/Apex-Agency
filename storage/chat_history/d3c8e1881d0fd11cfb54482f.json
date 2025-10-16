@@ -1,0 +1,46 @@
+[
+  {
+    "role": "system",
+    "content": "You are CEA. Respond concisely."
+  },
+  {
+    "role": "user",
+    "content": "\u201cPrepare a new post on the Mindfulness section of my blog, along with a post on X about the new article, and a facebook ad with a static image to promote it.\u201d \r\n"
+  },
+  {
+    "role": "assistant",
+    "content": "I apologize, but I couldn't analyze your request properly. Please try rephrasing."
+  },
+  {
+    "role": "user",
+    "content": " \u201cPrepare a new post on the Mindfulness section of my blog, along with a post on X about the new article, and a facebook ad with a static image to promote it.\u201d "
+  },
+  {
+    "role": "assistant",
+    "content": "I apologize, but I couldn't analyze your request properly. Please try rephrasing."
+  },
+  {
+    "role": "user",
+    "content": " \u201cPrepare a new post on the Mindfulness section of my blog, along with a post on X about the new article, and a facebook ad with a static image to promote it.\u201d \r\n"
+  },
+  {
+    "role": "assistant",
+    "content": "Task completed with some results, but final synthesis failed: {'marketing': {'marketing_content_creation.yaml': {'status': 'failed', 'error': 'Max iterations (3) reached', 'iterations': 3, 'feedback_history': []}, 'marketing_social_media.yaml': {'status': 'failed', 'error': 'Max iterations (3) reached', 'iterations': 3, 'feedback_history': []}, 'marketing_advertising.yaml': {'status': 'failed', 'error': 'Max iterations (3) reached', 'iterations': 3, 'feedback_history': []}}}"
+  },
+  {
+    "role": "user",
+    "content": "\u201cCreate a new post for the Sleep section of the blog every day at 9am and send word about it through all free channels.\u201d\r\n\r\n"
+  },
+  {
+    "role": "assistant",
+    "content": "I apologize, but I couldn't analyze your request properly. Please try rephrasing."
+  },
+  {
+    "role": "user",
+    "content": "\"Create a new post for the Sleep section of the blog every day at 9am and send word about it through all free channels.\""
+  },
+  {
+    "role": "assistant",
+    "content": "Task completed with some results, but final synthesis failed: {'marketing': {'marketing_content_creation.yaml': {'status': 'failed', 'error': 'Max iterations (3) reached', 'iterations': 3, 'feedback_history': []}, 'marketing_social_media.yaml': {'status': 'failed', 'error': 'Max iterations (3) reached', 'iterations': 3, 'feedback_history': []}}}"
+  }
+]

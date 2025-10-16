@@ -90,29 +90,38 @@ def debug_delegation():
     """Test CEA delegation system."""
     try:
         from services.grok_service import grok_chat
+        from services.cea_delegation_service import analyze_and_delegate
 
         # Test 1: Direct Grok API call
         try:
             direct_test = grok_chat([
-                {"role": "user", "content": "What is 2+2? Answer in one word."}
+                {"role": "user", "content": "What is 2+2? Answer with just the number."}
             ], {})
-            api_working = "API Working" in direct_test or "4" in direct_test
+            api_working = direct_test.strip() in ["4", "Four", "four"] or "4" in direct_test
         except Exception as e:
             direct_test = f"API Failed: {str(e)}"
             api_working = False
 
-        # Test 2: Simple CEA response
+        # Test 2: Delegation Analysis
+        test_message = "Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners."
+        test_task = analyze_and_delegate(test_message, [])
+        delegation_info = {
+            "task_status": test_task.status,
+            "delegations_count": len(test_task.delegations),
+            "departments": list(set(d["department"] for d in test_task.delegations)) if test_task.delegations else [],
+            "agents": [d["agent_file"] for d in test_task.delegations] if test_task.delegations else [],
+            "test_message": test_message
+        }
+
+        # Test 3: Simple CEA response
         from services.cea_delegation_service import delegate_cea_task
         simple_test = delegate_cea_task("What is the capital of Pakistan?", [])
 
-        # Test 3: Complex delegation
-        complex_test = delegate_cea_task("Prepare a new post on the Mindfulness section of my blog, along with a post on X about the new article, and a facebook ad with a static image to promote it.", [])
-
         return jsonify({
             "api_status": "working" if api_working else "failed",
+            "delegation_analysis": delegation_info,
             "direct_grok_test": direct_test[:200] + "..." if len(direct_test) > 200 else direct_test,
             "simple_cea_test": simple_test[:200] + "..." if len(simple_test) > 200 else simple_test,
-            "complex_delegation_test": complex_test[:300] + "..." if len(complex_test) > 300 else complex_test,
             "tests_completed": True
         })
     except Exception as e:

@@ -955,3 +955,139 @@ requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://api.
 2025-10-15 16:04:53,705 - INFO - 127.0.0.1 - - [15/Oct/2025 16:04:53] "[32mPOST /chat HTTP/1.1[0m" 302 -
 2025-10-15 16:04:53,805 - INFO - 127.0.0.1 - - [15/Oct/2025 16:04:53] "GET /chat-ui HTTP/1.1" 200 -
 2025-10-15 16:04:53,880 - INFO - 127.0.0.1 - - [15/Oct/2025 16:04:53] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-15 16:30:51,640 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-15 16:30:51,664 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-15 16:30:51,665 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-15 16:30:59,646 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-15 16:31:00,965 - WARNING - Grok API failed for simple response, using fallback: 403 Client Error: Forbidden for url: https://api.x.ai/v1/chat/completions
+2025-10-15 16:31:00,969 - INFO - 127.0.0.1 - - [15/Oct/2025 16:31:00] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:01:34,930 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 11:01:34,994 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 11:01:34,995 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 11:01:58,112 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:02:00,227 - INFO - 127.0.0.1 - - [16/Oct/2025 11:02:00] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:02:00,330 - INFO - 127.0.0.1 - - [16/Oct/2025 11:02:00] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 11:02:52,262 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:02:54,343 - INFO - 127.0.0.1 - - [16/Oct/2025 11:02:54] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:05:10,446 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 11:05:10,468 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 11:05:10,468 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 11:05:19,897 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:05:22,857 - INFO - 127.0.0.1 - - [16/Oct/2025 11:05:22] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:06:00,463 - INFO - 127.0.0.1 - - [16/Oct/2025 11:06:00] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:06:00,607 - INFO - 127.0.0.1 - - [16/Oct/2025 11:06:00] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:06:32,589 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:06:45,947 - INFO - CEA reply for shared_global_thread: Below is a comprehensive marketing campaign plan for the launch of your new product. Since you didn't specify the product details, I'll assume it's a innovative fitness tracker called "FitTrack Pro" (
+2025-10-16 11:06:45,948 - INFO - 127.0.0.1 - - [16/Oct/2025 11:06:45] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 11:06:46,032 - INFO - 127.0.0.1 - - [16/Oct/2025 11:06:46] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:06:46,060 - INFO - 127.0.0.1 - - [16/Oct/2025 11:06:46] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:11:55,969 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:11:56,878 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:11:58,719 - INFO - 127.0.0.1 - - [16/Oct/2025 11:11:58] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:11:59,784 - INFO - 127.0.0.1 - - [16/Oct/2025 11:11:59] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:12:23,395 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 11:12:23,423 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 11:12:23,424 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 11:12:32,820 - INFO - CEA detected complex task, analyzing for delegation: "Create a comprehensive marketing campaign for our new product launch including social media posts, ...
+2025-10-16 11:12:32,821 - INFO - CEA will respond directly to: "Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners."
+2025-10-16 11:12:42,937 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:42] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:12:43,026 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:43] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:12:45,240 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:45] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:12:45,267 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:45] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-16 11:12:45,351 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 11:12:52,164 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:52] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:12:52,187 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:52] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-16 11:12:52,217 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:52] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 11:12:54,901 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:54] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:12:54,926 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:54] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-16 11:12:54,953 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:54] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 11:12:57,040 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:57] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:12:57,062 - INFO - 127.0.0.1 - - [16/Oct/2025 11:12:57] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:13:03,608 - WARNING - Grok API failed for simple response, using fallback: HTTPSConnectionPool(host='api.x.ai', port=443): Read timed out. (read timeout=30)
+2025-10-16 11:13:03,663 - INFO - CEA reply for shared_global_thread: I understand you're asking about '"Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners."'. I'm here to help wi
+2025-10-16 11:13:03,664 - INFO - 127.0.0.1 - - [16/Oct/2025 11:13:03] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 11:13:05,269 - INFO - CEA detected complex task, analyzing for delegation: "Create a comprehensive marketing campaign for our new product launch including social media posts, ...
+2025-10-16 11:13:05,270 - INFO - CEA will respond directly to: "Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners."
+
+2025-10-16 11:13:30,594 - INFO - CEA reply for shared_global_thread: ### Comprehensive Marketing Campaign for New Product Launch: "EcoPure Water Bottle"
+
+#### Campaign Overview
+**Product**: EcoPure Water Bottle – A sustainable, BPA-free, insulated bottle that keeps dri
+2025-10-16 11:13:30,598 - INFO - 127.0.0.1 - - [16/Oct/2025 11:13:30] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 11:13:30,694 - INFO - 127.0.0.1 - - [16/Oct/2025 11:13:30] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:13:30,723 - INFO - 127.0.0.1 - - [16/Oct/2025 11:13:30] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:14:04,184 - INFO - CEA detected complex task, analyzing for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:14:04,185 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:14:07,425 - INFO - 127.0.0.1 - - [16/Oct/2025 11:14:07] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:14:25,780 - INFO - CEA detected complex task, analyzing for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:14:25,781 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:14:28,365 - INFO - 127.0.0.1 - - [16/Oct/2025 11:14:28] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:17:59,138 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 11:17:59,165 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 11:17:59,166 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 11:18:06,032 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:18:06,032 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:18:06,032 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:18:06,033 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:18:09,154 - INFO - 127.0.0.1 - - [16/Oct/2025 11:18:09] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:19:13,707 - INFO - CEA analyzing request for delegation: create a marketing post on social media for new product launch of perfumes...
+2025-10-16 11:19:13,708 - INFO - CEA will respond directly to: create a marketing post on social media for new product launch of perfumes
+2025-10-16 11:19:17,949 - INFO - 127.0.0.1 - - [16/Oct/2025 11:19:17] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 11:19:18,045 - INFO - 127.0.0.1 - - [16/Oct/2025 11:19:18] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:19:18,144 - INFO - 127.0.0.1 - - [16/Oct/2025 11:19:18] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:19:34,297 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:19:34,298 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:19:34,298 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:19:34,299 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:19:36,053 - INFO - 127.0.0.1 - - [16/Oct/2025 11:19:36] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:20:18,338 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:20:18,338 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:20:33,427 - INFO - CEA reply for shared_global_thread: ### Comprehensive Marketing Campaign for New Product Launch: EcoSmart Water Bottle
+
+**Campaign Overview**  
+Launch a new eco-friendly, smart water bottle (EcoSmart) that tracks hydration via app integ
+2025-10-16 11:20:33,428 - INFO - 127.0.0.1 - - [16/Oct/2025 11:20:33] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 11:20:33,519 - INFO - 127.0.0.1 - - [16/Oct/2025 11:20:33] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:20:33,549 - INFO - 127.0.0.1 - - [16/Oct/2025 11:20:33] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:20:47,729 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:20:47,729 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:20:47,730 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:20:47,731 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:20:50,171 - INFO - 127.0.0.1 - - [16/Oct/2025 11:20:50] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:22:15,370 - INFO - 127.0.0.1 - - [16/Oct/2025 11:22:15] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:22:15,405 - INFO - 127.0.0.1 - - [16/Oct/2025 11:22:15] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:24:07,827 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 11:24:07,847 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 11:24:07,850 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 11:24:13,850 - INFO - 127.0.0.1 - - [16/Oct/2025 11:24:13] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:24:13,923 - INFO - 127.0.0.1 - - [16/Oct/2025 11:24:13] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:24:20,381 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:24:20,381 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+
+2025-10-16 11:24:28,634 - INFO - CEA reply for shared_global_thread: ### Comprehensive Marketing Campaign for NovaPhone X1 Launch
+
+**Campaign Overview**  
+This campaign promotes the NovaPhone X1, a revolutionary smartphone with AI-powered camera, 5-day battery life, an
+2025-10-16 11:24:28,635 - INFO - 127.0.0.1 - - [16/Oct/2025 11:24:28] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 11:24:28,752 - INFO - 127.0.0.1 - - [16/Oct/2025 11:24:28] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:24:28,786 - INFO - 127.0.0.1 - - [16/Oct/2025 11:24:28] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:24:38,634 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:24:38,635 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:24:38,635 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:24:38,635 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:24:40,400 - INFO - 127.0.0.1 - - [16/Oct/2025 11:24:40] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:26:44,817 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 11:26:44,837 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 11:26:44,838 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 11:26:59,497 - INFO - CEA FORCE delegating marketing task: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 11:26:59,498 - INFO - CEA force-delegated to 3 marketing agents
+2025-10-16 11:26:59,498 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:26:59,499 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:27:02,673 - INFO - 127.0.0.1 - - [16/Oct/2025 11:27:02] "GET /debug-delegation HTTP/1.1" 200 -

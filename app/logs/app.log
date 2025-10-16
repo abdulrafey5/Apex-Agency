@@ -1091,3 +1091,309 @@ This campaign promotes the NovaPhone X1, a revolutionary smartphone with AI-powe
 2025-10-16 11:26:59,498 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
 2025-10-16 11:26:59,499 - INFO - CEA will respond directly to: What is the capital of Pakistan?
 2025-10-16 11:27:02,673 - INFO - 127.0.0.1 - - [16/Oct/2025 11:27:02] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:38:07,622 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 11:38:07,655 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 11:38:07,656 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 11:38:17,592 - INFO - 127.0.0.1 - - [16/Oct/2025 11:38:17] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:38:17,672 - INFO - 127.0.0.1 - - [16/Oct/2025 11:38:17] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:38:27,023 - INFO - CEA FORCE delegating marketing task: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 11:38:27,023 - INFO - CEA force-delegated to 3 marketing agents
+2025-10-16 11:38:27,023 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:38:27,024 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:38:29,179 - INFO - 127.0.0.1 - - [16/Oct/2025 11:38:29] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:38:34,120 - INFO - CEA FORCE delegating marketing task: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 11:38:34,121 - INFO - CEA force-delegated to 3 marketing agents
+2025-10-16 11:38:34,122 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:38:34,122 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:38:37,596 - INFO - 127.0.0.1 - - [16/Oct/2025 11:38:37] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:40:38,758 - INFO - CEA analyzing request for delegation: “Create a new post for the Sleep section of the blog every day at 9am and send word about it through...
+2025-10-16 11:40:38,759 - INFO - CEA delegated recurring automation task task_20251016_064038 to 2 agents
+2025-10-16 11:40:38,852 - ERROR - Agent marketing_content_creation.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 11:40:38,853 - ERROR - Agent marketing_social_media.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 11:40:38,854 - ERROR - Agent marketing_content_creation.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 11:40:38,854 - ERROR - Agent marketing_social_media.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 11:40:38,855 - ERROR - Agent marketing_content_creation.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 11:40:38,855 - ERROR - Agent marketing_social_media.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 11:40:38,856 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 11:40:38,939 - INFO - 127.0.0.1 - - [16/Oct/2025 11:40:38] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 11:40:39,051 - INFO - 127.0.0.1 - - [16/Oct/2025 11:40:39] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:40:39,079 - INFO - 127.0.0.1 - - [16/Oct/2025 11:40:39] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:41:42,133 - INFO - CEA FORCE delegating marketing task: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 11:41:42,133 - INFO - CEA force-delegated to 3 marketing agents
+2025-10-16 11:41:42,133 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:41:42,134 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:41:44,666 - INFO - 127.0.0.1 - - [16/Oct/2025 11:41:44] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:57:39,556 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 11:57:39,578 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 11:57:39,578 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 11:57:54,997 - INFO - 127.0.0.1 - - [16/Oct/2025 11:57:54] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:57:55,084 - INFO - 127.0.0.1 - - [16/Oct/2025 11:57:55] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-16 11:57:55,124 - INFO - 127.0.0.1 - - [16/Oct/2025 11:57:55] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 11:58:02,345 - INFO - CEA FORCE delegating complex task: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 11:58:02,346 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:58:02,346 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:58:02,347 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:58:02,347 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:58:03,919 - INFO - 127.0.0.1 - - [16/Oct/2025 11:58:03] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:58:03,962 - INFO - 127.0.0.1 - - [16/Oct/2025 11:58:03] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 11:58:30,209 - INFO - CEA analyzing request for delegation: Analyze our sales performance and create improvement recommendations...
+2025-10-16 11:58:30,210 - INFO - CEA will respond directly to: Analyze our sales performance and create improvement recommendations
+2025-10-16 11:58:45,409 - INFO - CEA reply for shared_global_thread: ### Sales Performance Analysis Framework
+
+To provide a tailored analysis, I'd need specific data such as sales figures (e.g., quarterly revenue, units sold), KPIs (e.g., conversion rates, customer acq
+2025-10-16 11:58:45,410 - INFO - 127.0.0.1 - - [16/Oct/2025 11:58:45] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 11:58:45,514 - INFO - 127.0.0.1 - - [16/Oct/2025 11:58:45] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 11:58:45,540 - INFO - 127.0.0.1 - - [16/Oct/2025 11:58:45] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 11:59:02,378 - INFO - CEA FORCE delegating complex task: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 11:59:02,379 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:59:02,379 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:59:02,379 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:59:02,380 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:59:04,493 - INFO - 127.0.0.1 - - [16/Oct/2025 11:59:04] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 11:59:57,055 - INFO - CEA FORCE delegating complex task: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 11:59:57,055 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 11:59:57,055 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 11:59:57,056 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 11:59:57,056 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 11:59:58,821 - INFO - 127.0.0.1 - - [16/Oct/2025 11:59:58] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:04:40,050 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 12:04:40,070 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 12:04:40,070 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 12:04:56,838 - INFO - 127.0.0.1 - - [16/Oct/2025 12:04:56] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:04:56,917 - INFO - 127.0.0.1 - - [16/Oct/2025 12:04:56] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-16 12:04:56,950 - INFO - 127.0.0.1 - - [16/Oct/2025 12:04:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 12:04:58,011 - INFO - 127.0.0.1 - - [16/Oct/2025 12:04:58] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:04:58,038 - INFO - 127.0.0.1 - - [16/Oct/2025 12:04:58] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:05:04,767 - INFO - CEA analyzing request for delegation: "Prepare a budget forecast for next quarter"...
+2025-10-16 12:05:04,768 - INFO - CEA analyzing request for delegation: "Prepare a budget forecast for next quarter"...
+2025-10-16 12:05:04,768 - INFO - CEA will respond directly to: "Prepare a budget forecast for next quarter"
+2025-10-16 12:05:26,153 - INFO - CEA reply for shared_global_thread: ### Budget Forecast for Next Quarter
+
+To prepare an accurate budget forecast, I need key details like your current financials (e.g., revenue streams, fixed/variable costs, historical data), industry, 
+2025-10-16 12:05:26,154 - INFO - 127.0.0.1 - - [16/Oct/2025 12:05:26] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 12:05:26,248 - INFO - 127.0.0.1 - - [16/Oct/2025 12:05:26] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:05:26,273 - INFO - 127.0.0.1 - - [16/Oct/2025 12:05:26] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:05:40,835 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 12:05:40,836 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 12:05:40,836 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 12:05:40,836 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 12:05:40,837 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 12:05:40,837 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 12:05:42,554 - INFO - 127.0.0.1 - - [16/Oct/2025 12:05:42] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:05:48,962 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 12:05:48,962 - INFO - CEA analyzing request for delegation: Create a comprehensive marketing campaign for our new product launch including social media posts, e...
+2025-10-16 12:05:48,962 - INFO - CEA will respond directly to: Create a comprehensive marketing campaign for our new product launch including social media posts, email newsletters, and advertising banners.
+2025-10-16 12:05:48,963 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 12:05:48,963 - INFO - CEA analyzing request for delegation: What is the capital of Pakistan?...
+2025-10-16 12:05:48,963 - INFO - CEA will respond directly to: What is the capital of Pakistan?
+2025-10-16 12:05:53,157 - INFO - 127.0.0.1 - - [16/Oct/2025 12:05:53] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:05:53,202 - INFO - 127.0.0.1 - - [16/Oct/2025 12:05:53] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 12:09:32,801 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 12:09:32,823 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 12:09:32,823 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 12:09:41,625 - INFO - 127.0.0.1 - - [16/Oct/2025 12:09:41] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:09:41,717 - INFO - 127.0.0.1 - - [16/Oct/2025 12:09:41] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:09:45,661 - INFO - 127.0.0.1 - - [16/Oct/2025 12:09:45] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:09:45,683 - INFO - 127.0.0.1 - - [16/Oct/2025 12:09:45] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-16 12:09:45,723 - INFO - 127.0.0.1 - - [16/Oct/2025 12:09:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 12:10:02,632 - INFO - CEA FORCE delegating to test full system: "Prepare a budget forecast for next quarter"
+2025-10-16 12:10:02,632 - INFO - CEA force-delegated to demonstrate multi-department coordination
+2025-10-16 12:10:02,727 - ERROR - Agent marketing_content_creation.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:10:02,727 - ERROR - Agent sales_appointment_setters.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:10:02,728 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:10:02,729 - ERROR - Agent marketing_content_creation.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:10:02,729 - ERROR - Agent sales_appointment_setters.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:10:02,730 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:10:02,731 - ERROR - Agent marketing_content_creation.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:10:02,731 - ERROR - Agent sales_appointment_setters.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:10:02,732 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:10:02,732 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:10:02,833 - INFO - 127.0.0.1 - - [16/Oct/2025 12:10:02] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 12:10:02,958 - INFO - 127.0.0.1 - - [16/Oct/2025 12:10:02] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:10:02,997 - INFO - 127.0.0.1 - - [16/Oct/2025 12:10:02] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:10:35,916 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:10:35,916 - INFO - CEA force-delegated to demonstrate multi-department coordination
+2025-10-16 12:10:35,917 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:10:35,917 - INFO - CEA force-delegated to demonstrate multi-department coordination
+2025-10-16 12:10:35,947 - ERROR - Agent marketing_content_creation.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:10:35,948 - ERROR - Agent sales_appointment_setters.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:10:35,949 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:10:35,950 - ERROR - Agent marketing_content_creation.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:10:35,950 - ERROR - Agent sales_appointment_setters.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:10:35,951 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:10:35,951 - ERROR - Agent marketing_content_creation.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:10:35,952 - ERROR - Agent sales_appointment_setters.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:10:35,952 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:10:35,960 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:10:35,962 - INFO - 127.0.0.1 - - [16/Oct/2025 12:10:35] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:13:09,868 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 12:13:09,893 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 12:13:09,894 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 12:13:15,593 - INFO - 127.0.0.1 - - [16/Oct/2025 12:13:15] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:13:15,680 - INFO - 127.0.0.1 - - [16/Oct/2025 12:13:15] "GET /static/css/chat.css HTTP/1.1" 200 -
+2025-10-16 12:13:15,746 - INFO - 127.0.0.1 - - [16/Oct/2025 12:13:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 12:13:19,262 - INFO - 127.0.0.1 - - [16/Oct/2025 12:13:19] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:13:19,288 - INFO - 127.0.0.1 - - [16/Oct/2025 12:13:19] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:13:46,107 - INFO - CEA FORCE delegating to test full system: Prepare a budget forecast for next quarter
+2025-10-16 12:13:46,107 - INFO - CEA smart-delegated to 1 agents across 1 departments
+2025-10-16 12:13:46,147 - ERROR - Agent finance_budgeting.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:13:46,147 - ERROR - Agent finance_budgeting.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:13:46,148 - ERROR - Agent finance_budgeting.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:13:46,149 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:13:46,234 - INFO - 127.0.0.1 - - [16/Oct/2025 12:13:46] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 12:13:46,324 - INFO - 127.0.0.1 - - [16/Oct/2025 12:13:46] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:13:46,345 - INFO - 127.0.0.1 - - [16/Oct/2025 12:13:46] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:14:00,879 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:14:00,880 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:14:00,880 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:14:00,881 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:14:00,894 - ERROR - Agent marketing_content_creation.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:14:00,895 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 1: Grok API key not configured
+2025-10-16 12:14:00,896 - ERROR - Agent marketing_content_creation.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:14:00,897 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 2: Grok API key not configured
+2025-10-16 12:14:00,898 - ERROR - Agent marketing_content_creation.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:14:00,898 - ERROR - Agent business_intelligence_market_intelligence.yaml failed on iteration 3: Grok API key not configured
+2025-10-16 12:14:00,899 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:14:00,900 - INFO - 127.0.0.1 - - [16/Oct/2025 12:14:00] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:18:10,158 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 12:18:10,180 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 12:18:10,180 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 12:18:16,361 - INFO - CEA FORCE delegating to test full system: "Prepare a budget forecast for next quarter"
+2025-10-16 12:18:16,361 - INFO - CEA smart-delegated to 1 agents across 1 departments
+2025-10-16 12:18:16,472 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:18:16,585 - INFO - 127.0.0.1 - - [16/Oct/2025 12:18:16] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 12:18:16,715 - INFO - 127.0.0.1 - - [16/Oct/2025 12:18:16] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:18:16,789 - INFO - 127.0.0.1 - - [16/Oct/2025 12:18:16] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:18:41,052 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:18:41,052 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:18:41,052 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:18:41,053 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:18:41,180 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:18:41,181 - INFO - 127.0.0.1 - - [16/Oct/2025 12:18:41] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:19:00,876 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:19:00,877 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:19:00,878 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:19:00,878 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:19:01,003 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:19:01,005 - INFO - 127.0.0.1 - - [16/Oct/2025 12:19:01] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:27:25,671 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 12:27:25,716 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 12:27:25,717 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 12:27:34,244 - INFO - 127.0.0.1 - - [16/Oct/2025 12:27:34] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:27:34,315 - INFO - 127.0.0.1 - - [16/Oct/2025 12:27:34] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:28:21,436 - INFO - CEA FORCE delegating to test full system: Give a post for marketing campaign of my new product perfume
+2025-10-16 12:28:21,436 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:28:21,564 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:28:21,679 - INFO - 127.0.0.1 - - [16/Oct/2025 12:28:21] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 12:28:21,785 - INFO - 127.0.0.1 - - [16/Oct/2025 12:28:21] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:28:21,812 - INFO - 127.0.0.1 - - [16/Oct/2025 12:28:21] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:29:23,428 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:29:23,428 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:29:23,429 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:29:23,429 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:29:23,595 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:29:23,597 - INFO - 127.0.0.1 - - [16/Oct/2025 12:29:23] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:29:26,611 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:29:26,612 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:29:26,613 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:29:26,613 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:29:26,749 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:29:26,750 - INFO - 127.0.0.1 - - [16/Oct/2025 12:29:26] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:30:02,136 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:30:02,136 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:30:02,137 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:30:02,137 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:30:02,267 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:30:02,268 - INFO - 127.0.0.1 - - [16/Oct/2025 12:30:02] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:30:13,017 - INFO - 127.0.0.1 - - [16/Oct/2025 12:30:13] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:30:13,051 - INFO - 127.0.0.1 - - [16/Oct/2025 12:30:13] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:36:58,759 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:36:58,760 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:36:58,760 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:36:58,761 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:36:58,885 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:36:58,887 - INFO - 127.0.0.1 - - [16/Oct/2025 12:36:58] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:37:52,424 - INFO - CEA FORCE delegating to test full system: Prepare a budget forecast for next quarter
+2025-10-16 12:37:52,434 - INFO - CEA smart-delegated to 1 agents across 1 departments
+2025-10-16 12:37:52,819 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:37:55,782 - INFO - 127.0.0.1 - - [16/Oct/2025 12:37:55] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 12:37:56,096 - INFO - 127.0.0.1 - - [16/Oct/2025 12:37:56] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:37:56,136 - INFO - 127.0.0.1 - - [16/Oct/2025 12:37:56] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:38:32,316 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:38:32,316 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:38:32,316 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:38:32,317 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:38:32,451 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:38:32,453 - INFO - 127.0.0.1 - - [16/Oct/2025 12:38:32] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:41:48,548 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 12:41:48,570 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 12:41:48,571 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 12:41:57,721 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:41:57,722 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:41:57,724 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:41:57,724 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:41:57,849 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:41:57,851 - INFO - 127.0.0.1 - - [16/Oct/2025 12:41:57] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:42:25,034 - INFO - CEA FORCE delegating to test full system: Give a short post on perfume launch for marketing
+2025-10-16 12:42:25,034 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:42:25,165 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:42:25,284 - INFO - 127.0.0.1 - - [16/Oct/2025 12:42:25] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 12:42:25,415 - INFO - 127.0.0.1 - - [16/Oct/2025 12:42:25] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 12:42:25,493 - INFO - 127.0.0.1 - - [16/Oct/2025 12:42:25] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 12:42:58,708 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 12:42:58,709 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 12:42:58,710 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 12:42:58,711 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 12:42:58,823 - ERROR - Failed to improve synthesis: Grok API key not configured
+2025-10-16 12:42:58,824 - INFO - 127.0.0.1 - - [16/Oct/2025 12:42:58] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 12:42:58,889 - INFO - 127.0.0.1 - - [16/Oct/2025 12:42:58] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 13:14:56,367 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 13:14:56,392 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 13:14:56,393 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 13:15:07,637 - INFO - 127.0.0.1 - - [16/Oct/2025 13:15:07] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 13:15:07,717 - INFO - 127.0.0.1 - - [16/Oct/2025 13:15:07] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 13:15:13,744 - INFO - CEA FORCE delegating to test full system: Prepare a budget forecast for next quarter"
+2025-10-16 13:15:13,745 - INFO - CEA smart-delegated to 1 agents across 1 departments
+2025-10-16 13:15:14,009 - INFO - 127.0.0.1 - - [16/Oct/2025 13:15:14] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 13:15:14,126 - INFO - 127.0.0.1 - - [16/Oct/2025 13:15:14] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 13:15:14,156 - INFO - 127.0.0.1 - - [16/Oct/2025 13:15:14] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 13:15:40,214 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 13:15:40,215 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 13:15:40,215 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 13:15:40,215 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 13:15:40,346 - INFO - 127.0.0.1 - - [16/Oct/2025 13:15:40] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 13:53:56,061 - INFO - 127.0.0.1 - - [16/Oct/2025 13:53:56] "GET / HTTP/1.1" 200 -
+2025-10-16 13:53:56,241 - INFO - 127.0.0.1 - - [16/Oct/2025 13:53:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-16 14:17:49,371 - INFO - CEA FORCE delegating to test full system: Create marketing campaign
+2025-10-16 14:17:49,373 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 14:17:49,685 - INFO - 127.0.0.1 - - [16/Oct/2025 14:17:49] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 14:17:49,811 - INFO - 127.0.0.1 - - [16/Oct/2025 14:17:49] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 14:17:49,887 - INFO - 127.0.0.1 - - [16/Oct/2025 14:17:49] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 14:18:24,295 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 14:18:24,295 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 14:18:24,295 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 14:18:24,296 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 14:18:24,444 - INFO - 127.0.0.1 - - [16/Oct/2025 14:18:24] "GET /debug-delegation HTTP/1.1" 200 -
+2025-10-16 14:30:56,070 - INFO - Starting Inception backend... SHARED_THREAD=True
+2025-10-16 14:30:56,096 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:3000
+2025-10-16 14:30:56,097 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-16 14:31:03,195 - INFO - CEA FORCE delegating to test full system: Create a social media campaign for our new eco-friendly product launch
+2025-10-16 14:31:03,196 - INFO - CEA smart-delegated to 2 agents across 1 departments
+2025-10-16 14:31:03,671 - INFO - 127.0.0.1 - - [16/Oct/2025 14:31:03] "[32mPOST /chat HTTP/1.1[0m" 302 -
+2025-10-16 14:31:03,810 - INFO - 127.0.0.1 - - [16/Oct/2025 14:31:03] "GET /chat-ui HTTP/1.1" 200 -
+2025-10-16 14:31:03,903 - INFO - 127.0.0.1 - - [16/Oct/2025 14:31:03] "[36mGET /static/css/chat.css HTTP/1.1[0m" 304 -
+2025-10-16 14:31:52,847 - INFO - CEA FORCE delegating to test full system: Create a comprehensive marketing campaign for our new product launch including social media posts, e
+2025-10-16 14:31:52,847 - INFO - CEA smart-delegated to 3 agents across 2 departments
+2025-10-16 14:31:52,848 - INFO - CEA FORCE delegating to test full system: What is the capital of Pakistan?
+2025-10-16 14:31:52,848 - INFO - CEA smart-delegated to 2 agents across 2 departments
+2025-10-16 14:31:52,964 - INFO - 127.0.0.1 - - [16/Oct/2025 14:31:52] "GET /debug-delegation HTTP/1.1" 200 -

@@ -7,8 +7,13 @@ GROK_KEY = os.environ.get("GROK_API_KEY")
 def call_worker_api(prompt, timeout=60):
     headers = {"Authorization": f"Bearer {GROK_KEY}"} if GROK_KEY else {}
     payload = {
-        "model": "grok-4",
-        "messages": [{"role":"user","content":prompt}],
+        "model": "grok-4-latest",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        "stream": False,
+        "temperature": 0,
         "max_tokens": 512
     }
     try:

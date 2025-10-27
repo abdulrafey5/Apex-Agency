@@ -1,0 +1,25 @@
+# /data/inception/app/services/grok_wrapper.py
+import os, requests, logging
+
+GROK_URL = os.environ.get("GROK_API_URL", "https://api.x.ai/v1/chat/completions")
+GROK_KEY = os.environ.get("GROK_API_KEY")
+
+def call_worker_api(prompt, timeout=60):
+    headers = {"Authorization": f"Bearer {GROK_KEY}"} if GROK_KEY else {}
+    payload = {
+        "model": "grok-4",
+        "messages": [{"role":"user","content":prompt}],
+        "max_tokens": 512
+    }
+    try:
+        r = requests.post(GROK_URL, json=payload, headers=headers, timeout=timeout)
+        r.raise_for_status()
+        j = r.json()
+        # adapt to your response format
+        if "choices" in j and j["choices"]:
+            return j["choices"][0].get("message", {}).get("content") or j["choices"][0].get("text")
+        return j
+    except Exception:
+        logging.exception("Worker API failed")
+        raise
+

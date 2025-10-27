@@ -18,12 +18,8 @@ def call_worker_api(prompt, timeout=60):
         "temperature": 0,
         "max_tokens": 512
     }
-    print("Headers:", headers)
-    print("Payload:", payload)
     try:
         r = requests.post(GROK_URL, json=payload, headers=headers, timeout=timeout)
-        print("Response status:", r.status_code)
-        print("Response text:", r.text[:500])
         r.raise_for_status()
         j = r.json()
         # adapt to your response format

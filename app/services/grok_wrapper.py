@@ -4,6 +4,8 @@ import os, requests, logging
 GROK_URL = os.environ.get("GROK_API_URL", "https://api.x.ai/v1/chat/completions")
 
 def call_worker_api(prompt, timeout=60):
+    from dotenv import load_dotenv
+    load_dotenv('/data/inception/app/.env')  # Explicit path
     GROK_KEY = os.environ.get("GROK_API_KEY")
     headers = {"Authorization": f"Bearer {GROK_KEY}", "Content-Type": "application/json"} if GROK_KEY else {}
     payload = {

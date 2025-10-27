@@ -8,7 +8,7 @@ except Exception:
 def init_agentops():
     key = os.environ.get("AGENTOPS_API_KEY")
     if not key:
-        # Try SSM (if on EC2 with role)
+        # Try SSM (if on EC2 with role) - Uses IAM role for S3/SSM access on EC2
         try:
             import boto3, botocore
             ssm = boto3.client("ssm", region_name=os.getenv("AWS_REGION", ""))

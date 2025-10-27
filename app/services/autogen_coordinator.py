@@ -34,37 +34,43 @@ def parse_delegation_from_cea(text):
         # fallback: craft a worker instruction
         return {"instruction": text}
 
-def run_autogen_task(user_message, context=None, timeout_total=300):
+def run_autogen_task(user_message, context=None, timeout_total=300, max_turns=5):
     """
     Orchestrates: CEA analyzes -> delegate -> worker -> CEA synthesizes
     Returns final text string.
     """
     logging.info("Autogen run started")
     log_agentops("task_start", {"user_message": user_message})
-    # 1. Ask CEA to analyze & delegate (use a system prompt telling it to return JSON if possible)
-    cea_prompt = f"""You are CEA. Analyse and if necessary delegate the following task.
+    turn_count = 0
+    while turn_count < max_turns:
+        turn_count += 1
+        # 1. Ask CEA to analyze & delegate (use a system prompt telling it to return JSON if possible)
+        cea_prompt = f"""You are CEA. Analyse and delegate the following task to the worker if needed.
 Return either a JSON with keys: 'delegation': {{'instruction':..., 'deliverable':...}}
 or plain text representing the worker instruction.
 Task: {user_message}
 Recent context: {context or 'none'}
 """
-    cea_resp = call_local_cea(cea_prompt)
-    log_agentops("cea_response", {"cea_text": cea_resp[:200]})
-    delegation = parse_delegation_from_cea(cea_resp)
+        cea_resp = call_local_cea(cea_prompt)
+        log_agentops("cea_response", {"cea_text": cea_resp[:200]})
+        delegation = parse_delegation_from_cea(cea_resp)
 
-    # 2. Send to worker
-    worker_instruction = delegation.get("instruction") if isinstance(delegation, dict) and "instruction" in delegation else cea_resp
-    log_agentops("delegation_sent", {"instruction": worker_instruction[:200]})
-    worker_resp = call_worker_api(worker_instruction)
-    log_agentops("worker_response", {"worker_text": worker_resp[:200]})
+        # 2. Send to worker
+        worker_instruction = delegation.get("instruction") if isinstance(delegation, dict) and "instruction" in delegation else cea_resp
+        log_agentops("delegation_sent", {"instruction": worker_instruction[:200]})
+        worker_resp = call_worker_api(worker_instruction)
+        log_agentops("worker_response", {"worker_text": worker_resp[:200]})
 
-    # 3. Synthesize via CEA
-    synth_prompt = f"""You are CEA. Given this worker output, create the final deliverable for the user.
+        # 3. Synthesize via CEA
+        synth_prompt = f"""You are CEA. Given this worker output, create the final deliverable for the user.
 Worker output: {worker_resp}
 Original task: {user_message}
 Context: {context or 'none'}
 """
-    final = call_local_cea(synth_prompt)
-    log_agentops("task_completed", {"final_len": len(final)})
-    return final
+        final = call_local_cea(synth_prompt)
+        log_agentops("task_completed", {"final_len": len(final)})
+        return final
+    # If max turns reached
+    logging.warning("Max turns reached, returning CEA response")
+    return cea_resp
 

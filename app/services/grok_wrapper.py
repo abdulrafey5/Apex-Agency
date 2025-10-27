@@ -7,6 +7,7 @@ def call_worker_api(prompt, timeout=60):
     from dotenv import load_dotenv
     load_dotenv('/data/inception/app/.env')  # Explicit path
     GROK_KEY = os.environ.get("GROK_API_KEY")
+    logging.info(f"GROK_KEY loaded in web app: {bool(GROK_KEY)}")
     headers = {"Authorization": f"Bearer {GROK_KEY}", "Content-Type": "application/json"} if GROK_KEY else {}
     payload = {
         "model": "grok-4-0709",

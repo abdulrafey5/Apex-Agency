@@ -2,9 +2,9 @@
 import os, requests, logging
 
 GROK_URL = os.environ.get("GROK_API_URL", "https://api.x.ai/v1/chat/completions")
-GROK_KEY = os.environ.get("GROK_API_KEY")
 
 def call_worker_api(prompt, timeout=60):
+    GROK_KEY = os.environ.get("GROK_API_KEY")
     headers = {"Authorization": f"Bearer {GROK_KEY}", "Content-Type": "application/json"} if GROK_KEY else {}
     payload = {
         "model": "grok-4-0709",

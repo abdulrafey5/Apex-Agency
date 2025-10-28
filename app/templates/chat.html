@@ -98,15 +98,37 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           },
           body: JSON.stringify({ message: message })
         });
 
-        const data = await response.json();
-        
+        // If server returned non-OK status, surface the body for debugging
+        if (!response.ok) {
+          const errBody = await response.text();
+          throw new Error(`Server responded with ${response.status}: ${errBody.substring(0,1000)}`);
+        }
+
+        // Be defensive about content type. If not JSON, include body in the error so devs can see stack traces/HTML.
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+          const text = await response.text();
+          throw new Error(`Server returned non-JSON response. Body: ${text.substring(0,1000)}`);
+        }
+
+        // Try parsing JSON, but if it fails show the raw body to aid debugging
+        let data;
+        try {
+          data = await response.json();
+        } catch (jsonErr) {
+          const text = await response.text();
+          throw new Error(`Failed to parse JSON from server. Body: ${text.substring(0,2000)}`);
+        }
+
         // Remove loading indicator
         loadingDiv.remove();
-        
+
         // Check if response has error
         if (data.error) {
           addMessage(`Error: ${data.error}`, 'ai');
@@ -120,6 +142,7 @@
       } catch (error) {
         console.error('Error:', error);
         loadingDiv.remove();
+        // Show helpful message including any HTML/stacktrace the server returned
         addMessage(`Sorry — CEA failed to process the request. Error: ${error.message}`, 'ai');
       } finally {
         // Re-enable input

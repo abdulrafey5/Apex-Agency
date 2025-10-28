@@ -2,6 +2,7 @@ from flask import Blueprint, current_app, render_template, session, request, jso
 from pathlib import Path
 import logging
 import os
+import json
 from services.grok_service import grok_chat
 from services.thread_service import load_thread, save_thread, get_thread_id
 from services.cea_delegation_service import delegate_cea_task
@@ -44,9 +45,23 @@ def chat():
         return jsonify({"error": "Unauthorized"}), 401
 
     # Parse message
+    # Treat explicit AJAX requests as JSON API calls even if Flask's request.is_json is False.
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    payload = {}
+    msg = None
     if request.is_json:
         payload = request.get_json(silent=True) or {}
         msg = payload.get("message") or payload.get("prompt")
+    elif is_ajax:
+        # Try to parse raw body as JSON if the request claims to be AJAX
+        try:
+            raw = request.get_data(as_text=True)
+            if raw:
+                payload = json.loads(raw)
+                msg = payload.get("message") or payload.get("prompt")
+        except Exception:
+            payload = {}
+            msg = request.form.get("message") or None
     else:
         msg = request.form.get("message") or (request.json or {}).get("prompt")
 
@@ -68,8 +83,8 @@ def chat():
         logging.exception("CEA delegation failed")
         return jsonify({"error": f"CEA delegation failed: {e}"}), 500
 
-    # For browser or JSON client
-    if not request.is_json:
+    # For browser (regular form nav) redirect; for JSON/AJAX clients return JSON
+    if not (request.is_json or is_ajax):
         return redirect("/chat-ui")
 
     return jsonify({"response": reply, "thread_length": len(thread)})

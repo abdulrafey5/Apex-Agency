@@ -115,6 +115,11 @@ body {
   border-bottom-left-radius: 4px;
 }
 
+#loading-message {
+  opacity: 0.7;
+  font-style: italic;
+}
+
 /* ===== INPUT BAR ===== */
 #input-bar {
   position: fixed;

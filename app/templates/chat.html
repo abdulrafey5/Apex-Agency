@@ -29,8 +29,8 @@
       {% endif %}
     </div>
 
-    <form id="input-bar">
-      <input type="text" id="message-input" placeholder="Type a message..." required />
+    <form id="input-bar" action="/chat" method="post">
+      <input type="text" id="message-input" name="message" placeholder="Type a message..." required />
       <button id="send-btn" type="submit">Send</button>
     </form>
   </div>
@@ -69,48 +69,74 @@
       document.removeEventListener("mouseup", stopResize);
     }
 
-    // Chat functionality
-    const form = document.getElementById('input-bar');
-    const input = document.getElementById('message-input');
-    const messages = document.getElementById('messages');
+    // Handle form submission with AJAX
+    const form = document.getElementById("input-bar");
+    const messageInput = document.getElementById("message-input");
+    const sendBtn = document.getElementById("send-btn");
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const message = input.value.trim();
+      
+      const message = messageInput.value.trim();
       if (!message) return;
 
-      // Add user message
-      addMessage('user', message);
-      input.value = '';
+      // Disable input while processing
+      messageInput.disabled = true;
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Sending...";
+
+      // Add user message to UI immediately
+      addMessage(message, 'user');
+      messageInput.value = "";
+
+      // Add loading indicator for AI response
+      const loadingDiv = addMessage("Thinking...", 'ai', true);
 
       try {
+        // Send message to backend
         const response = await fetch('/chat', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `message=${encodeURIComponent(message)}`
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: message })
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          if (data.response) {
-            addMessage('assistant', data.response);
-          } else if (data.error) {
-            addMessage('assistant', `Error: ${data.error}`);
-          }
-        } else {
-          addMessage('assistant', 'Sorry, there was an error processing your message.');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const data = await response.json();
+        
+        // Remove loading indicator
+        loadingDiv.remove();
+        
+        // Add AI response
+        addMessage(data.response, 'ai');
+
       } catch (error) {
-        addMessage('assistant', 'Network error. Please try again.');
+        console.error('Error:', error);
+        loadingDiv.remove();
+        addMessage("Sorry — CEA failed to process the request. Please try again.", 'ai');
+      } finally {
+        // Re-enable input
+        messageInput.disabled = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Send";
+        messageInput.focus();
       }
     });
 
-    function addMessage(role, content) {
-      const div = document.createElement('div');
-      div.className = `message ${role}-message`;
-      div.textContent = content;
-      messages.appendChild(div);
-      messages.scrollTop = messages.scrollHeight;
+    function addMessage(content, role, isLoading = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${role === 'user' ? 'user-message' : 'ai-message'}`;
+      messageDiv.textContent = content;
+      if (isLoading) messageDiv.id = 'loading-message';
+      
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      return messageDiv;
     }
   </script>
 </body>

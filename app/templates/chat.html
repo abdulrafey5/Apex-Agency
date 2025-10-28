@@ -29,13 +29,14 @@
       {% endif %}
     </div>
 
-    <form id="input-bar" action="/chat" method="post">
+    <form id="input-bar" action="{{ url_for('chat.chat') }}" method="post">
       <input type="text" id="message-input" name="message" placeholder="Type a message..." required />
       <button id="send-btn" type="submit">Send</button>
     </form>
   </div>
 
   <script>
+    const chatEndpoint = "{{ url_for('chat.chat') }}";
     // Auto-scroll to bottom on load
     const messagesContainer = document.getElementById("messages");
     if (messagesContainer) {
@@ -101,7 +102,7 @@
 
       try {
         // Send message to backend
-        const response = await fetch('/chat', {
+        const response = await fetch(chatEndpoint, {
           method: 'POST',
           // Ensure cookies/session are sent so server can recognize logged-in state
           credentials: 'same-origin',
@@ -151,8 +152,8 @@
         if (data.error) {
           addMessage(`Error: ${data.error}`, 'ai');
         } else if (data.response) {
-          // Add AI response
-          addMessage(data.response, 'ai');
+          // Add AI response with basic Markdown/line-break rendering
+          addMessage(renderBasicMarkdown(data.response), 'ai', false, true);
         } else {
           addMessage("Received empty response from CEA.", 'ai');
         }
@@ -171,10 +172,14 @@
       }
     });
 
-    function addMessage(content, role, isLoading = false) {
+    function addMessage(content, role, isLoading = false, isHtml = false) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${role === 'user' ? 'user-message' : 'ai-message'}`;
-      messageDiv.textContent = content;
+      if (isHtml) {
+        messageDiv.innerHTML = content;
+      } else {
+        messageDiv.textContent = content;
+      }
       if (isLoading) messageDiv.id = 'loading-message';
 
       messagesContainer.appendChild(messageDiv);
@@ -187,6 +192,31 @@
       }
 
       return messageDiv;
+    }
+
+    // Minimal safe renderer: escape HTML, then allow **bold**, _em_, backticks, and <br> tokens
+    function renderBasicMarkdown(raw) {
+      if (!raw) return '';
+      // First, normalize Windows line endings
+      let text = String(raw).replace(/\r\n/g, '\n');
+      // Convert literal HTML entities for <br> into actual <br>
+      text = text.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
+      // Escape existing HTML to avoid XSS
+      const escaped = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      // Apply simple markdown replacements on the escaped text
+      let html = escaped
+        // bold **text**
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // italics _text_
+        .replace(/\b_(.+?)_\b/g, '<em>$1</em>')
+        // inline code `code`
+        .replace(/`([^`]+?)`/g, '<code>$1</code>')
+        // newlines to <br>
+        .replace(/\n/g, '<br>');
+      return html;
     }
   </script>
 </body>

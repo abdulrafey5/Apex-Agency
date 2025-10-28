@@ -96,6 +96,8 @@
         // Send message to backend
         const response = await fetch('/chat', {
           method: 'POST',
+          // Ensure cookies/session are sent so server can recognize logged-in state
+          credentials: 'same-origin',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -114,6 +116,11 @@
         const contentType = response.headers.get('content-type') || '';
         if (!contentType.includes('application/json')) {
           const text = await response.text();
+          // If the body looks like an HTML login/redirect page, give a helpful hint
+          const lower = text.toLowerCase();
+          if (lower.includes('<html') || lower.includes('login') || lower.includes('redirect')) {
+            throw new Error(`Server returned HTML (likely a login/redirect). Body starts: ${text.substring(0,300)}`);
+          }
           throw new Error(`Server returned non-JSON response. Body: ${text.substring(0,1000)}`);
         }
 

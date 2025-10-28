@@ -36,7 +36,7 @@ def chat_ui():
     return render_template("chat.html", messages=messages, note=note)
 
 
-@chat_bp.route("/chat", methods=["POST"])
+@chat_bp.route("/chat", methods=["POST"], strict_slashes=False)
 def chat():
     """Handles chat input, sends to CEA (with delegation logic), stores replies."""
     # Skip authentication for testing - remove in production

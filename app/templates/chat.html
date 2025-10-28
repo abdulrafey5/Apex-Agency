@@ -117,9 +117,16 @@
         // If server returned non-OK status, handle some common cases (401 -> show login hint)
         if (!response.ok) {
           const errBody = await response.text();
+          // If unauthorized, tell user; if 404+HTML, try fallback form POST so browser can follow redirects
           if (response.status === 401) {
-            // Clear loading and show a helpful message that the user needs to sign in
             throw new Error(`Unauthorized (401). You may need to sign in. Server response: ${errBody.substring(0,500)}`);
+          }
+          const isHtml = (response.headers.get('content-type') || '').includes('text/html')
+            || /<html/i.test(errBody);
+          if (response.status === 404 && isHtml) {
+            // Fallback: submit a hidden form POST (traditional navigation)
+            fallbackSubmit(message);
+            return;
           }
           throw new Error(`Server responded with ${response.status}: ${errBody.substring(0,1000)}`);
         }
@@ -217,6 +224,19 @@
         // newlines to <br>
         .replace(/\n/g, '<br>');
       return html;
+    }
+
+    function fallbackSubmit(message) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = chatEndpoint.endsWith('/') ? chatEndpoint : (chatEndpoint + '/');
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'message';
+      input.value = message;
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
     }
   </script>
 </body>

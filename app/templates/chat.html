@@ -38,7 +38,14 @@
   <script>
     // Auto-scroll to bottom on load
     const messagesContainer = document.getElementById("messages");
-    if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      // ensure last message is visible (works better when input is fixed)
+      const last = messagesContainer.lastElementChild;
+      if (last && typeof last.scrollIntoView === 'function') {
+        last.scrollIntoView({ block: 'end' });
+      }
+    }
 
     // Resizer (drag left edge)
     const chatContainer = document.getElementById("chat-container");
@@ -169,10 +176,16 @@
       messageDiv.className = `message ${role === 'user' ? 'user-message' : 'ai-message'}`;
       messageDiv.textContent = content;
       if (isLoading) messageDiv.id = 'loading-message';
-      
+
       messagesContainer.appendChild(messageDiv);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      
+      // Prefer scrollIntoView to ensure the last message is brought above the fixed input bar
+      try {
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      } catch (e) {
+        // Fallback
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
       return messageDiv;
     }
   </script>

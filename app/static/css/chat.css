@@ -90,6 +90,8 @@ body {
   padding: 20px;
   word-wrap: break-word;
   white-space: pre-wrap;
+  /* Reserve space at bottom so fixed input bar doesn't cover the last messages */
+  padding-bottom: 140px;
 }
 
 .message {
@@ -130,6 +132,7 @@ body {
   border-top: 1px solid #ccc;
   display: flex;
   padding: 16px;
+  z-index: 5; /* ensure input sits above messages */
 }
 
 #message-input {

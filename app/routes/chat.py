@@ -36,6 +36,12 @@ def chat_ui():
     return render_template("chat.html", messages=messages, note=note)
 
 
+@chat_bp.route("/chat", methods=["GET"], strict_slashes=False)
+def chat_get_redirect():
+    """If a GET ever hits /chat, redirect to the UI instead of 404."""
+    return redirect("/chat-ui")
+
+
 @chat_bp.route("/chat", methods=["POST"], strict_slashes=False)
 def chat():
     """Handles chat input, sends to CEA (with delegation logic), stores replies."""

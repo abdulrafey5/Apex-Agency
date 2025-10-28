@@ -102,22 +102,25 @@
           body: JSON.stringify({ message: message })
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const data = await response.json();
         
         // Remove loading indicator
         loadingDiv.remove();
         
-        // Add AI response
-        addMessage(data.response, 'ai');
+        // Check if response has error
+        if (data.error) {
+          addMessage(`Error: ${data.error}`, 'ai');
+        } else if (data.response) {
+          // Add AI response
+          addMessage(data.response, 'ai');
+        } else {
+          addMessage("Received empty response from CEA.", 'ai');
+        }
 
       } catch (error) {
         console.error('Error:', error);
         loadingDiv.remove();
-        addMessage("Sorry — CEA failed to process the request. Please try again.", 'ai');
+        addMessage(`Sorry — CEA failed to process the request. Error: ${error.message}`, 'ai');
       } finally {
         // Re-enable input
         messageInput.disabled = false;

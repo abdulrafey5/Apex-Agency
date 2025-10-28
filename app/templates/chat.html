@@ -106,9 +106,13 @@
           body: JSON.stringify({ message: message })
         });
 
-        // If server returned non-OK status, surface the body for debugging
+        // If server returned non-OK status, handle some common cases (401 -> show login hint)
         if (!response.ok) {
           const errBody = await response.text();
+          if (response.status === 401) {
+            // Clear loading and show a helpful message that the user needs to sign in
+            throw new Error(`Unauthorized (401). You may need to sign in. Server response: ${errBody.substring(0,500)}`);
+          }
           throw new Error(`Server responded with ${response.status}: ${errBody.substring(0,1000)}`);
         }
 

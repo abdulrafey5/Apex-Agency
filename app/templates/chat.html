@@ -37,6 +37,7 @@
 
   <script>
     const chatEndpoint = "{{ url_for('chat.chat') }}";
+    const chatAsyncEndpoint = "{{ url_for('chat.chat_async') }}";
     // Auto-scroll to bottom on load
     const messagesContainer = document.getElementById("messages");
     if (messagesContainer) {
@@ -101,8 +102,8 @@
       const loadingDiv = addMessage("Thinking...", 'ai', true);
 
       try {
-        // Send message to backend
-        const response = await fetch(chatEndpoint, {
+        // Prefer async kickoff + polling to avoid Cloudflare 524
+        const response = await fetch(chatAsyncEndpoint, {
           method: 'POST',
           // Ensure cookies/session are sent so server can recognize logged-in state
           credentials: 'same-origin',
@@ -143,27 +144,46 @@
           throw new Error(`Server returned non-JSON response. Body: ${text.substring(0,1000)}`);
         }
 
-        // Try parsing JSON, but if it fails show the raw body to aid debugging
-        let data;
+        // Try parsing JSON
+        let kickoff;
         try {
-          data = await response.json();
+          kickoff = await response.json();
         } catch (jsonErr) {
           const text = await response.text();
           throw new Error(`Failed to parse JSON from server. Body: ${text.substring(0,2000)}`);
         }
 
-        // Remove loading indicator
-        loadingDiv.remove();
-
-        // Check if response has error
-        if (data.error) {
-          addMessage(`Error: ${data.error}`, 'ai');
-        } else if (data.response) {
-          // Add AI response with basic Markdown/line-break rendering
-          addMessage(renderBasicMarkdown(data.response), 'ai', false, true);
-        } else {
-          addMessage("Received empty response from CEA.", 'ai');
+        if (kickoff.error) {
+          loadingDiv.remove();
+          addMessage(`Error: ${kickoff.error}`, 'ai');
+          return;
         }
+
+        // Poll for result
+        const taskId = kickoff.task_id;
+        let attempts = 0;
+        const maxAttempts = 120; // ~4 minutes at 2s
+        while (attempts < maxAttempts) {
+          attempts++;
+          const r = await fetch(`{{ url_for('chat.chat_result', task_id='__TASK__') }}`.replace('__TASK__', taskId), {
+            credentials: 'same-origin', headers: { 'Accept': 'application/json' }
+          });
+          const data = await r.json();
+          if (data.status === 'done') {
+            loadingDiv.remove();
+            addMessage(renderBasicMarkdown(data.response), 'ai', false, true);
+            return;
+          }
+          if (data.status === 'error') {
+            loadingDiv.remove();
+            addMessage(`Error: ${data.error || 'Task failed'}`, 'ai');
+            return;
+          }
+          // pending: wait and poll again
+          await new Promise(res => setTimeout(res, 2000));
+        }
+        loadingDiv.remove();
+        addMessage('Sorry — CEA took too long. Please try a shorter prompt.', 'ai');
 
       } catch (error) {
         console.error('Error:', error);

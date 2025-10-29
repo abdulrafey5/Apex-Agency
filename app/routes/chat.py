@@ -6,6 +6,7 @@ import json
 from services.grok_service import grok_chat
 from services.thread_service import load_thread, save_thread, get_thread_id
 from services.cea_delegation_service import delegate_cea_task
+from services.async_tasks import start_chat_task, get_task
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -94,6 +95,47 @@ def chat():
         return redirect("/chat-ui")
 
     return jsonify({"response": reply, "thread_length": len(thread)})
+
+
+@chat_bp.route("/chat-async", methods=["POST"], strict_slashes=False)
+def chat_async():
+    """Kick off async processing and return task_id immediately."""
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    payload = {}
+    msg = None
+    if request.is_json:
+        payload = request.get_json(silent=True) or {}
+        msg = payload.get("message") or payload.get("prompt")
+    elif is_ajax:
+        try:
+            raw = request.get_data(as_text=True)
+            if raw:
+                import json as _json
+                payload = _json.loads(raw)
+                msg = payload.get("message") or payload.get("prompt")
+        except Exception:
+            payload = {}
+            msg = request.form.get("message") or None
+    else:
+        msg = request.form.get("message") or (request.json or {}).get("prompt")
+
+    if not msg:
+        return jsonify({"error": "Missing message"}), 400
+
+    shared = current_app.config.get("SHARED_THREAD", False)
+    thread_id = get_thread_id(session, shared)
+    task_id = start_chat_task(msg, thread_id, current_app.config.get("CHAT_DIR"))
+    return jsonify({"task_id": task_id, "status": "queued"})
+
+
+@chat_bp.route("/chat-result/<task_id>", methods=["GET"], strict_slashes=False)
+def chat_result(task_id):
+    data = get_task(task_id)
+    return jsonify(data)
 
 
 @chat_bp.route("/debug-grok")

@@ -162,7 +162,7 @@
         // Poll for result
         const taskId = kickoff.task_id;
         let attempts = 0;
-        const maxAttempts = 120; // ~4 minutes at 2s
+        const maxAttempts = 300; // ~10 minutes at 2s
         while (attempts < maxAttempts) {
           attempts++;
           const r = await fetch(`{{ url_for('chat.chat_result', task_id='__TASK__') }}`.replace('__TASK__', taskId), {
@@ -179,8 +179,9 @@
             addMessage(`Error: ${data.error || 'Task failed'}`, 'ai');
             return;
           }
-          // pending: wait and poll again
-          await new Promise(res => setTimeout(res, 2000));
+          // pending: wait and poll again (slight backoff after 1 minute)
+          const delay = attempts > 30 ? 3000 : 2000;
+          await new Promise(res => setTimeout(res, delay));
         }
         loadingDiv.remove();
         addMessage('Sorry — CEA took too long. Please try a shorter prompt.', 'ai');

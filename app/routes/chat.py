@@ -75,6 +75,11 @@ def chat():
     if not msg:
         return jsonify({"error": "Missing message"}), 400
 
+    # Fast path for trivial health checks to avoid hitting LLMs
+    simple = (msg or "").strip().lower()
+    if simple in ("ping", "hi", "hello"):
+        return jsonify({"response": "Pong" if simple == "ping" else "Hello!" , "thread_length": 0})
+
     shared = current_app.config.get("SHARED_THREAD", False)
     thread_id = get_thread_id(session, shared)
     thread = load_thread(thread_id, current_app.config.get("CHAT_DIR"))

@@ -8,8 +8,12 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 
 # Default Ollama API endpoint and model name from /api/tags
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-MODEL = os.environ.get("OLLAMA_ENGINE", "gpt-oss:20b")  # CEA uses ChatGPT-OSS-20B with MXFP4-bit quantization on GPU
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
+MODEL = os.environ.get("OLLAMA_ENGINE", "gpt-oss:20b")  # Fixed per client requirement
+CEA_MAX_TOKENS = int(os.environ.get("CEA_MAX_TOKENS", os.environ.get("OLLAMA_MAX_TOKENS", "200")))
+CEA_TEMPERATURE = float(os.environ.get("CEA_TEMPERATURE", os.environ.get("OLLAMA_TEMPERATURE", "0.2")))
+OLLAMA_NUM_THREAD = int(os.environ.get("OLLAMA_NUM_THREAD", "0"))  # 0 = library default
+OLLAMA_NUM_GPU = int(os.environ.get("OLLAMA_NUM_GPU", "0"))  # 0 = auto/none
 
 def read_s3_context():
     """Read company context from S3 bucket."""
@@ -47,8 +51,16 @@ def call_local_cea(prompt, stream=False, timeout=300):
     payload = {
         "model": MODEL,
         "prompt": prompt,
-        "stream": stream
+        "stream": stream,
+        "options": {
+            "num_predict": CEA_MAX_TOKENS,
+            "temperature": CEA_TEMPERATURE,
+        }
     }
+    if OLLAMA_NUM_THREAD:
+        payload["options"]["num_thread"] = OLLAMA_NUM_THREAD
+    if OLLAMA_NUM_GPU:
+        payload["options"]["num_gpu"] = OLLAMA_NUM_GPU
 
     try:
         response = requests.post(url, json=payload, timeout=timeout)

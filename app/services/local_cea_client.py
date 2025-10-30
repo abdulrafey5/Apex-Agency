@@ -14,6 +14,7 @@ CEA_MAX_TOKENS = int(os.environ.get("CEA_MAX_TOKENS", os.environ.get("OLLAMA_MAX
 CEA_TEMPERATURE = float(os.environ.get("CEA_TEMPERATURE", os.environ.get("OLLAMA_TEMPERATURE", "0.2")))
 OLLAMA_NUM_THREAD = int(os.environ.get("OLLAMA_NUM_THREAD", "0"))  # 0 = library default
 OLLAMA_NUM_GPU = int(os.environ.get("OLLAMA_NUM_GPU", "0"))  # 0 = auto/none
+OLLAMA_NUM_CTX = int(os.environ.get("OLLAMA_NUM_CTX", os.environ.get("CEA_NUM_CTX", "8192")))
 
 def read_s3_context():
     """Read company context from S3 bucket."""
@@ -58,6 +59,7 @@ def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperat
         "options": {
             "num_predict": effective_tokens,
             "temperature": effective_temp,
+            "num_ctx": OLLAMA_NUM_CTX,
         }
     }
     if OLLAMA_NUM_THREAD:

@@ -88,6 +88,8 @@ def _looks_truncated(text: str) -> bool:
         return False
     tail = text.rstrip()
     # If it ends mid-sentence/word or with a dangling list bullet/number, consider truncated
+    if "[END]" in tail:
+        return False
     if not tail.endswith((".", "!", "?")):
         return True
     # Very short responses to seemingly broad prompts
@@ -102,12 +104,11 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
         while iters < max_iters and _looks_truncated(out):
             iters += 1
             continuation_prompt = (
-                "You previously wrote the following answer.\n\n" +
-                out.strip() +
-                "\n\nContinue the answer. Do not repeat content. Keep the same format and finish any incomplete "
-                "bullets or sentences."
+                "You previously wrote the following answer.\n\n" + out.strip() +
+                "\n\nContinue the answer until it is complete. Do not repeat content. Keep the same format and "
+                "finish any incomplete bullets or sentences. When you are fully finished, append the token [END] at the end."
             )
-            cont = call_local_cea(continuation_prompt, num_predict=350, temperature=0.2)
+            cont = call_local_cea(continuation_prompt, num_predict=500, temperature=0.2)
             if not cont:
                 break
             # Simple de-duplication heuristic: avoid appending if mostly repeated

@@ -23,7 +23,14 @@ def read_s3_context():
         bucket = os.environ.get("S3_BUCKET", "inception-context")
         obj = s3.get_object(Bucket=bucket, Key="company_details.yaml")
         import yaml
-        return yaml.safe_load(obj['Body'].read().decode('utf-8'))
+        raw = obj['Body'].read().decode('utf-8')
+        # Cap context to avoid blowing prompt/ctx window
+        if len(raw) > 4000:
+            raw = raw[:4000]
+        try:
+            return yaml.safe_load(raw)
+        except Exception:
+            return {"raw": raw}
     except Exception as e:
         logging.warning(f"Failed to read S3 context: {e}")
         return {}
@@ -52,6 +59,8 @@ def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperat
     effective_tokens = int(num_predict) if num_predict else CEA_MAX_TOKENS
     effective_temp = float(temperature) if temperature is not None else CEA_TEMPERATURE
 
+    keep_alive = os.environ.get("OLLAMA_KEEP_ALIVE", "10m")
+
     payload = {
         "model": MODEL,
         "prompt": prompt,
@@ -60,8 +69,12 @@ def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperat
             "num_predict": effective_tokens,
             "temperature": effective_temp,
             "num_ctx": OLLAMA_NUM_CTX,
+            "stop": [],
         }
     }
+    # keep model in memory to avoid cold load between calls
+    if keep_alive:
+        payload["keep_alive"] = keep_alive
     if OLLAMA_NUM_THREAD:
         payload["options"]["num_thread"] = OLLAMA_NUM_THREAD
     if OLLAMA_NUM_GPU:

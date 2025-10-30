@@ -41,7 +41,8 @@ def delegate_cea_task(user_message, thread_context):
             return result
         else:
             # Direct single-shot local CEA without orchestration
-            base = call_local_cea(user_message)
+            first_pass_tokens = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "500")))
+            base = call_local_cea(user_message, num_predict=first_pass_tokens)
             base = _maybe_continue_list(user_message, base)
             return _ensure_complete(user_message, base)
     except Exception as e:

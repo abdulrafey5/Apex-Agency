@@ -37,7 +37,7 @@ def write_s3_context(context):
     except Exception as e:
         logging.warning(f"Failed to write S3 context: {e}")
 
-def call_local_cea(prompt, stream=False, timeout=300):
+def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperature=None):
     """
     Calls the locally hosted CEA model (e.g., gpt-oss:20b via Ollama).
     Returns the model's generated text.
@@ -48,13 +48,16 @@ def call_local_cea(prompt, stream=False, timeout=300):
         prompt = f"Company Context: {s3_context}\n\n{prompt}"
 
     url = f"{OLLAMA_URL}/api/generate"
+    effective_tokens = int(num_predict) if num_predict else CEA_MAX_TOKENS
+    effective_temp = float(temperature) if temperature is not None else CEA_TEMPERATURE
+
     payload = {
         "model": MODEL,
         "prompt": prompt,
         "stream": stream,
         "options": {
-            "num_predict": CEA_MAX_TOKENS,
-            "temperature": CEA_TEMPERATURE,
+            "num_predict": effective_tokens,
+            "temperature": effective_temp,
         }
     }
     if OLLAMA_NUM_THREAD:

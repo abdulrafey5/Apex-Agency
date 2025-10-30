@@ -19,6 +19,8 @@ OLLAMA_NUM_CTX = int(os.environ.get("OLLAMA_NUM_CTX", os.environ.get("CEA_NUM_CT
 def read_s3_context():
     """Read company context from S3 bucket."""
     try:
+        if os.environ.get("S3_CONTEXT_DISABLE", "").strip().lower() in ("1", "true", "yes"):  # allow disabling for perf
+            return {}
         s3 = boto3.client('s3', region_name=os.environ.get("S3_REGION", "eu-north-1"))
         bucket = os.environ.get("S3_BUCKET", "inception-context")
         obj = s3.get_object(Bucket=bucket, Key="company_details.yaml")

@@ -67,10 +67,13 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
             return text
         # Ask model to continue from last+1 to target only
         remaining_prompt = (
-            f"Continue the list from {last+1} to {target}. Output ONLY the remaining items, one per line, "
-            f"using the same 'number. title  short description' format. Do not repeat previous items."
+            "You previously wrote the following answer.\n\n" +
+            text.strip() +
+            "\n\nContinue the list from " + str(last+1) + " to " + str(target) + ". "
+            "Output ONLY the remaining items, one per line, using the same 'number. title  short description' format. "
+            "Do not repeat previous items."
         )
-        continuation = call_local_cea(remaining_prompt, num_predict=300, temperature=0.2)
+        continuation = call_local_cea(remaining_prompt, num_predict=400, temperature=0.2)
         # Basic sanity: if continuation starts at expected number, append with a newline
         if continuation and str(last+1) + "." in continuation:
             sep = "\n\n" if not text.endswith("\n") else "\n"
@@ -91,7 +94,7 @@ def _looks_truncated(text: str) -> bool:
     return False
 
 
-def _ensure_complete(user_message: str, text: str, max_iters: int = 2) -> str:
+def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
     """If output appears truncated, request short continuations and append."""
     try:
         out = text or ""
@@ -99,10 +102,12 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 2) -> str:
         while iters < max_iters and _looks_truncated(out):
             iters += 1
             continuation_prompt = (
-                "Continue the previous answer. Do not repeat content. "
-                "Keep the same format and finish any incomplete bullets or sentences."
+                "You previously wrote the following answer.\n\n" +
+                out.strip() +
+                "\n\nContinue the answer. Do not repeat content. Keep the same format and finish any incomplete "
+                "bullets or sentences."
             )
-            cont = call_local_cea(continuation_prompt, num_predict=250, temperature=0.2)
+            cont = call_local_cea(continuation_prompt, num_predict=350, temperature=0.2)
             if not cont:
                 break
             # Simple de-duplication heuristic: avoid appending if mostly repeated

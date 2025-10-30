@@ -70,9 +70,11 @@ def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperat
         "options": {
             "num_predict": effective_tokens,
             "temperature": effective_temp,
-            "num_ctx": safe_num_ctx,
         }
     }
+    # Only pass num_ctx if explicitly forced; otherwise let server default (avoids 400s on some builds)
+    if os.environ.get("CEA_FORCE_NUM_CTX", "").strip().lower() in ("1", "true", "yes"):
+        payload["options"]["num_ctx"] = safe_num_ctx
     # Only include stop sequences if provided via env to avoid API 400s
     stop_env = os.environ.get("CEA_STOP_SEQUENCES", "").strip()
     if stop_env:

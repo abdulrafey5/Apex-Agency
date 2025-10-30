@@ -60,6 +60,8 @@ def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperat
     effective_temp = float(temperature) if temperature is not None else CEA_TEMPERATURE
 
     keep_alive = os.environ.get("OLLAMA_KEEP_ALIVE", "10m")
+    # Safety: cap num_ctx to a sensible upper bound to avoid 400s if server is lower
+    safe_num_ctx = max(2048, min(OLLAMA_NUM_CTX, 8192))
 
     payload = {
         "model": MODEL,
@@ -68,10 +70,13 @@ def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperat
         "options": {
             "num_predict": effective_tokens,
             "temperature": effective_temp,
-            "num_ctx": OLLAMA_NUM_CTX,
-            "stop": [],
+            "num_ctx": safe_num_ctx,
         }
     }
+    # Only include stop sequences if provided via env to avoid API 400s
+    stop_env = os.environ.get("CEA_STOP_SEQUENCES", "").strip()
+    if stop_env:
+        payload["options"]["stop"] = [s for s in stop_env.split("|") if s]
     # keep model in memory to avoid cold load between calls
     if keep_alive:
         payload["keep_alive"] = keep_alive
@@ -100,8 +105,14 @@ def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperat
             return data.get("response", "").strip()
 
     except requests.exceptions.RequestException as e:
-        logging.exception(f"Local CEA call failed: {e}")
-        raise RuntimeError(f"Failed to reach local CEA model: {e}")
+        # Try to include server error body for debugging 400s
+        err_text = ""
+        try:
+            err_text = f" body={response.text[:500]}" if 'response' in locals() and hasattr(response, 'text') else ""
+        except Exception:
+            pass
+        logging.exception(f"Local CEA call failed: {e}{err_text}")
+        raise RuntimeError(f"Failed to reach local CEA model: {e}{err_text}")
 
     except Exception as e:
         logging.exception(f"Unexpected error in call_local_cea: {e}")

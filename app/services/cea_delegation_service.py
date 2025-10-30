@@ -22,10 +22,16 @@ def delegate_cea_task(user_message, thread_context):
         # Fast path: short, simple prompts → Grok (faster latency)
         if use_grok_for_short and len((user_message or "").strip()) <= short_len:
             try:
-                return grok_chat([{"role": "user", "content": user_message}], None)
+                grok_text = grok_chat([{"role": "user", "content": user_message}], None)
+                # Pass Grok output through completion logic; use local CEA for continuations
+                grok_text = _maybe_continue_list(user_message, grok_text)
+                grok_text = _ensure_complete(user_message, grok_text)
+                return grok_text
             except Exception:
                 # fall back to local CEA
-                return call_local_cea(user_message)
+                base = call_local_cea(user_message)
+                base = _maybe_continue_list(user_message, base)
+                return _ensure_complete(user_message, base)
 
         if use_autogen:
             result = run_autogen_task(user_message, context=ctx)

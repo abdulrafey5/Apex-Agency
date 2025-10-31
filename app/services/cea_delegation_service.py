@@ -85,7 +85,9 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
             "Output ONLY the remaining items, one per line, using the same 'number. title  short description' format. "
             "Do not repeat previous items."
         )
-        continuation = call_local_cea(remaining_prompt, num_predict=400, temperature=0.2)
+        import os
+        cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "400"))
+        continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2)
         # Basic sanity: if continuation starts at expected number, append with a newline
         if continuation and str(last+1) + "." in continuation:
             sep = "\n\n" if not text.endswith("\n") else "\n"
@@ -120,7 +122,9 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 "\n\nContinue the answer until it is complete. Do not repeat content. Keep the same format and "
                 "finish any incomplete bullets or sentences. When you are fully finished, append the token [END] at the end."
             )
-            cont = call_local_cea(continuation_prompt, num_predict=500, temperature=0.2)
+            import os
+            cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "400"))
+            cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2)
             if not cont:
                 break
             # Simple de-duplication heuristic: avoid appending if mostly repeated

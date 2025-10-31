@@ -35,16 +35,21 @@ def delegate_cea_task(user_message, thread_context):
 
         if use_autogen:
             result = run_autogen_task(user_message, context=ctx)
-            # Attempt to complete truncated outputs and numbered lists
-            result = _maybe_continue_list(user_message, result)
-            result = _ensure_complete(user_message, result)
+            # Optional minimal completion based on env
+            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "0"))
+            if cont_max > 0:
+                result = _maybe_continue_list(user_message, result)
+                result = _ensure_complete(user_message, result, max_iters=cont_max)
             return result
         else:
             # Direct single-shot local CEA without orchestration
             first_pass_tokens = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "500")))
             base = call_local_cea(user_message, num_predict=first_pass_tokens)
-            base = _maybe_continue_list(user_message, base)
-            return _ensure_complete(user_message, base)
+            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "0"))
+            if cont_max > 0:
+                base = _maybe_continue_list(user_message, base)
+                base = _ensure_complete(user_message, base, max_iters=cont_max)
+            return base
     except Exception as e:
         logging.exception("CEA delegation failed")
         # fallback: quick local CEA answer to not break UI

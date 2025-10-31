@@ -1,7 +1,7 @@
 # /data/inception/app/services/autogen_coordinator.py
 import logging, json, time
 from services.local_cea_client import call_local_cea
-from services.grok_wrapper import call_worker_api
+from services.grok_service import grok_chat
 from config.agentops_config import init_agentops
 
 # optional: agentops instrumentation
@@ -34,7 +34,7 @@ def parse_delegation_from_cea(text):
         # fallback: craft a worker instruction
         return {"instruction": text}
 
-def run_autogen_task(user_message, context=None, timeout_total=300, max_turns=5):
+def run_autogen_task(user_message, context=None, timeout_total=120, max_turns=3):
     """
     Orchestrates: CEA analyzes -> delegate -> worker -> CEA synthesizes
     Returns final text string.
@@ -51,14 +51,17 @@ or plain text representing the worker instruction.
 Task: {user_message}
 Recent context: {context or 'none'}
 """
-        cea_resp = call_local_cea(cea_prompt)
+        import os
+        first_pass = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "300")))
+        cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=30)
         log_agentops("cea_response", {"cea_text": cea_resp[:200]})
         delegation = parse_delegation_from_cea(cea_resp)
 
         # 2. Send to worker
         worker_instruction = delegation.get("instruction") if isinstance(delegation, dict) and "instruction" in delegation else cea_resp
         log_agentops("delegation_sent", {"instruction": worker_instruction[:200]})
-        worker_resp = call_worker_api(worker_instruction)
+        # Use Grok API for worker with bounded tokens
+        worker_resp = grok_chat([{"role": "user", "content": worker_instruction}], None)
         log_agentops("worker_response", {"worker_text": worker_resp[:200]})
 
         # 3. Synthesize via CEA
@@ -67,7 +70,7 @@ Worker output: {worker_resp}
 Original task: {user_message}
 Context: {context or 'none'}
 """
-        final = call_local_cea(synth_prompt)
+        final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=30)
         log_agentops("task_completed", {"final_len": len(final)})
         return final
     # If max turns reached

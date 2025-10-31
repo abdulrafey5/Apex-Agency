@@ -53,7 +53,8 @@ Recent context: {context or 'none'}
 """
         import os
         first_pass = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "300")))
-        cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=30)
+        stage_timeout = int(os.getenv("CEA_STAGE_TIMEOUT_S", "45"))
+        cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=stage_timeout)
         log_agentops("cea_response", {"cea_text": cea_resp[:200]})
         delegation = parse_delegation_from_cea(cea_resp)
 
@@ -61,6 +62,8 @@ Recent context: {context or 'none'}
         worker_instruction = delegation.get("instruction") if isinstance(delegation, dict) and "instruction" in delegation else cea_resp
         log_agentops("delegation_sent", {"instruction": worker_instruction[:200]})
         # Use Grok API for worker with bounded tokens
+        # Allow tuning via env to avoid truncated content
+        os.environ.setdefault("GROK_MAX_TOKENS", os.environ.get("GROK_MAX_TOKENS", "300"))
         worker_resp = grok_chat([{"role": "user", "content": worker_instruction}], None)
         log_agentops("worker_response", {"worker_text": worker_resp[:200]})
 
@@ -70,7 +73,7 @@ Worker output: {worker_resp}
 Original task: {user_message}
 Context: {context or 'none'}
 """
-        final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=30)
+        final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=stage_timeout)
         log_agentops("task_completed", {"final_len": len(final)})
         return final
     # If max turns reached

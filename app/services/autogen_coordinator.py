@@ -44,11 +44,17 @@ def run_autogen_task(user_message, context=None, timeout_total=120, max_turns=3)
     turn_count = 0
     while turn_count < max_turns:
         turn_count += 1
-        # 1. Ask CEA to analyze & delegate (use a system prompt telling it to return JSON if possible)
-        cea_prompt = f"""You are CEA. Analyse and delegate the following task to the worker if needed.
-Return either a JSON with keys: 'delegation': {{'instruction':..., 'deliverable':...}}
-or plain text representing the worker instruction.
-Task: {user_message}
+        # 1. Ask CEA to analyze & delegate with assumption-driven policy (no questions back to user)
+        cea_prompt = f"""You are CEA, a decisive executive agent.
+Analyse the user's task and, if needed, delegate exactly ONE clear instruction to a Worker.
+
+Rules:
+1) Do NOT ask the user questions.
+2) If information is missing, make reasonable assumptions and proceed.
+3) Return either JSON with key 'delegation': {{'instruction': <one instruction>, 'deliverable': <what to return>}}
+   OR return a single clear instruction string for the Worker.
+
+User task: {user_message}
 Recent context: {context or 'none'}
 """
         import os
@@ -67,8 +73,14 @@ Recent context: {context or 'none'}
         worker_resp = grok_chat([{"role": "user", "content": worker_instruction}], None)
         log_agentops("worker_response", {"worker_text": worker_resp[:200]})
 
-        # 3. Synthesize via CEA
-        synth_prompt = f"""You are CEA. Given this worker output, create the final deliverable for the user.
+        # 3. Synthesize via CEA with assumption policy and no questions
+        synth_prompt = f"""You are CEA. Produce the final deliverable for the user.
+
+Rules:
+1) Do NOT ask questions.
+2) If details are missing, state assumptions briefly and deliver a complete, ready-to-use answer.
+3) Prefer structured, skimmable formatting (headings, lists, tables) as appropriate.
+
 Worker output: {worker_resp}
 Original task: {user_message}
 Context: {context or 'none'}

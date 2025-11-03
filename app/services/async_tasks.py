@@ -56,7 +56,7 @@ def get_task(task_id: str) -> Dict[str, Any]:
 def _run_chat_task(task_id: str, message: str, thread_id: str, chat_dir: str) -> None:
     try:
         start = time.monotonic()
-        soft_deadline = int(os.getenv("CEA_TASK_SOFT_DEADLINE_S", "45"))
+        soft_deadline = int(os.getenv("CEA_TASK_SOFT_DEADLINE_S", "0"))
         thread = load_thread(thread_id, chat_dir)
         thread.append({"role": "user", "content": message})
         reply = None
@@ -67,7 +67,7 @@ def _run_chat_task(task_id: str, message: str, thread_id: str, chat_dir: str) ->
             reply = None
 
         elapsed = time.monotonic() - start
-        if (reply is None or len(str(reply).strip()) == 0) and elapsed >= soft_deadline:
+        if soft_deadline > 0 and (reply is None or len(str(reply).strip()) == 0) and elapsed >= soft_deadline:
             # Provide a graceful fallback rather than hanging the UI
             reply = "Sorry — generating a full answer is taking longer than usual. Here is a brief outline; re-ask to expand specific sections."
 

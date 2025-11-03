@@ -60,7 +60,7 @@ Recent context: {context or 'none'}
         import os
         first_pass = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "300")))
         stage_timeout = int(os.getenv("CEA_STAGE_TIMEOUT_S", "45"))
-        cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=stage_timeout)
+        cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True)
         log_agentops("cea_response", {"cea_text": cea_resp[:200]})
         delegation = parse_delegation_from_cea(cea_resp)
 
@@ -86,7 +86,7 @@ Original task: {user_message}
 Context: {context or 'none'}
 """
         try:
-            final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=stage_timeout)
+            final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True)
         except Exception:
             # Fallback: return worker output summarized minimally to avoid empty result
             final = worker_resp[:1500]

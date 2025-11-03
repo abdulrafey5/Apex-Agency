@@ -44,7 +44,7 @@ def delegate_cea_task(user_message, thread_context):
         else:
             # Direct single-shot local CEA without orchestration
             first_pass_tokens = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "500")))
-            base = call_local_cea(user_message, num_predict=first_pass_tokens)
+            base = call_local_cea(user_message, num_predict=first_pass_tokens, stream=True)
             cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "0"))
             if cont_max > 0:
                 base = _maybe_continue_list(user_message, base)
@@ -87,7 +87,7 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
         )
         import os
         cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "400"))
-        continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2)
+        continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
         # Basic sanity: if continuation starts at expected number, append with a newline
         if continuation and str(last+1) + "." in continuation:
             sep = "\n\n" if not text.endswith("\n") else "\n"
@@ -124,7 +124,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             )
             import os
             cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "400"))
-            cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2)
+            cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
             if not cont:
                 break
             # Simple de-duplication heuristic: avoid appending if mostly repeated

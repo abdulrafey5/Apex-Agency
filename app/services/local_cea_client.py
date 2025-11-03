@@ -47,7 +47,7 @@ def write_s3_context(context):
     except Exception as e:
         logging.warning(f"Failed to write S3 context: {e}")
 
-def call_local_cea(prompt, stream=False, timeout=300, num_predict=None, temperature=None):
+def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperature=None):
     """
     Calls the locally hosted CEA model (e.g., gpt-oss:20b via Ollama).
     Returns the model's generated text.

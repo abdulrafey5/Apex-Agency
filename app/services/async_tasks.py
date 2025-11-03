@@ -71,6 +71,11 @@ def _run_chat_task(task_id: str, message: str, thread_id: str, chat_dir: str) ->
             # Provide a graceful fallback rather than hanging the UI
             reply = "Sorry — generating a full answer is taking longer than usual. Here is a brief outline; re-ask to expand specific sections."
 
+        # If still empty, return an error so UI doesn't show a blank message
+        if reply is None or len(str(reply).strip()) == 0:
+            _set_task(task_id, {"status": "error", "error": "Generation timed out. Please try again."})
+            return
+
         thread.append({"role": "assistant", "content": reply})
         save_thread(thread_id, thread, chat_dir)
         _set_task(task_id, {"status": "done", "response": reply})

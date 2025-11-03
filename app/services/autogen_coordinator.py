@@ -85,7 +85,11 @@ Worker output: {worker_resp}
 Original task: {user_message}
 Context: {context or 'none'}
 """
-        final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=stage_timeout)
+        try:
+            final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=stage_timeout)
+        except Exception:
+            # Fallback: return worker output summarized minimally to avoid empty result
+            final = worker_resp[:1500]
         log_agentops("task_completed", {"final_len": len(final)})
         return final
     # If max turns reached

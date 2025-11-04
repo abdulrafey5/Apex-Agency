@@ -58,9 +58,14 @@ User task: {user_message}
 Recent context: {context or 'none'}
 """
         import os
-        first_pass = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "300")))
-        stage_timeout = int(os.getenv("CEA_STAGE_TIMEOUT_S", "45"))
-        cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True)
+        first_pass = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "200")))
+        stage_timeout = int(os.getenv("CEA_STAGE_TIMEOUT_S", "300"))
+        try:
+            cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True)
+        except Exception as e:
+            logging.error(f"CEA analysis stage failed: {e}")
+            # Fallback: use user message directly as instruction
+            cea_resp = user_message
         log_agentops("cea_response", {"cea_text": cea_resp[:200]})
         delegation = parse_delegation_from_cea(cea_resp)
 
@@ -87,9 +92,13 @@ Context: {context or 'none'}
 """
         try:
             final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True)
-        except Exception:
-            # Fallback: return worker output summarized minimally to avoid empty result
-            final = worker_resp[:1500]
+            if not final or len(final.strip()) == 0:
+                # If synthesis returned empty, return worker output
+                final = worker_resp[:2000] if worker_resp else "Sorry, I couldn't generate a complete response. Please try again."
+        except Exception as e:
+            logging.error(f"CEA synthesis stage failed: {e}")
+            # Fallback: return worker output to avoid empty result
+            final = worker_resp[:2000] if worker_resp else f"Error during synthesis: {str(e)}"
         log_agentops("task_completed", {"final_len": len(final)})
         return final
     # If max turns reached

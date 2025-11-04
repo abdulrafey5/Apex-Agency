@@ -61,19 +61,22 @@ def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperatu
     # Read company context from S3
     s3_context = read_s3_context()
     if s3_context:
-        # Truncate context if combined prompt would exceed context window
+        # Truncate context aggressively - reserve most space for prompt and response
         context_str = str(s3_context)
-        max_context_chars = 200  # Reserve space for prompt and response
+        max_context_chars = 150  # Very limited to avoid truncation
         if len(context_str) > max_context_chars:
             context_str = context_str[:max_context_chars] + "..."
         prompt = f"Company Context: {context_str}\n\n{prompt}"
     
-    # Truncate prompt if too long to fit in context window
-    # Reserve ~100 tokens for response, so max prompt ~900 tokens (~3600 chars)
-    max_prompt_chars = 3600
+    # Aggressive truncation: Reserve ~300 tokens for response, so max prompt ~700 tokens (~2800 chars)
+    # This prevents Ollama from truncating and losing critical information
+    max_prompt_chars = 2800
     if len(prompt) > max_prompt_chars:
-        logging.warning(f"Prompt truncated from {len(prompt)} to {max_prompt_chars} chars")
-        prompt = prompt[:max_prompt_chars] + "\n[Prompt truncated due to context limits]"
+        logging.warning(f"Prompt truncated from {len(prompt)} to {max_prompt_chars} chars to fit 1024 token context")
+        # Truncate from the middle, keeping beginning and end
+        keep_start = max_prompt_chars // 2 - 100
+        keep_end = max_prompt_chars // 2 - 100
+        prompt = prompt[:keep_start] + "\n[...truncated...]\n" + prompt[-keep_end:]
 
     url = f"{OLLAMA_URL}/api/generate"
     effective_tokens = int(num_predict) if num_predict else CEA_MAX_TOKENS

@@ -45,6 +45,11 @@ def run_autogen_task(user_message, context=None, timeout_total=120, max_turns=3)
     while turn_count < max_turns:
         turn_count += 1
         # 1. Ask CEA to analyze & delegate with assumption-driven policy (no questions back to user)
+        # Truncate context to prevent prompt overflow
+        context_str = str(context)[:300] if context else 'none'
+        if context and len(str(context)) > 300:
+            context_str += "..."
+        
         cea_prompt = f"""You are CEA, a decisive executive agent.
 Analyse the user's task and, if needed, delegate exactly ONE clear instruction to a Worker.
 
@@ -54,8 +59,8 @@ Rules:
 3) Return either JSON with key 'delegation': {{'instruction': <one instruction>, 'deliverable': <what to return>}}
    OR return a single clear instruction string for the Worker.
 
-User task: {user_message}
-Recent context: {context or 'none'}
+User task: {user_message[:500]}
+Recent context: {context_str}
 """
         import os
         first_pass = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "200")))
@@ -79,6 +84,11 @@ Recent context: {context or 'none'}
         log_agentops("worker_response", {"worker_text": worker_resp[:200]})
 
         # 3. Synthesize via CEA with assumption policy and no questions
+        # Truncate worker output to fit in context window (max ~1500 chars = ~375 tokens)
+        worker_truncated = worker_resp[:1500] if len(worker_resp) > 1500 else worker_resp
+        if len(worker_resp) > 1500:
+            worker_truncated += "\n[Worker output truncated...]"
+        
         synth_prompt = f"""You are CEA. Produce the final deliverable for the user.
 
 Rules:
@@ -86,9 +96,9 @@ Rules:
 2) If details are missing, state assumptions briefly and deliver a complete, ready-to-use answer.
 3) Prefer structured, skimmable formatting (headings, lists, tables) as appropriate.
 
-Worker output: {worker_resp}
-Original task: {user_message}
-Context: {context or 'none'}
+Worker output: {worker_truncated}
+Original task: {user_message[:500]}
+Context: {str(context)[:200] if context else 'none'}
 """
         try:
             final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True)

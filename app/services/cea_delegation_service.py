@@ -69,31 +69,76 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
         if not m:
             return text
         target = int(m.group(1))
-        # Count numbered lines like '1.' '2.' etc.
+        # Count numbered lines like '1.' '2.' etc. - also check for incomplete last item
         items = re.findall(r"^\s*(\d+)\.", text, flags=re.MULTILINE)
         nums = sorted({int(n) for n in items if n.isdigit()})
         if not nums:
             return text
         last = nums[-1]
-        if last >= target:
+        
+        # Check if the last item appears incomplete (ends mid-sentence without proper punctuation)
+        # This handles cases where item 9 is cut off and item 10 is missing
+        # Simple heuristic: if text doesn't end with proper punctuation, it's likely truncated
+        text_ends_properly = text.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
+        last_item_incomplete = False
+        
+        # Also check if the last numbered item's description seems incomplete
+        # Find the last occurrence of "last." and check what comes after it
+        last_item_marker = f"{last}."
+        last_marker_pos = text.rfind(last_item_marker)
+        if last_marker_pos >= 0:
+            # Get text after the last item marker
+            after_marker = text[last_marker_pos + len(last_item_marker):].strip()
+            # If there's text after the marker but it doesn't end with punctuation, it's incomplete
+            if after_marker and not text_ends_properly:
+                last_item_incomplete = True
+        
+        # If we have fewer items than requested OR the last item is incomplete, trigger continuation
+        if last >= target and not last_item_incomplete:
             return text
-        # Ask model to continue from last+1 to target only
+        
+        # Determine starting point: if last item is incomplete, complete it first, then continue
+        start_from = last if last_item_incomplete else (last + 1)
+        
+        # Ask model to continue from start_from to target
         remaining_prompt = (
             "You previously wrote the following answer.\n\n" +
             text.strip() +
-            "\n\nContinue the list from " + str(last+1) + " to " + str(target) + ". "
-            "Output ONLY the remaining items, one per line, using the same 'number. title  short description' format. "
-            "Do not repeat previous items."
+            "\n\n" +
+            (f"Complete item {last} (it was cut off), then continue the list from {last+1} to {target}."
+             if last_item_incomplete and last < target
+             else f"Continue the list from {start_from} to {target}.") +
+            " Output ONLY the remaining items, using the same format (number. title, short description). " +
+            "Do not repeat previous items. When finished, append [END]."
         )
         import os
-        cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "400"))
+        cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
         continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
-        # Basic sanity: if continuation starts at expected number, append with a newline
-        if continuation and str(last+1) + "." in continuation:
-            sep = "\n\n" if not text.endswith("\n") else "\n"
+        
+        if not continuation or not continuation.strip():
+            return text
+        
+        # If continuation starts at expected number or completes the last item, append it
+        continuation_starts_correctly = (
+            (str(start_from) + "." in continuation) or 
+            (last_item_incomplete and (str(last) + "." in continuation or continuation.strip().startswith(str(last))))
+        )
+        
+        if continuation_starts_correctly:
+            sep = "\n\n" if not text.rstrip().endswith(("\n", "\n\n")) else "\n"
+            # If last item was incomplete, we might need to replace it rather than append
+            if last_item_incomplete and str(last) + "." in continuation:
+                # Find where the last item starts and replace from there
+                last_item_start = text.rfind(str(last) + ".")
+                if last_item_start >= 0:
+                    # Keep everything before the incomplete last item, then append continuation
+                    text_before_last = text[:last_item_start].rstrip()
+                    return text_before_last + "\n\n" + continuation.strip()
             return text + sep + continuation.strip()
+        
         return text
-    except Exception:
+    except Exception as e:
+        logging.warning(f"_maybe_continue_list error: {e}")
         return text
 
 

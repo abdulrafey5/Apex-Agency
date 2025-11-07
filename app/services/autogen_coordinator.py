@@ -101,7 +101,9 @@ Original task: {user_message[:500]}
 Context: {str(context)[:200] if context else 'none'}
 """
         try:
-            final = call_local_cea(synth_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True)
+            # Use full token budget for synthesis to ensure complete responses (e.g., "Top 10" lists)
+            synthesis_tokens = int(os.getenv("CEA_MAX_TOKENS", os.getenv("CEA_FIRST_PASS_TOKENS", "600")))
+            final = call_local_cea(synth_prompt, num_predict=synthesis_tokens, timeout=stage_timeout, stream=True)
             if not final or len(final.strip()) == 0:
                 # If synthesis returned empty, return worker output
                 final = worker_resp[:2000] if worker_resp else "Sorry, I couldn't generate a complete response. Please try again."

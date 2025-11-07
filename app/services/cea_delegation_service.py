@@ -143,42 +143,107 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
 
 
 def _looks_truncated(text: str) -> bool:
+    """Detect if text appears truncated. Improved detection for mid-word/sentence cuts."""
     if not text:
         return False
     tail = text.rstrip()
-    # If it ends mid-sentence/word or with a dangling list bullet/number, consider truncated
+    # If [END] marker is present, consider it complete
     if "[END]" in tail:
         return False
-    if not tail.endswith((".", "!", "?")):
+    
+    # Check if it ends with proper sentence-ending punctuation
+    if tail.endswith((".", "!", "?")):
+        # Additional check: if it ends with punctuation but the last word is suspiciously short,
+        # it might still be cut off (e.g., "conte." where "conte" is incomplete)
+        words = tail.split()
+        if words:
+            last_word = words[-1].rstrip(".,!?;:)\"]}")
+            if len(last_word) < 4:  # Very short word before punctuation might indicate truncation
+                return True
+        return False
+    
+    # If it ends with other punctuation (:, ;, ), ], }, "), might be mid-sentence
+    if tail.endswith((":", ";", ")", "]", "}", "\"")):
         return True
-    # Very short responses to seemingly broad prompts
-    return False
+    
+    # If it doesn't end with any punctuation, it's likely truncated
+    # Check if last word is suspiciously short (mid-word cut)
+    words = tail.split()
+    if words:
+        last_word = words[-1]
+        # If last word is very short (< 4 chars) and doesn't look like a complete word, likely truncated
+        if len(last_word) < 4:
+            return True
+    
+    # Default: if no proper ending punctuation, consider truncated
+    return True
 
 
 def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
-    """If output appears truncated, request short continuations and append."""
+    """If output appears truncated, request continuations and append. Uses smart truncation to preserve token budget."""
     try:
+        import os
         out = text or ""
         iters = 0
+        cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
+        
         while iters < max_iters and _looks_truncated(out):
             iters += 1
-            continuation_prompt = (
-                "You previously wrote the following answer.\n\n" + out.strip() +
-                "\n\nContinue the answer until it is complete. Do not repeat content. Keep the same format and "
-                "finish any incomplete bullets or sentences. When you are fully finished, append the token [END] at the end."
-            )
-            import os
-            cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "400"))
-            cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
-            if not cont:
-                break
-            # Simple de-duplication heuristic: avoid appending if mostly repeated
-            if cont.strip() and cont.strip() not in out:
-                sep = "\n\n" if not out.endswith("\n") else "\n"
-                out = out + sep + cont.strip()
+            logging.info(f"_ensure_complete: iteration {iters}, text length: {len(out)}")
+            
+            # Smart truncation: Keep only the last ~1200 chars of previous text to preserve token budget for continuation
+            # This ensures we have room for the continuation prompt + actual continuation content
+            # ~1200 chars ≈ ~300 tokens, leaving ~700 tokens for continuation in a 1024 token context
+            max_context_chars = 1200
+            if len(out) > max_context_chars:
+                # Keep the beginning (first 200 chars for context) and the end (last portion)
+                context_start = out[:200] + "\n[... earlier content ...]\n"
+                context_end = out[-(max_context_chars - len(context_start)):]
+                truncated_context = context_start + context_end
             else:
+                truncated_context = out
+            
+            continuation_prompt = (
+                f"You previously wrote the following answer (showing last portion for context):\n\n{truncated_context}\n\n"
+                f"Continue the answer from where it was cut off. Do not repeat content. Keep the same format and "
+                f"finish any incomplete bullets, sentences, or sections. Complete the answer fully. "
+                f"When you are fully finished, append the token [END] at the end."
+            )
+            
+            try:
+                cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
+            except Exception as e:
+                logging.warning(f"_ensure_complete: continuation call failed: {e}")
                 break
+                
+            if not cont or not cont.strip():
+                logging.warning(f"_ensure_complete: empty continuation at iteration {iters}")
+                break
+            
+            # Remove [END] marker if present
+            cont_clean = cont.strip().replace("[END]", "").strip()
+            
+            # Better de-duplication: check if continuation is substantially different from what we already have
+            # Compare last 200 chars of out with first 200 chars of cont to avoid appending duplicates
+            if len(out) > 200 and len(cont_clean) > 200:
+                out_tail = out[-200:].lower().strip()
+                cont_head = cont_clean[:200].lower().strip()
+                # If more than 80% similarity, likely a duplicate
+                if out_tail in cont_head or cont_head in out_tail:
+                    logging.warning(f"_ensure_complete: continuation appears to be duplicate, stopping")
+                    break
+            
+            # Append continuation
+            sep = "\n\n" if not out.rstrip().endswith(("\n", "\n\n")) else "\n"
+            out = out + sep + cont_clean
+            
+            # Check if continuation ended with [END] or proper punctuation (likely complete)
+            if "[END]" in cont or cont_clean.rstrip().endswith((".", "!", "?")):
+                logging.info(f"_ensure_complete: continuation appears complete, stopping")
+                break
+                
         return out
-    except Exception:
+    except Exception as e:
+        logging.warning(f"_ensure_complete error: {e}")
         return text
 

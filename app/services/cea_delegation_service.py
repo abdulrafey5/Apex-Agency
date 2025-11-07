@@ -160,10 +160,18 @@ def _looks_truncated(text: str) -> bool:
             last_word = words[-1].rstrip(".,!?;:)\"]}")
             if len(last_word) < 4:  # Very short word before punctuation might indicate truncation
                 return True
+        # If it ends with proper punctuation, check if it looks like a complete thought
+        # For longer responses (like guides), check if the last sentence is complete
+        if len(tail) > 500:  # Longer responses should have more structure
+            # Check if last sentence ends properly (not mid-bullet or mid-list)
+            last_sentence = tail.split(".")[-1] if "." in tail else tail
+            # If last "sentence" is very short or looks incomplete, might be truncated
+            if len(last_sentence.strip()) < 20:
+                return True
         return False
     
-    # If it ends with other punctuation (:, ;, ), ], }, "), might be mid-sentence
-    if tail.endswith((":", ";", ")", "]", "}", "\"")):
+    # If it ends with mid-sentence punctuation (comma, colon, semicolon, etc.), it's likely truncated
+    if tail.endswith((",", ":", ";", ")", "]", "}", "\"")):
         return True
     
     # If it doesn't end with any punctuation, it's likely truncated
@@ -191,15 +199,19 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             iters += 1
             logging.info(f"_ensure_complete: iteration {iters}, text length: {len(out)}")
             
-            # Smart truncation: Keep only the last ~1200 chars of previous text to preserve token budget for continuation
+            # Smart truncation: Keep only the last ~1000 chars of previous text to preserve token budget for continuation
             # This ensures we have room for the continuation prompt + actual continuation content
-            # ~1200 chars ≈ ~300 tokens, leaving ~700 tokens for continuation in a 1024 token context
-            max_context_chars = 1200
+            # ~1000 chars ≈ ~250 tokens, leaving ~750 tokens for continuation in a 1024 token context
+            # More aggressive truncation to ensure continuation has enough room
+            max_context_chars = 1000
             if len(out) > max_context_chars:
-                # Keep the beginning (first 200 chars for context) and the end (last portion)
-                context_start = out[:200] + "\n[... earlier content ...]\n"
-                context_end = out[-(max_context_chars - len(context_start)):]
+                # Keep the beginning (first 150 chars for context) and the end (last portion)
+                # This gives better context while preserving more tokens for continuation
+                context_start = out[:150] + "\n[... earlier content ...]\n"
+                remaining_chars = max_context_chars - len(context_start)
+                context_end = out[-remaining_chars:] if remaining_chars > 0 else out[-800:]
                 truncated_context = context_start + context_end
+                logging.info(f"_ensure_complete: truncated context from {len(out)} to {len(truncated_context)} chars")
             else:
                 truncated_context = out
             
@@ -237,10 +249,19 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             sep = "\n\n" if not out.rstrip().endswith(("\n", "\n\n")) else "\n"
             out = out + sep + cont_clean
             
-            # Check if continuation ended with [END] or proper punctuation (likely complete)
-            if "[END]" in cont or cont_clean.rstrip().endswith((".", "!", "?")):
+            # Check if continuation ended with [END] or proper sentence-ending punctuation (likely complete)
+            # Don't stop if it ends with comma, colon, etc. - those indicate it's still incomplete
+            cont_ends_properly = cont_clean.rstrip().endswith((".", "!", "?"))
+            if "[END]" in cont or cont_ends_properly:
+                # Double-check: if continuation is very short (< 50 chars), it might be incomplete
+                if len(cont_clean.strip()) < 50 and not "[END]" in cont:
+                    logging.info(f"_ensure_complete: continuation is very short ({len(cont_clean)} chars), continuing...")
+                    continue
                 logging.info(f"_ensure_complete: continuation appears complete, stopping")
                 break
+            else:
+                # Continuation itself might be truncated (ends with comma, etc.) - continue
+                logging.info(f"_ensure_complete: continuation ends with mid-sentence punctuation, continuing...")
                 
         return out
     except Exception as e:

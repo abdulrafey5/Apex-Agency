@@ -35,11 +35,14 @@ def delegate_cea_task(user_message, thread_context):
 
         if use_autogen:
             result = run_autogen_task(user_message, context=ctx)
-            # Optional minimal completion based on env
-            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "0"))
+            # Always run completion logic to ensure responses are complete
+            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "3"))
             if cont_max > 0:
                 result = _maybe_continue_list(user_message, result)
                 result = _ensure_complete(user_message, result, max_iters=cont_max)
+            # Final check: if result still looks truncated, log warning
+            if _looks_truncated(result):
+                logging.warning(f"delegate_cea_task: Result still appears truncated after completion logic. Length: {len(result)}")
             return result
         else:
             # Direct single-shot local CEA without orchestration
@@ -171,7 +174,12 @@ def _looks_truncated(text: str) -> bool:
         return False
     
     # If it ends with mid-sentence punctuation (comma, colon, semicolon, etc.), it's likely truncated
-    if tail.endswith((",", ":", ";", ")", "]", "}", "\"")):
+    if tail.endswith((",", ":", ";", ")", "]", "}", "\"", "+", "-", "|")):
+        return True
+    
+    # Check for incomplete table cells or markdown structures
+    # If it ends with "|" or "+" or "-" (common in tables), it's likely truncated
+    if tail.rstrip().endswith(("|", "+", "-")) and not tail.rstrip().endswith(("---", "===")):
         return True
     
     # If it doesn't end with any punctuation, it's likely truncated
@@ -180,7 +188,14 @@ def _looks_truncated(text: str) -> bool:
     if words:
         last_word = words[-1]
         # If last word is very short (< 4 chars) and doesn't look like a complete word, likely truncated
-        if len(last_word) < 4:
+        # Also check for symbols like "+", "-", "|" which indicate incomplete content
+        if len(last_word) < 4 or last_word in ("+", "-", "|"):
+            return True
+    
+    # Check if it ends mid-table (common pattern: ends with "|" or incomplete cell)
+    if "|" in tail[-50:]:  # If there's a pipe in the last 50 chars, might be a table
+        # Check if it ends with incomplete table cell
+        if tail.rstrip().endswith(("|", "| ", "|  ")) or tail.rstrip().endswith(("+", "+ ", "-", "- ")):
             return True
     
     # Default: if no proper ending punctuation, consider truncated
@@ -278,22 +293,38 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 # Don't break - continue to next iteration
                 continue
             
+            # Check if [END] marker is present
             if "[END]" in cont:
-                logging.info(f"_ensure_complete: [END] marker found, stopping")
-                break
-            elif cont_ends_properly:
-                # Check if the full output now ends properly (not just the continuation)
-                if out.rstrip().endswith((".", "!", "?")):
-                    logging.info(f"_ensure_complete: continuation appears complete, stopping")
+                logging.info(f"_ensure_complete: [END] marker found, checking if output is complete...")
+                # Even with [END], verify the output doesn't look truncated
+                if not _looks_truncated(out):
+                    logging.info(f"_ensure_complete: Output appears complete with [END], stopping")
                     break
                 else:
-                    # Continuation ends properly but full output doesn't - might need another pass
-                    logging.info(f"_ensure_complete: continuation ends properly but full output doesn't, continuing...")
+                    logging.info(f"_ensure_complete: [END] found but output still looks truncated, continuing...")
+                    continue
+            
+            # Check if continuation ends properly
+            if cont_ends_properly:
+                # CRITICAL: Check if the FULL output now ends properly and doesn't look truncated
+                if out.rstrip().endswith((".", "!", "?")) and not _looks_truncated(out):
+                    logging.info(f"_ensure_complete: Full output appears complete, stopping")
+                    break
+                else:
+                    # Continuation ends properly but full output still looks truncated - continue
+                    logging.info(f"_ensure_complete: Continuation ends properly but full output still looks truncated, continuing...")
                     continue
             else:
                 # Continuation itself might be truncated (ends with comma, colon, etc.) - continue
                 logging.info(f"_ensure_complete: continuation ends with mid-sentence punctuation ({cont_clean[-10:]}), continuing...")
-                
+                continue
+        
+        # FINAL CHECK: Before returning, verify the output is actually complete
+        # If it still looks truncated after all iterations, log a warning
+        if _looks_truncated(out):
+            logging.warning(f"_ensure_complete: Output still appears truncated after {iters} iterations. Length: {len(out)}")
+            # Don't add a note here - let it return as-is, but log the issue
+        
         return out
     except Exception as e:
         logging.warning(f"_ensure_complete error: {e}")

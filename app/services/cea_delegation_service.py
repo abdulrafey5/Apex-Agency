@@ -171,6 +171,31 @@ def _looks_truncated(text: str) -> bool:
             # If last "sentence" is very short or looks incomplete, might be truncated
             if len(last_sentence.strip()) < 20:
                 return True
+            # Check if it ends mid-section (e.g., "### 7.4 Daily Optimization Cadence" followed by incomplete content)
+            # Look for section headers (###, ##, #) near the end - if there's a header but no content after, it's incomplete
+            last_lines = tail.split("\n")[-10:] if "\n" in tail else [tail]  # Check last 10 lines for better detection
+            for line in reversed(last_lines):
+                line_stripped = line.strip()
+                # If we find a section header (starts with #) near the end, check if there's substantial content after
+                if line_stripped.startswith(("#", "##", "###", "####")):
+                    # Found a header - check if there's enough content after it
+                    header_pos = tail.rfind(line_stripped)
+                    content_after = tail[header_pos + len(line_stripped):].strip()
+                    # If there's a header but less than 100 chars of content after, likely incomplete
+                    # Also check if the header suggests multiple items (e.g., "Cadence", "Timeline", "Steps") but only one item exists
+                    header_lower = line_stripped.lower()
+                    suggests_multiple = any(word in header_lower for word in ["cadence", "timeline", "steps", "phases", "schedule", "checklist", "items", "tasks"])
+                    if suggests_multiple:
+                        # Count bullet points or numbered items after the header
+                        bullets_after = content_after.count("-") + content_after.count("*") + content_after.count("•")
+                        numbered_items = len([l for l in content_after.split("\n") if l.strip() and (l.strip()[0].isdigit() or l.strip().startswith(("-", "*", "•")))])
+                        # If header suggests multiple items but we only see 1-2 items, likely incomplete
+                        if numbered_items <= 2 and bullets_after <= 2:
+                            return True
+                    # If there's a header but less than 100 chars of content after, likely incomplete
+                    if len(content_after) < 100:
+                        return True
+                    break
         return False
     
     # If it ends with mid-sentence punctuation (comma, colon, semicolon, etc.), it's likely truncated

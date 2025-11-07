@@ -19,10 +19,19 @@ def delegate_cea_task(user_message, thread_context):
         # Reduce context for speed
         ctx = thread_context[-max_ctx:] if isinstance(thread_context, list) else []
 
-        # Fast path: short, simple prompts → Grok (faster latency)
-        if use_grok_for_short and len((user_message or "").strip()) <= short_len:
+        # Fast path: short, simple prompts → Grok (faster latency, concise responses)
+        # Check if prompt is short AND looks like a simple factual question (not a complex request)
+        user_msg_clean = (user_message or "").strip()
+        is_simple_question = (
+            len(user_msg_clean) <= short_len and
+            # Simple questions: "What is X?", "Population of X", "Capital of X", etc.
+            (not any(word in user_msg_clean.lower() for word in ["help", "create", "launch", "plan", "campaign", "strategy", "guide", "how to", "step"]))
+        )
+        
+        if use_grok_for_short and is_simple_question:
             try:
-                grok_text = grok_chat([{"role": "user", "content": user_message}], None)
+                # For simple questions, use Grok directly with a concise prompt
+                grok_text = grok_chat([{"role": "user", "content": f"{user_message}. Provide a concise, factual answer."}], None)
                 # Pass Grok output through completion logic; use local CEA for continuations
                 grok_text = _maybe_continue_list(user_message, grok_text)
                 grok_text = _ensure_complete(user_message, grok_text)
@@ -239,7 +248,20 @@ def _looks_truncated(text: str) -> bool:
             return True
     
     # Check for incomplete markdown structures (bold, italic, code blocks)
+    # Also check if it ends with incomplete markdown like "**Data Quality" (starts with ** but incomplete)
     if tail.rstrip().endswith(("*", "**", "***", "`", "```", "|")):
+        return True
+    
+    # Get last line for markdown checks (avoid duplicate)
+    last_line_for_md = tail.split("\n")[-1].strip() if "\n" in tail else tail.strip()
+    
+    # Check if last line starts with markdown but is incomplete (e.g., "**Data Quality" without closing)
+    if last_line_for_md.startswith(("**", "***", "`", "```")) and not last_line_for_md.endswith(("**", "***", "`", "```")):
+        # Started markdown formatting but didn't close it - likely truncated
+        return True
+    # Check if it ends with text that looks like it's starting a markdown section (e.g., "**Data Quality")
+    if last_line_for_md.startswith("**") and len(last_line_for_md.split()) <= 3:
+        # Looks like a markdown header that was cut off
         return True
     
     # Default: if no proper ending punctuation, consider truncated

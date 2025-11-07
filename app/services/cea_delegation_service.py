@@ -193,10 +193,29 @@ def _looks_truncated(text: str) -> bool:
             return True
     
     # Check if it ends mid-table (common pattern: ends with "|" or incomplete cell)
-    if "|" in tail[-50:]:  # If there's a pipe in the last 50 chars, might be a table
-        # Check if it ends with incomplete table cell
-        if tail.rstrip().endswith(("|", "| ", "|  ")) or tail.rstrip().endswith(("+", "+ ", "-", "- ")):
+    if "|" in tail[-100:]:  # If there's a pipe in the last 100 chars, might be a table
+        # Check if it ends with incomplete table cell or row
+        if tail.rstrip().endswith(("|", "| ", "|  ", "*", "**", "***")):
             return True
+        # Check if last line looks like an incomplete table row (ends with text but no closing "|")
+        last_line = tail.split("\n")[-1].strip() if "\n" in tail else tail.strip()
+        if "|" in last_line:
+            # If it's a table row, it should end with "|" - if not, it's incomplete
+            if not last_line.endswith("|"):
+                # Incomplete table row - missing closing pipe
+                return True
+            # Even if it ends with "|", check if the row looks complete (has enough cells)
+            # A complete table row typically has multiple "|" separators
+            pipe_count = last_line.count("|")
+            if pipe_count < 2:  # Less than 2 pipes suggests incomplete row
+                return True
+        # Check if it ends with markdown formatting that suggests incomplete content
+        if last_line.endswith(("*", "**", "***", "`", "```")):
+            return True
+    
+    # Check for incomplete markdown structures (bold, italic, code blocks)
+    if tail.rstrip().endswith(("*", "**", "***", "`", "```", "|")):
+        return True
     
     # Default: if no proper ending punctuation, consider truncated
     return True
@@ -233,8 +252,9 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             continuation_prompt = (
                 f"You previously wrote the following answer (showing last portion for context):\n\n{truncated_context}\n\n"
                 f"Continue the answer from where it was cut off. Do not repeat content. Keep the same format and "
-                f"finish any incomplete bullets, sentences, or sections. Complete the answer fully. "
-                f"IMPORTANT: Provide a complete continuation that finishes the current section and completes the answer. "
+                f"finish any incomplete bullets, sentences, sections, or tables. Complete the answer fully. "
+                f"IMPORTANT: If the previous content ends mid-table, complete that table row and any remaining table rows. "
+                f"Provide a complete continuation that finishes the current section and completes the entire answer. "
                 f"When you are fully finished, append the token [END] at the end."
             )
             

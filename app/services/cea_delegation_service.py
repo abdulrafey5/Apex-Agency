@@ -227,21 +227,39 @@ def _looks_truncated(text: str) -> bool:
             return True
     
     # Check if it ends mid-table (common pattern: ends with "|" or incomplete cell)
-    if "|" in tail[-100:]:  # If there's a pipe in the last 100 chars, might be a table
+    if "|" in tail[-200:]:  # If there's a pipe in the last 200 chars, might be a table (increased range)
         # Check if it ends with incomplete table cell or row
         if tail.rstrip().endswith(("|", "| ", "|  ", "*", "**", "***")):
             return True
         # Check if last line looks like an incomplete table row (ends with text but no closing "|")
-        last_line = tail.split("\n")[-1].strip() if "\n" in tail else tail.strip()
+        lines = tail.split("\n")
+        last_line = lines[-1].strip() if lines else tail.strip()
         if "|" in last_line:
             # If it's a table row, it should end with "|" - if not, it's incomplete
             if not last_line.endswith("|"):
                 # Incomplete table row - missing closing pipe
                 return True
+            # Check if the table row has the same number of columns as the header
+            # Find the table header (look for a line with "|" that's not the last line)
+            header_pipe_count = None
+            for line in reversed(lines[:-1]):  # Check lines before the last one
+                line_stripped = line.strip()
+                if "|" in line_stripped and line_stripped.startswith("|"):
+                    # Found a potential header - count pipes
+                    header_pipe_count = line_stripped.count("|")
+                    break
+            
+            # Count pipes in the last row
+            last_pipe_count = last_line.count("|")
+            
+            # If we found a header and the last row has fewer pipes, it's incomplete
+            if header_pipe_count is not None and last_pipe_count < header_pipe_count:
+                logging.info(f"_looks_truncated: Table row has {last_pipe_count} pipes but header has {header_pipe_count} - incomplete")
+                return True
+            
             # Even if it ends with "|", check if the row looks complete (has enough cells)
             # A complete table row typically has multiple "|" separators
-            pipe_count = last_line.count("|")
-            if pipe_count < 2:  # Less than 2 pipes suggests incomplete row
+            if last_pipe_count < 2:  # Less than 2 pipes suggests incomplete row
                 return True
         # Check if it ends with markdown formatting that suggests incomplete content
         if last_line.endswith(("*", "**", "***", "`", "```")):
@@ -296,11 +314,18 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             else:
                 truncated_context = out
             
+            # Detect if we're in a table context
+            is_table_context = "|" in truncated_context[-200:]
+            table_instruction = ""
+            if is_table_context:
+                table_instruction = "CRITICAL: The previous content ends in an incomplete table row. You MUST complete that table row first (match the number of columns in the header), then complete any remaining table rows, then finish the section. "
+            
             continuation_prompt = (
                 f"You previously wrote the following answer (showing last portion for context):\n\n{truncated_context}\n\n"
                 f"Continue the answer from where it was cut off. Do not repeat content. Keep the same format and "
                 f"finish any incomplete bullets, sentences, sections, or tables. Complete the answer fully. "
-                f"IMPORTANT: If the previous content ends mid-table, complete that table row and any remaining table rows. "
+                f"{table_instruction}"
+                f"IMPORTANT: If the previous content ends mid-table, complete that table row first (ensure it has the same number of columns as the header), then complete any remaining table rows and sections. "
                 f"Provide a complete continuation that finishes the current section and completes the entire answer. "
                 f"When you are fully finished, append the token [END] at the end."
             )
@@ -371,19 +396,21 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                     logging.info(f"_ensure_complete: [END] found but output still looks truncated, continuing...")
                     continue
             
-            # Check if continuation ends properly
+            # CRITICAL: Always check if the FULL output looks truncated, regardless of how continuation ended
+            # This ensures we continue even if continuation ends properly but full output is still incomplete
+            if _looks_truncated(out):
+                logging.info(f"_ensure_complete: Full output still looks truncated after continuation, continuing...")
+                continue
+            
+            # If we get here, the full output doesn't look truncated
+            # But also check if continuation ends properly as a secondary check
             if cont_ends_properly:
-                # CRITICAL: Check if the FULL output now ends properly and doesn't look truncated
-                if out.rstrip().endswith((".", "!", "?")) and not _looks_truncated(out):
-                    logging.info(f"_ensure_complete: Full output appears complete, stopping")
-                    break
-                else:
-                    # Continuation ends properly but full output still looks truncated - continue
-                    logging.info(f"_ensure_complete: Continuation ends properly but full output still looks truncated, continuing...")
-                    continue
+                logging.info(f"_ensure_complete: Full output appears complete and continuation ends properly, stopping")
+                break
             else:
-                # Continuation itself might be truncated (ends with comma, colon, etc.) - continue
-                logging.info(f"_ensure_complete: continuation ends with mid-sentence punctuation ({cont_clean[-10:]}), continuing...")
+                # Continuation doesn't end properly but full output doesn't look truncated
+                # This might be a false negative - continue to be safe
+                logging.info(f"_ensure_complete: Full output doesn't look truncated but continuation ends oddly, continuing to be safe...")
                 continue
         
         # FINAL CHECK: Before returning, verify the output is actually complete

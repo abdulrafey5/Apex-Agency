@@ -131,10 +131,23 @@ def chat_async():
     if not msg:
         return jsonify({"error": "Missing message"}), 400
 
-    shared = current_app.config.get("SHARED_THREAD", False)
-    thread_id = get_thread_id(session, shared)
+    # Allow thread_id to be passed in payload; if not provided, determine from session or generate unique
+    provided_thread_id = payload.get("thread_id")
+    if provided_thread_id:
+        thread_id = provided_thread_id
+    else:
+        # If there's a session, use normal thread logic
+        if "id_token" in session or "anon_id" in session:
+            shared = current_app.config.get("SHARED_THREAD", False)
+            thread_id = get_thread_id(session, shared)
+        else:
+            # No session (e.g., curl request) - generate a unique thread_id per request
+            # This prevents cross-contamination between different curl requests
+            import uuid
+            thread_id = f"curl_{uuid.uuid4().hex[:16]}"
+    
     task_id = start_chat_task(msg, thread_id, current_app.config.get("CHAT_DIR"))
-    return jsonify({"task_id": task_id, "status": "queued"})
+    return jsonify({"task_id": task_id, "status": "queued", "thread_id": thread_id})
 
 
 @chat_bp.route("/chat-result/<task_id>", methods=["GET"], strict_slashes=False)

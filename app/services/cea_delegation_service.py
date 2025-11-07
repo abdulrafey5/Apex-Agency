@@ -45,13 +45,27 @@ def delegate_cea_task(user_message, thread_context):
         if use_autogen:
             result = run_autogen_task(user_message, context=ctx)
             # Always run completion logic to ensure responses are complete
-            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "3"))
+            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "5"))
             if cont_max > 0:
                 result = _maybe_continue_list(user_message, result)
                 result = _ensure_complete(user_message, result, max_iters=cont_max)
-            # Final check: if result still looks truncated, log warning
+            
+            # AGGRESSIVE FINAL CHECK: For complex prompts, always do one more continuation pass if it looks incomplete
+            # This ensures we catch edge cases where detection might miss truncation
             if _looks_truncated(result):
-                logging.warning(f"delegate_cea_task: Result still appears truncated after completion logic. Length: {len(result)}")
+                logging.warning(f"delegate_cea_task: Result still appears truncated after {cont_max} iterations. Running final continuation pass...")
+                try:
+                    # One final aggressive continuation attempt
+                    final_cont = _ensure_complete(user_message, result, max_iters=1)
+                    if not _looks_truncated(final_cont) or len(final_cont) > len(result) + 50:
+                        # Final continuation helped - use it
+                        result = final_cont
+                        logging.info(f"delegate_cea_task: Final continuation pass improved result. New length: {len(result)}")
+                    else:
+                        logging.warning(f"delegate_cea_task: Final continuation pass didn't help. Result still truncated. Length: {len(result)}")
+                except Exception as e:
+                    logging.warning(f"delegate_cea_task: Final continuation pass failed: {e}")
+            
             return result
         else:
             # Direct single-shot local CEA without orchestration
@@ -180,6 +194,32 @@ def _looks_truncated(text: str) -> bool:
             # If last "sentence" is very short or looks incomplete, might be truncated
             if len(last_sentence.strip()) < 20:
                 return True
+            
+            # Check if response ends with a table but no closing statement
+            # For comprehensive guides/campaigns, they usually end with a summary or conclusion
+            if "|" in tail[-300:]:  # Table in last 300 chars
+                # Check if there's any text after the last table (closing statement, summary, etc.)
+                lines = tail.split("\n")
+                last_table_line_idx = None
+                for i in range(len(lines) - 1, max(0, len(lines) - 20), -1):  # Check last 20 lines
+                    if "|" in lines[i]:
+                        last_table_line_idx = i
+                        break
+                
+                if last_table_line_idx is not None:
+                    # Found a table - check if there's substantial content after it
+                    content_after_table = "\n".join(lines[last_table_line_idx + 1:]).strip()
+                    # If there's a table near the end but no closing statement, likely incomplete
+                    if len(content_after_table) < 50:
+                        # Check if the last line of the table is complete (has proper ending)
+                        last_table_line = lines[last_table_line_idx].strip()
+                        if not last_table_line.endswith("|") or last_table_line.count("|") < 2:
+                            return True
+                        # Table seems complete but no closing - might be OK, but for comprehensive guides, usually have a closing
+                        # Only flag as incomplete if the response is very long (suggests it should have a closing)
+                        if len(tail) > 3000:  # Very long response should have a closing statement
+                            return True
+            
             # Check if it ends mid-section (e.g., "### 7.4 Daily Optimization Cadence" followed by incomplete content)
             # Look for section headers (###, ##, #) near the end - if there's a header but no content after, it's incomplete
             last_lines = tail.split("\n")[-10:] if "\n" in tail else [tail]  # Check last 10 lines for better detection
@@ -287,12 +327,14 @@ def _looks_truncated(text: str) -> bool:
 
 
 def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
-    """If output appears truncated, request continuations and append. Uses smart truncation to preserve token budget."""
+    """If output appears truncated, request continuations and append. Uses Grok for faster, more reliable continuations."""
     try:
         import os
         out = text or ""
         iters = 0
-        cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
+        cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "800"))
+        # Use Grok for continuation (faster and more reliable than local CEA)
+        use_grok_for_continuation = os.getenv("CEA_USE_GROK_FOR_CONTINUATION", "true").lower() in ("1", "true", "yes")
         
         while iters < max_iters and _looks_truncated(out):
             iters += 1
@@ -331,21 +373,45 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             )
             
             try:
-                cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
+                # Use Grok for continuation (faster and more reliable)
+                if use_grok_for_continuation:
+                    logging.info(f"_ensure_complete: Using Grok for continuation (iteration {iters})")
+                    cont = grok_chat([{"role": "user", "content": continuation_prompt}], None)
+                else:
+                    # Fallback to local CEA if Grok is disabled
+                    cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
             except Exception as e:
                 error_msg = str(e)
                 logging.warning(f"_ensure_complete: continuation call failed at iteration {iters}: {error_msg}")
-                # Check if it's a connection error (Ollama not running)
-                if "Connection refused" in error_msg or "Failed to reach local CEA model" in error_msg:
-                    logging.error(f"_ensure_complete: Ollama appears to be unavailable. Cannot complete response.")
-                    # Return what we have with a note that it may be incomplete
-                    if _looks_truncated(out):
-                        out = out + "\n\n[Note: Response may be incomplete due to Ollama service unavailability]"
-                    break
-                # For other errors, try again if we have iterations left
-                if iters >= max_iters:
-                    break
-                continue
+                # If Grok fails, try local CEA as fallback
+                if use_grok_for_continuation:
+                    try:
+                        logging.info(f"_ensure_complete: Grok failed, trying local CEA as fallback")
+                        cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
+                    except Exception as e2:
+                        error_msg = str(e2)
+                        logging.warning(f"_ensure_complete: Local CEA fallback also failed: {error_msg}")
+                        # Check if it's a connection error (Ollama not running)
+                        if "Connection refused" in error_msg or "Failed to reach local CEA model" in error_msg:
+                            logging.error(f"_ensure_complete: Both Grok and Ollama unavailable. Cannot complete response.")
+                            if _looks_truncated(out):
+                                out = out + "\n\n[Note: Response may be incomplete due to service unavailability]"
+                            break
+                        # For other errors, try again if we have iterations left
+                        if iters >= max_iters:
+                            break
+                        continue
+                else:
+                    # Local CEA failed - check if it's a connection error
+                    if "Connection refused" in error_msg or "Failed to reach local CEA model" in error_msg:
+                        logging.error(f"_ensure_complete: Ollama appears to be unavailable. Cannot complete response.")
+                        if _looks_truncated(out):
+                            out = out + "\n\n[Note: Response may be incomplete due to Ollama service unavailability]"
+                        break
+                    # For other errors, try again if we have iterations left
+                    if iters >= max_iters:
+                        break
+                    continue
                 
             if not cont or not cont.strip():
                 logging.warning(f"_ensure_complete: empty continuation at iteration {iters}")

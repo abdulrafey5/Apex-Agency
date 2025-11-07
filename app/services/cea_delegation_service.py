@@ -219,31 +219,42 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 f"You previously wrote the following answer (showing last portion for context):\n\n{truncated_context}\n\n"
                 f"Continue the answer from where it was cut off. Do not repeat content. Keep the same format and "
                 f"finish any incomplete bullets, sentences, or sections. Complete the answer fully. "
+                f"IMPORTANT: Provide a complete continuation that finishes the current section and completes the answer. "
                 f"When you are fully finished, append the token [END] at the end."
             )
             
             try:
                 cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
             except Exception as e:
-                logging.warning(f"_ensure_complete: continuation call failed: {e}")
-                break
+                logging.warning(f"_ensure_complete: continuation call failed at iteration {iters}: {e}")
+                # Don't break immediately - try one more time if we have iterations left
+                if iters >= max_iters:
+                    break
+                continue
                 
             if not cont or not cont.strip():
                 logging.warning(f"_ensure_complete: empty continuation at iteration {iters}")
-                break
+                # If we have more iterations, try again
+                if iters >= max_iters:
+                    break
+                continue
             
             # Remove [END] marker if present
             cont_clean = cont.strip().replace("[END]", "").strip()
             
             # Better de-duplication: check if continuation is substantially different from what we already have
-            # Compare last 200 chars of out with first 200 chars of cont to avoid appending duplicates
-            if len(out) > 200 and len(cont_clean) > 200:
-                out_tail = out[-200:].lower().strip()
-                cont_head = cont_clean[:200].lower().strip()
-                # If more than 80% similarity, likely a duplicate
-                if out_tail in cont_head or cont_head in out_tail:
-                    logging.warning(f"_ensure_complete: continuation appears to be duplicate, stopping")
-                    break
+            # Only check if continuation is long enough to avoid false positives
+            if len(cont_clean) > 100:
+                # Compare last 100 chars of out with first 100 chars of cont to avoid appending duplicates
+                # Use a more lenient check - only reject if there's very high overlap
+                if len(out) > 100:
+                    out_tail = out[-100:].lower().strip()
+                    cont_head = cont_clean[:100].lower().strip()
+                    # Only reject if the continuation head is almost identical to the output tail
+                    # This prevents false positives when continuation naturally continues from where it left off
+                    if len(cont_head) > 50 and out_tail[-50:] == cont_head[:50]:
+                        logging.warning(f"_ensure_complete: continuation appears to be duplicate (high overlap), stopping")
+                        break
             
             # Append continuation
             sep = "\n\n" if not out.rstrip().endswith(("\n", "\n\n")) else "\n"
@@ -252,16 +263,28 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             # Check if continuation ended with [END] or proper sentence-ending punctuation (likely complete)
             # Don't stop if it ends with comma, colon, etc. - those indicate it's still incomplete
             cont_ends_properly = cont_clean.rstrip().endswith((".", "!", "?"))
-            if "[END]" in cont or cont_ends_properly:
-                # Double-check: if continuation is very short (< 50 chars), it might be incomplete
-                if len(cont_clean.strip()) < 50 and not "[END]" in cont:
-                    logging.info(f"_ensure_complete: continuation is very short ({len(cont_clean)} chars), continuing...")
-                    continue
-                logging.info(f"_ensure_complete: continuation appears complete, stopping")
+            
+            # If continuation is very short (< 100 chars), it's likely incomplete or cut off
+            if len(cont_clean.strip()) < 100:
+                logging.info(f"_ensure_complete: continuation is very short ({len(cont_clean)} chars), likely incomplete, continuing...")
+                # Don't break - continue to next iteration
+                continue
+            
+            if "[END]" in cont:
+                logging.info(f"_ensure_complete: [END] marker found, stopping")
                 break
+            elif cont_ends_properly:
+                # Check if the full output now ends properly (not just the continuation)
+                if out.rstrip().endswith((".", "!", "?")):
+                    logging.info(f"_ensure_complete: continuation appears complete, stopping")
+                    break
+                else:
+                    # Continuation ends properly but full output doesn't - might need another pass
+                    logging.info(f"_ensure_complete: continuation ends properly but full output doesn't, continuing...")
+                    continue
             else:
-                # Continuation itself might be truncated (ends with comma, etc.) - continue
-                logging.info(f"_ensure_complete: continuation ends with mid-sentence punctuation, continuing...")
+                # Continuation itself might be truncated (ends with comma, colon, etc.) - continue
+                logging.info(f"_ensure_complete: continuation ends with mid-sentence punctuation ({cont_clean[-10:]}), continuing...")
                 
         return out
     except Exception as e:

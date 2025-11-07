@@ -101,14 +101,23 @@ Original task: {user_message[:500]}
 Context: {str(context)[:200] if context else 'none'}
 """
         try:
-            # Use full token budget for synthesis to ensure complete responses (e.g., "Top 10" lists)
-            synthesis_tokens = int(os.getenv("CEA_MAX_TOKENS", os.getenv("CEA_FIRST_PASS_TOKENS", "600")))
-            final = call_local_cea(synth_prompt, num_predict=synthesis_tokens, timeout=stage_timeout, stream=True)
+            # Use Grok for synthesis (faster than local CEA) - can be overridden via env
+            use_grok_for_synthesis = os.getenv("CEA_USE_GROK_FOR_SYNTHESIS", "true").lower() in ("1", "true", "yes")
+            
+            if use_grok_for_synthesis:
+                # Use Grok for faster synthesis - it's already fast and produces good results
+                logging.info("Using Grok for synthesis (faster than local CEA)")
+                final = grok_chat([{"role": "user", "content": synth_prompt}], None)
+            else:
+                # Use local CEA for synthesis (slower but potentially more consistent with CEA style)
+                synthesis_tokens = int(os.getenv("CEA_MAX_TOKENS", os.getenv("CEA_FIRST_PASS_TOKENS", "600")))
+                final = call_local_cea(synth_prompt, num_predict=synthesis_tokens, timeout=stage_timeout, stream=True)
+            
             if not final or len(final.strip()) == 0:
                 # If synthesis returned empty, return worker output
                 final = worker_resp[:2000] if worker_resp else "Sorry, I couldn't generate a complete response. Please try again."
         except Exception as e:
-            logging.error(f"CEA synthesis stage failed: {e}")
+            logging.error(f"Synthesis stage failed: {e}")
             # Fallback: return worker output to avoid empty result
             final = worker_resp[:2000] if worker_resp else f"Error during synthesis: {str(e)}"
         log_agentops("task_completed", {"final_len": len(final)})

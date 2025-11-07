@@ -226,8 +226,16 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             try:
                 cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
             except Exception as e:
-                logging.warning(f"_ensure_complete: continuation call failed at iteration {iters}: {e}")
-                # Don't break immediately - try one more time if we have iterations left
+                error_msg = str(e)
+                logging.warning(f"_ensure_complete: continuation call failed at iteration {iters}: {error_msg}")
+                # Check if it's a connection error (Ollama not running)
+                if "Connection refused" in error_msg or "Failed to reach local CEA model" in error_msg:
+                    logging.error(f"_ensure_complete: Ollama appears to be unavailable. Cannot complete response.")
+                    # Return what we have with a note that it may be incomplete
+                    if _looks_truncated(out):
+                        out = out + "\n\n[Note: Response may be incomplete due to Ollama service unavailability]"
+                    break
+                # For other errors, try again if we have iterations left
                 if iters >= max_iters:
                     break
                 continue

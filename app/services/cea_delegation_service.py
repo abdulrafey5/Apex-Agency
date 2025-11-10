@@ -98,7 +98,7 @@ def delegate_cea_task(user_message, thread_context):
 
 
 def _maybe_continue_list(user_message: str, text: str) -> str:
-    """If user asked for top N and model returned fewer items, request continuation and append. Stops at exactly N items."""
+    """If user asked for top N, ensure exactly N items. Truncate if more, continue if fewer."""
     try:
         import re
         msg = (user_message or "").lower()
@@ -114,37 +114,98 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
             return text
         last = nums[-1]
         
-        # CRITICAL: If we already have target or more items, STOP - don't continue beyond requested number
-        if last >= target:
-            # But check if the last item (item #target) is incomplete
+        # CRITICAL: If we have MORE items than requested, TRUNCATE to exactly target
+        if last > target:
+            logging.warning(f"_maybe_continue_list: Found {last} items but target is {target}, truncating to {target}")
+            # Find where item #target ends by looking for the next item marker
+            target_marker = f"{target}."
+            next_item_marker = f"{target + 1}."
+            
+            # Find all item markers
+            lines = text.split("\n")
+            result_lines = []
+            item_count = 0
+            found_target = False
+            
+            for i, line in enumerate(lines):
+                # Check if this line starts a new numbered item
+                item_match = re.match(r"^\s*(\d+)\.", line)
+                if item_match:
+                    item_num = int(item_match.group(1))
+                    if item_num == target:
+                        found_target = True
+                        result_lines.append(line)
+                        item_count = target
+                    elif item_num > target:
+                        # We've hit an item beyond target - stop here
+                        # But first, check if there's a closing statement after the target item
+                        # Look ahead a few lines to see if there's a summary
+                        break
+                    else:
+                        # Item is before target - keep it
+                        result_lines.append(line)
+                        item_count = item_num
+                else:
+                    # Not a numbered item line
+                    if found_target and item_count == target:
+                        # We've already found the target item - check if this is a closing statement
+                        # If it's a short line (likely a closing statement), include it
+                        line_stripped = line.strip()
+                        if line_stripped and len(line_stripped) < 300:
+                            # Check if it looks like a closing statement (not another item's description)
+                            # If the next line starts with a number > target, this is likely a closing statement
+                            if i + 1 < len(lines):
+                                next_line = lines[i + 1]
+                                next_item_match = re.match(r"^\s*(\d+)\.", next_line)
+                                if next_item_match and int(next_item_match.group(1)) > target:
+                                    # This is a closing statement before the next item - include it
+                                    result_lines.append(line)
+                                    continue
+                            # If there's no next item or it's far away, this might be a closing statement
+                            # Include it if it's short and doesn't look like it's starting a new section
+                            if not line_stripped.startswith(("#", "##", "###", "|")):
+                                result_lines.append(line)
+                                continue
+                        # Otherwise, skip this line (it's part of item > target)
+                        break
+                    elif item_count < target:
+                        # Still building up to target - include this line
+                        result_lines.append(line)
+            
+            truncated = "\n".join(result_lines).rstrip()
+            # Ensure it ends properly
+            if truncated and not truncated.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
+                truncated = truncated.rstrip() + "."
+            return truncated
+        
+        # If we have exactly target items, check if the last one is complete
+        if last == target:
             text_ends_properly = text.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
             if text_ends_properly:
-                # We have enough items and they end properly - STOP
+                # We have exactly target items and they end properly - PERFECT, return as-is
                 return text
-            # Last item might be incomplete - check if it's item #target
-            if last == target:
-                # Item #target is incomplete - complete it but don't go beyond
-                last_item_marker = f"{last}."
-                last_marker_pos = text.rfind(last_item_marker)
-                if last_marker_pos >= 0:
-                    after_marker = text[last_marker_pos + len(last_item_marker):].strip()
-                    if after_marker and not text_ends_properly:
-                        # Complete item #target only
-                        remaining_prompt = (
-                            "You previously wrote the following answer.\n\n" +
-                            text.strip() +
-                            "\n\n" +
-                            f"Complete item {target} (it was cut off). Output ONLY the completed item {target}, using the same format. Do not add any more items. When finished, append [END]."
-                        )
-                        import os
-                        cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
-                        continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
-                        if continuation and continuation.strip():
-                            # Replace the incomplete last item
-                            last_item_start = text.rfind(last_item_marker)
-                            if last_item_start >= 0:
-                                text_before_last = text[:last_item_start].rstrip()
-                                return text_before_last + "\n\n" + continuation.strip().replace("[END]", "").strip()
+            # Last item might be incomplete - complete it but don't go beyond
+            last_item_marker = f"{last}."
+            last_marker_pos = text.rfind(last_item_marker)
+            if last_marker_pos >= 0:
+                after_marker = text[last_marker_pos + len(last_item_marker):].strip()
+                if after_marker and not text_ends_properly:
+                    # Complete item #target only
+                    remaining_prompt = (
+                        "You previously wrote the following answer.\n\n" +
+                        text.strip() +
+                        "\n\n" +
+                        f"Complete item {target} (it was cut off). Output ONLY the completed item {target}, using the same format. Do not add any more items. When finished, append [END]."
+                    )
+                    import os
+                    cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
+                    continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
+                    if continuation and continuation.strip():
+                        # Replace the incomplete last item
+                        last_item_start = text.rfind(last_item_marker)
+                        if last_item_start >= 0:
+                            text_before_last = text[:last_item_start].rstrip()
+                            return text_before_last + "\n\n" + continuation.strip().replace("[END]", "").strip()
             return text
         
         # We have fewer than target items - continue to reach target

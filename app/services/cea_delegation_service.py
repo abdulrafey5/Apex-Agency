@@ -62,6 +62,8 @@ def delegate_cea_task(user_message, thread_context):
                         nums = sorted({int(n) for n in items if n.isdigit()})
                         if nums:
                             last_item = nums[-1]
+                            logging.info(f"delegate_cea_task: After _maybe_continue_list, 'Top {target}' list has {last_item} items")
+                            
                             # If we have exactly target items and it ends properly, we're done
                             text_ends_properly = result.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
                             if last_item == target and text_ends_properly:
@@ -70,8 +72,15 @@ def delegate_cea_task(user_message, thread_context):
                                 return result
                             elif last_item > target:
                                 # Still have too many items - truncate again (shouldn't happen, but safety check)
-                                logging.warning(f"delegate_cea_task: 'Top {target}' list still has {last_item} items after _maybe_continue_list, truncating again")
+                                logging.error(f"delegate_cea_task: 'Top {target}' list still has {last_item} items after _maybe_continue_list, truncating again")
                                 result = _maybe_continue_list(user_message, result)
+                                # Verify again after second truncation
+                                items2 = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
+                                nums2 = sorted({int(n) for n in items2 if n.isdigit()})
+                                if nums2 and nums2[-1] > target:
+                                    logging.error(f"delegate_cea_task: CRITICAL - Still have {nums2[-1]} items after second truncation, forcing stop")
+                                    # Force stop - don't return more than target
+                                    return result
                                 return result
                             elif last_item < target:
                                 # Still need more items - but _maybe_continue_list should have handled this
@@ -83,6 +92,10 @@ def delegate_cea_task(user_message, thread_context):
                                     result = _complete_top_n_item(user_message, result, target)
                                 # If it ends properly but we have fewer items, that's fine - return as-is
                                 return result
+                        else:
+                            # No items found - this shouldn't happen, but return as-is
+                            logging.warning(f"delegate_cea_task: 'Top {target}' request but no numbered items found in result")
+                            return result
                 else:
                     # Not a "top N" request - run both functions normally
                     result = _maybe_continue_list(user_message, result)
@@ -164,31 +177,62 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
         # CRITICAL: If we have MORE items than requested, TRUNCATE to exactly target
         if last > target:
             logging.warning(f"_maybe_continue_list: Found {last} items but target is {target}, truncating to {target}")
-            # SIMPLE APPROACH: Go through lines, stop when we hit item #(target+1)
+            # SIMPLE APPROACH: Go through lines, stop IMMEDIATELY when we hit item #(target+1)
             lines = text.split("\n")
             result_lines = []
             highest_item_seen = 0
+            found_target_item = False
             
             for i, line in enumerate(lines):
                 # Check if this line starts a numbered item
                 item_match = re.match(r"^\s*(\d+)\.", line)
                 if item_match:
                     item_num = int(item_match.group(1))
-                    highest_item_seen = item_num
                     
                     if item_num > target:
-                        # We've hit an item beyond target - STOP IMMEDIATELY
+                        # We've hit an item beyond target - STOP IMMEDIATELY, don't include this line
+                        logging.info(f"_maybe_continue_list: Stopping at item {item_num} (target is {target})")
                         break
+                    elif item_num == target:
+                        # This is the target item - include it and mark that we found it
+                        found_target_item = True
+                        highest_item_seen = item_num
+                        result_lines.append(line)
                     else:
-                        # Item is target or less - include it
+                        # Item is less than target - include it
+                        highest_item_seen = item_num
                         result_lines.append(line)
                 else:
                     # Not a numbered item line
-                    if highest_item_seen <= target:
-                        # We haven't exceeded target yet - include this line
+                    if found_target_item:
+                        # We've already found and included the target item
+                        # Only include this line if it's part of the target item's description
+                        # (i.e., it's not a blank line followed by item > target)
+                        # Check if the next non-blank line is an item > target
+                        next_item_line = None
+                        for j in range(i + 1, len(lines)):
+                            if lines[j].strip():  # Find next non-blank line
+                                next_item_match = re.match(r"^\s*(\d+)\.", lines[j])
+                                if next_item_match:
+                                    next_item_line = int(next_item_match.group(1))
+                                break
+                        
+                        if next_item_line and next_item_line > target:
+                            # Next item is beyond target - this line might be a separator, stop here
+                            if not line.strip():
+                                # Blank line before next item - stop
+                                break
+                            # Non-blank line - might be closing text, include it but stop after
+                            result_lines.append(line)
+                            break
+                        else:
+                            # No next item or next item is <= target - include this line
+                            result_lines.append(line)
+                    elif highest_item_seen < target:
+                        # Still building up to target - include this line
                         result_lines.append(line)
                     else:
-                        # We've already exceeded target - stop
+                        # Shouldn't happen, but stop just in case
                         break
             
             truncated = "\n".join(result_lines).rstrip()
@@ -198,28 +242,26 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
             final_nums = sorted({int(n) for n in final_items if n.isdigit()})
             
             if final_nums and final_nums[-1] > target:
-                # Still have too many - force truncate at target
-                logging.warning(f"_maybe_continue_list: Still have {final_nums[-1]} items after truncation, forcing to {target}")
+                # Still have too many - force truncate at target (this shouldn't happen, but safety check)
+                logging.error(f"_maybe_continue_list: CRITICAL - Still have {final_nums[-1]} items after truncation, forcing to {target}")
                 result_lines = []
-                highest_item_seen = 0
                 for line in lines:
                     item_match = re.match(r"^\s*(\d+)\.", line)
                     if item_match:
                         item_num = int(item_match.group(1))
                         if item_num > target:
                             break
-                        highest_item_seen = item_num
-                        result_lines.append(line)
-                    else:
-                        if highest_item_seen <= target:
-                            result_lines.append(line)
-                        else:
-                            break
+                    result_lines.append(line)
                 truncated = "\n".join(result_lines).rstrip()
             
             # Ensure it ends properly
             if truncated and not truncated.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
                 truncated = truncated.rstrip() + "."
+            
+            # Final check - log what we're returning
+            final_check = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
+            final_check_nums = sorted({int(n) for n in final_check if n.isdigit()})
+            logging.info(f"_maybe_continue_list: After truncation, returning {len(final_check_nums)} items: {final_check_nums}")
             
             return truncated
         

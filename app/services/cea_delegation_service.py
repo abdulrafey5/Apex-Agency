@@ -47,24 +47,36 @@ def delegate_cea_task(user_message, thread_context):
             # Always run completion logic to ensure responses are complete
             cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "5"))
             if cont_max > 0:
+                # First, handle "top N" lists - this respects the exact number requested
                 result = _maybe_continue_list(user_message, result)
-                result = _ensure_complete(user_message, result, max_iters=cont_max)
-            
-            # AGGRESSIVE FINAL CHECK: For complex prompts, always do one more continuation pass if it looks incomplete
-            # This ensures we catch edge cases where detection might miss truncation
-            if _looks_truncated(result):
-                logging.warning(f"delegate_cea_task: Result still appears truncated after {cont_max} iterations. Running final continuation pass...")
-                try:
-                    # One final aggressive continuation attempt
-                    final_cont = _ensure_complete(user_message, result, max_iters=1)
-                    if not _looks_truncated(final_cont) or len(final_cont) > len(result) + 50:
-                        # Final continuation helped - use it
-                        result = final_cont
-                        logging.info(f"delegate_cea_task: Final continuation pass improved result. New length: {len(result)}")
+                # Then, ensure general completeness (but skip if it's a "top N" list that's already complete)
+                import re
+                is_top_n_request = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
+                if is_top_n_request:
+                    # For "top N" requests, only run _ensure_complete if the list is incomplete
+                    # Check if we have the right number of items
+                    target_match = re.search(r"top\s+(\d+)", (user_message or "").lower())
+                    if target_match:
+                        target = int(target_match.group(1))
+                        items = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
+                        nums = sorted({int(n) for n in items if n.isdigit()})
+                        if nums and nums[-1] >= target:
+                            # We have the right number of items - only ensure the last item is complete
+                            text_ends_properly = result.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
+                            if text_ends_properly:
+                                # List is complete - skip _ensure_complete to avoid going beyond target
+                                logging.info(f"delegate_cea_task: 'Top {target}' list is complete, skipping _ensure_complete")
+                            else:
+                                # Last item might be incomplete - run _ensure_complete but with lower max_iters
+                                result = _ensure_complete(user_message, result, max_iters=min(2, cont_max))
+                        else:
+                            # List is incomplete - run _ensure_complete normally
+                            result = _ensure_complete(user_message, result, max_iters=cont_max)
                     else:
-                        logging.warning(f"delegate_cea_task: Final continuation pass didn't help. Result still truncated. Length: {len(result)}")
-                except Exception as e:
-                    logging.warning(f"delegate_cea_task: Final continuation pass failed: {e}")
+                        result = _ensure_complete(user_message, result, max_iters=cont_max)
+                else:
+                    # Not a "top N" request - run _ensure_complete normally
+                    result = _ensure_complete(user_message, result, max_iters=cont_max)
             
             return result
         else:
@@ -86,7 +98,7 @@ def delegate_cea_task(user_message, thread_context):
 
 
 def _maybe_continue_list(user_message: str, text: str) -> str:
-    """If user asked for top N and model returned fewer items, request continuation and append."""
+    """If user asked for top N and model returned fewer items, request continuation and append. Stops at exactly N items."""
     try:
         import re
         msg = (user_message or "").lower()
@@ -102,46 +114,84 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
             return text
         last = nums[-1]
         
-        # Check if the last item appears incomplete (ends mid-sentence without proper punctuation)
-        # This handles cases where item 9 is cut off and item 10 is missing
-        # Simple heuristic: if text doesn't end with proper punctuation, it's likely truncated
+        # CRITICAL: If we already have target or more items, STOP - don't continue beyond requested number
+        if last >= target:
+            # But check if the last item (item #target) is incomplete
+            text_ends_properly = text.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
+            if text_ends_properly:
+                # We have enough items and they end properly - STOP
+                return text
+            # Last item might be incomplete - check if it's item #target
+            if last == target:
+                # Item #target is incomplete - complete it but don't go beyond
+                last_item_marker = f"{last}."
+                last_marker_pos = text.rfind(last_item_marker)
+                if last_marker_pos >= 0:
+                    after_marker = text[last_marker_pos + len(last_item_marker):].strip()
+                    if after_marker and not text_ends_properly:
+                        # Complete item #target only
+                        remaining_prompt = (
+                            "You previously wrote the following answer.\n\n" +
+                            text.strip() +
+                            "\n\n" +
+                            f"Complete item {target} (it was cut off). Output ONLY the completed item {target}, using the same format. Do not add any more items. When finished, append [END]."
+                        )
+                        import os
+                        cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
+                        continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
+                        if continuation and continuation.strip():
+                            # Replace the incomplete last item
+                            last_item_start = text.rfind(last_item_marker)
+                            if last_item_start >= 0:
+                                text_before_last = text[:last_item_start].rstrip()
+                                return text_before_last + "\n\n" + continuation.strip().replace("[END]", "").strip()
+            return text
+        
+        # We have fewer than target items - continue to reach target
         text_ends_properly = text.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
         last_item_incomplete = False
         
-        # Also check if the last numbered item's description seems incomplete
-        # Find the last occurrence of "last." and check what comes after it
+        # Check if the last numbered item's description seems incomplete
         last_item_marker = f"{last}."
         last_marker_pos = text.rfind(last_item_marker)
         if last_marker_pos >= 0:
-            # Get text after the last item marker
             after_marker = text[last_marker_pos + len(last_item_marker):].strip()
-            # If there's text after the marker but it doesn't end with punctuation, it's incomplete
             if after_marker and not text_ends_properly:
                 last_item_incomplete = True
-        
-        # If we have fewer items than requested OR the last item is incomplete, trigger continuation
-        if last >= target and not last_item_incomplete:
-            return text
         
         # Determine starting point: if last item is incomplete, complete it first, then continue
         start_from = last if last_item_incomplete else (last + 1)
         
-        # Ask model to continue from start_from to target
+        # Ask model to continue from start_from to target (exactly target, no more)
         remaining_prompt = (
             "You previously wrote the following answer.\n\n" +
             text.strip() +
             "\n\n" +
-            (f"Complete item {last} (it was cut off), then continue the list from {last+1} to {target}."
+            (f"Complete item {last} (it was cut off), then continue the list from {last+1} to {target} (exactly {target} items total, no more)."
              if last_item_incomplete and last < target
-             else f"Continue the list from {start_from} to {target}.") +
+             else f"Continue the list from {start_from} to {target} (exactly {target} items total, no more).") +
             " Output ONLY the remaining items, using the same format (number. title, short description). " +
-            "Do not repeat previous items. When finished, append [END]."
+            "Do not repeat previous items. Stop at item {target}. When finished, append [END]."
         )
         import os
         cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
         continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
         
         if not continuation or not continuation.strip():
+            return text
+        
+        # Remove [END] marker
+        continuation = continuation.strip().replace("[END]", "").strip()
+        
+        # Check for duplicates: if continuation contains items that already exist in text, skip them
+        existing_items = set(re.findall(r"^\s*(\d+)\.", text, flags=re.MULTILINE))
+        continuation_items = re.findall(r"^\s*(\d+)\.", continuation, flags=re.MULTILINE)
+        
+        # Filter out items that already exist
+        new_items = [item for item in continuation_items if item not in existing_items]
+        if not new_items:
+            # All items in continuation already exist - don't append
+            logging.warning(f"_maybe_continue_list: Continuation contains only duplicate items, skipping")
             return text
         
         # If continuation starts at expected number or completes the last item, append it
@@ -159,8 +209,42 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
                 if last_item_start >= 0:
                     # Keep everything before the incomplete last item, then append continuation
                     text_before_last = text[:last_item_start].rstrip()
-                    return text_before_last + "\n\n" + continuation.strip()
-            return text + sep + continuation.strip()
+                    combined = text_before_last + "\n\n" + continuation
+                    # Verify we don't exceed target
+                    final_items = re.findall(r"^\s*(\d+)\.", combined, flags=re.MULTILINE)
+                    final_nums = sorted({int(n) for n in final_items if n.isdigit()})
+                    if final_nums and final_nums[-1] > target:
+                        # We exceeded target - truncate at target
+                        logging.warning(f"_maybe_continue_list: Continuation exceeded target {target}, truncating")
+                        # Find where item #target ends
+                        target_marker = f"{target}."
+                        target_pos = combined.find(target_marker)
+                        if target_pos >= 0:
+                            # Find the end of item #target (next item marker or end of text)
+                            next_item_pos = combined.find(f"{target+1}.", target_pos)
+                            if next_item_pos >= 0:
+                                combined = combined[:next_item_pos].rstrip()
+                            # Ensure it ends properly
+                            if not combined.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
+                                # Add a period if needed
+                                combined = combined.rstrip() + "."
+                    return combined
+            combined = text + sep + continuation
+            # Verify we don't exceed target
+            final_items = re.findall(r"^\s*(\d+)\.", combined, flags=re.MULTILINE)
+            final_nums = sorted({int(n) for n in final_items if n.isdigit()})
+            if final_nums and final_nums[-1] > target:
+                # We exceeded target - truncate at target
+                logging.warning(f"_maybe_continue_list: Continuation exceeded target {target}, truncating")
+                target_marker = f"{target}."
+                target_pos = combined.find(target_marker)
+                if target_pos >= 0:
+                    next_item_pos = combined.find(f"{target+1}.", target_pos)
+                    if next_item_pos >= 0:
+                        combined = combined[:next_item_pos].rstrip()
+                    if not combined.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
+                        combined = combined.rstrip() + "."
+            return combined
         
         return text
     except Exception as e:
@@ -423,19 +507,60 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             # Remove [END] marker if present
             cont_clean = cont.strip().replace("[END]", "").strip()
             
-            # Better de-duplication: check if continuation is substantially different from what we already have
-            # Only check if continuation is long enough to avoid false positives
-            if len(cont_clean) > 100:
-                # Compare last 100 chars of out with first 100 chars of cont to avoid appending duplicates
-                # Use a more lenient check - only reject if there's very high overlap
-                if len(out) > 100:
-                    out_tail = out[-100:].lower().strip()
-                    cont_head = cont_clean[:100].lower().strip()
-                    # Only reject if the continuation head is almost identical to the output tail
-                    # This prevents false positives when continuation naturally continues from where it left off
-                    if len(cont_head) > 50 and out_tail[-50:] == cont_head[:50]:
-                        logging.warning(f"_ensure_complete: continuation appears to be duplicate (high overlap), stopping")
-                        break
+            # IMPROVED De-duplication: Check multiple ways to detect duplicate content
+            import re
+            should_skip = False
+            
+            # 1. Check for exact duplicate sentences (if continuation is mostly duplicate sentences, skip)
+            if len(out) > 200 and len(cont_clean) > 100:
+                out_sentences = set(re.split(r'[.!?]\s+', out[-1500:].lower()))
+                cont_sentences = re.split(r'[.!?]\s+', cont_clean.lower())
+                if len(cont_sentences) > 0:
+                    duplicate_sentences = sum(1 for s in cont_sentences if s.strip() and len(s.strip()) > 20 and s.strip() in out_sentences)
+                    if duplicate_sentences / len(cont_sentences) > 0.6:
+                        logging.warning(f"_ensure_complete: Continuation contains {duplicate_sentences}/{len(cont_sentences)} duplicate sentences, skipping")
+                        should_skip = True
+            
+            # 2. Check for duplicate numbered items (if continuation repeats numbered items, skip)
+            if not should_skip and len(cont_clean) > 50:
+                existing_items = set(re.findall(r"^\s*(\d+)\.", out, flags=re.MULTILINE))
+                continuation_items = re.findall(r"^\s*(\d+)\.", cont_clean, flags=re.MULTILINE)
+                if continuation_items:
+                    duplicate_items = sum(1 for item in continuation_items if item in existing_items)
+                    if duplicate_items / len(continuation_items) > 0.5:
+                        logging.warning(f"_ensure_complete: Continuation contains {duplicate_items}/{len(continuation_items)} duplicate numbered items, skipping")
+                        should_skip = True
+            
+            # 3. Check for substantial text overlap (if >70% of continuation matches existing content, skip)
+            if not should_skip and len(out) > 500 and len(cont_clean) > 100:
+                last_1500 = out[-1500:].lower()
+                cont_lower = cont_clean.lower()
+                # Use word-level overlap
+                out_words = set(last_1500.split())
+                cont_words = cont_lower.split()
+                if len(cont_words) > 10:
+                    matching_words = sum(1 for word in cont_words if len(word) > 3 and word in out_words)  # Only count words > 3 chars
+                    if matching_words / len(cont_words) > 0.7:
+                        logging.warning(f"_ensure_complete: Continuation has {matching_words}/{len(cont_words)} words overlapping with existing content, skipping")
+                        should_skip = True
+            
+            # 4. Check for exact duplicate at the end (if continuation head matches output tail exactly)
+            if not should_skip and len(out) > 100 and len(cont_clean) > 50:
+                out_tail = out[-100:].lower().strip()
+                cont_head = cont_clean[:100].lower().strip()
+                if len(cont_head) > 50 and out_tail[-50:] == cont_head[:50]:
+                    logging.warning(f"_ensure_complete: Continuation head exactly matches output tail, skipping")
+                    should_skip = True
+            
+            if should_skip:
+                # Skip this continuation, but check if output is complete
+                if not _looks_truncated(out):
+                    logging.info(f"_ensure_complete: Output appears complete after skipping duplicate continuation")
+                    break
+                # Output still looks truncated but continuation is duplicate - try one more time
+                if iters >= max_iters:
+                    break
+                continue
             
             # Append continuation
             sep = "\n\n" if not out.rstrip().endswith(("\n", "\n\n")) else "\n"

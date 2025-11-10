@@ -48,34 +48,44 @@ def delegate_cea_task(user_message, thread_context):
             cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "5"))
             if cont_max > 0:
                 # First, handle "top N" lists - this respects the exact number requested
-                result = _maybe_continue_list(user_message, result)
-                # Then, ensure general completeness (but skip if it's a "top N" list that's already complete)
                 import re
                 is_top_n_request = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
+                
                 if is_top_n_request:
-                    # For "top N" requests, only run _ensure_complete if the list is incomplete
-                    # Check if we have the right number of items
+                    # For "top N" requests, handle truncation/continuation first
+                    result = _maybe_continue_list(user_message, result)
+                    # CRITICAL: After _maybe_continue_list, verify we have exactly the target number
                     target_match = re.search(r"top\s+(\d+)", (user_message or "").lower())
                     if target_match:
                         target = int(target_match.group(1))
                         items = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
                         nums = sorted({int(n) for n in items if n.isdigit()})
-                        if nums and nums[-1] >= target:
-                            # We have the right number of items - only ensure the last item is complete
+                        if nums:
+                            last_item = nums[-1]
+                            # If we have exactly target items and it ends properly, we're done
                             text_ends_properly = result.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
-                            if text_ends_properly:
-                                # List is complete - skip _ensure_complete to avoid going beyond target
-                                logging.info(f"delegate_cea_task: 'Top {target}' list is complete, skipping _ensure_complete")
-                            else:
-                                # Last item might be incomplete - run _ensure_complete but with lower max_iters
-                                result = _ensure_complete(user_message, result, max_iters=min(2, cont_max))
-                        else:
-                            # List is incomplete - run _ensure_complete normally
-                            result = _ensure_complete(user_message, result, max_iters=cont_max)
-                    else:
-                        result = _ensure_complete(user_message, result, max_iters=cont_max)
+                            if last_item == target and text_ends_properly:
+                                # Perfect - exactly target items, ends properly - SKIP _ensure_complete
+                                logging.info(f"delegate_cea_task: 'Top {target}' list has exactly {last_item} items and ends properly, skipping _ensure_complete")
+                                return result
+                            elif last_item > target:
+                                # Still have too many items - truncate again (shouldn't happen, but safety check)
+                                logging.warning(f"delegate_cea_task: 'Top {target}' list still has {last_item} items after _maybe_continue_list, truncating again")
+                                result = _maybe_continue_list(user_message, result)
+                                return result
+                            elif last_item < target:
+                                # Still need more items - but _maybe_continue_list should have handled this
+                                # Only run _ensure_complete if the last item is incomplete
+                                if not text_ends_properly:
+                                    # Last item incomplete - complete it but don't go beyond target
+                                    logging.info(f"delegate_cea_task: 'Top {target}' list has {last_item} items but last is incomplete, completing last item only")
+                                    # Use a custom completion that respects the target
+                                    result = _complete_top_n_item(user_message, result, target)
+                                # If it ends properly but we have fewer items, that's fine - return as-is
+                                return result
                 else:
-                    # Not a "top N" request - run _ensure_complete normally
+                    # Not a "top N" request - run both functions normally
+                    result = _maybe_continue_list(user_message, result)
                     result = _ensure_complete(user_message, result, max_iters=cont_max)
             
             return result
@@ -95,6 +105,43 @@ def delegate_cea_task(user_message, thread_context):
             return call_local_cea(user_message)
         except Exception:
             return "Sorry — CEA failed to process the request."
+
+
+def _complete_top_n_item(user_message: str, text: str, target: int) -> str:
+    """Complete the last item in a 'top N' list without going beyond target."""
+    try:
+        import re
+        items = re.findall(r"^\s*(\d+)\.", text, flags=re.MULTILINE)
+        nums = sorted({int(n) for n in items if n.isdigit()})
+        if not nums:
+            return text
+        last = nums[-1]
+        
+        if last >= target:
+            return text  # Already have enough items
+        
+        # Complete the last item only
+        last_item_marker = f"{last}."
+        last_marker_pos = text.rfind(last_item_marker)
+        if last_marker_pos >= 0:
+            remaining_prompt = (
+                "You previously wrote the following answer.\n\n" +
+                text.strip() +
+                "\n\n" +
+                f"Complete item {last} (it was cut off). Output ONLY the completed item {last}, using the same format. Do not add any more items. When finished, append [END]."
+            )
+            import os
+            cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
+            continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
+            if continuation and continuation.strip():
+                last_item_start = text.rfind(last_item_marker)
+                if last_item_start >= 0:
+                    text_before_last = text[:last_item_start].rstrip()
+                    return text_before_last + "\n\n" + continuation.strip().replace("[END]", "").strip()
+        return text
+    except Exception as e:
+        logging.warning(f"_complete_top_n_item error: {e}")
+        return text
 
 
 def _maybe_continue_list(user_message: str, text: str) -> str:
@@ -117,65 +164,63 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
         # CRITICAL: If we have MORE items than requested, TRUNCATE to exactly target
         if last > target:
             logging.warning(f"_maybe_continue_list: Found {last} items but target is {target}, truncating to {target}")
-            # Find where item #target ends by looking for the next item marker
-            target_marker = f"{target}."
-            next_item_marker = f"{target + 1}."
-            
-            # Find all item markers
+            # SIMPLE APPROACH: Go through lines, stop when we hit item #(target+1)
             lines = text.split("\n")
             result_lines = []
-            item_count = 0
-            found_target = False
+            highest_item_seen = 0
             
             for i, line in enumerate(lines):
-                # Check if this line starts a new numbered item
+                # Check if this line starts a numbered item
                 item_match = re.match(r"^\s*(\d+)\.", line)
                 if item_match:
                     item_num = int(item_match.group(1))
-                    if item_num == target:
-                        found_target = True
-                        result_lines.append(line)
-                        item_count = target
-                    elif item_num > target:
-                        # We've hit an item beyond target - stop here
-                        # But first, check if there's a closing statement after the target item
-                        # Look ahead a few lines to see if there's a summary
+                    highest_item_seen = item_num
+                    
+                    if item_num > target:
+                        # We've hit an item beyond target - STOP IMMEDIATELY
                         break
                     else:
-                        # Item is before target - keep it
+                        # Item is target or less - include it
                         result_lines.append(line)
-                        item_count = item_num
                 else:
                     # Not a numbered item line
-                    if found_target and item_count == target:
-                        # We've already found the target item - check if this is a closing statement
-                        # If it's a short line (likely a closing statement), include it
-                        line_stripped = line.strip()
-                        if line_stripped and len(line_stripped) < 300:
-                            # Check if it looks like a closing statement (not another item's description)
-                            # If the next line starts with a number > target, this is likely a closing statement
-                            if i + 1 < len(lines):
-                                next_line = lines[i + 1]
-                                next_item_match = re.match(r"^\s*(\d+)\.", next_line)
-                                if next_item_match and int(next_item_match.group(1)) > target:
-                                    # This is a closing statement before the next item - include it
-                                    result_lines.append(line)
-                                    continue
-                            # If there's no next item or it's far away, this might be a closing statement
-                            # Include it if it's short and doesn't look like it's starting a new section
-                            if not line_stripped.startswith(("#", "##", "###", "|")):
-                                result_lines.append(line)
-                                continue
-                        # Otherwise, skip this line (it's part of item > target)
-                        break
-                    elif item_count < target:
-                        # Still building up to target - include this line
+                    if highest_item_seen <= target:
+                        # We haven't exceeded target yet - include this line
                         result_lines.append(line)
+                    else:
+                        # We've already exceeded target - stop
+                        break
             
             truncated = "\n".join(result_lines).rstrip()
+            
+            # Final verification: count items to ensure we have exactly target
+            final_items = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
+            final_nums = sorted({int(n) for n in final_items if n.isdigit()})
+            
+            if final_nums and final_nums[-1] > target:
+                # Still have too many - force truncate at target
+                logging.warning(f"_maybe_continue_list: Still have {final_nums[-1]} items after truncation, forcing to {target}")
+                result_lines = []
+                highest_item_seen = 0
+                for line in lines:
+                    item_match = re.match(r"^\s*(\d+)\.", line)
+                    if item_match:
+                        item_num = int(item_match.group(1))
+                        if item_num > target:
+                            break
+                        highest_item_seen = item_num
+                        result_lines.append(line)
+                    else:
+                        if highest_item_seen <= target:
+                            result_lines.append(line)
+                        else:
+                            break
+                truncated = "\n".join(result_lines).rstrip()
+            
             # Ensure it ends properly
             if truncated and not truncated.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
                 truncated = truncated.rstrip() + "."
+            
             return truncated
         
         # If we have exactly target items, check if the last one is complete

@@ -52,21 +52,51 @@ def write_s3_context(context):
     except Exception as e:
         logging.warning(f"Failed to write S3 context: {e}")
 
-def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperature=None):
+def _format_context_for_prompt(context):
+    """Format conversation context into a readable prompt string."""
+    if not context or not isinstance(context, list):
+        return ""
+    
+    context_parts = []
+    for msg in context[-6:]:  # Last 6 messages
+        if isinstance(msg, dict) and "role" in msg and "content" in msg:
+            role = msg["role"]
+            content = str(msg["content"])[:200]  # Limit each message to 200 chars
+            if role == "user":
+                context_parts.append(f"User: {content}")
+            elif role == "assistant":
+                context_parts.append(f"Assistant: {content}")
+    
+    if context_parts:
+        return "\n".join(context_parts) + "\n\n"
+    return ""
+
+
+def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperature=None, context=None):
     """
     Calls the locally hosted CEA model (e.g., gpt-oss:20b via Ollama).
     Returns the model's generated text.
     Uses a lock to prevent concurrent requests that cause multiple runners (partial GPU offload).
     """
+    # Format conversation context if provided
+    conversation_context = ""
+    if context:
+        conversation_context = _format_context_for_prompt(context)
+    
     # Read company context from S3
     s3_context = read_s3_context()
+    s3_context_str = ""
     if s3_context:
         # Truncate context aggressively - reserve most space for prompt and response
         context_str = str(s3_context)
-        max_context_chars = 150  # Very limited to avoid truncation
+        max_context_chars = 100  # Very limited to avoid truncation
         if len(context_str) > max_context_chars:
             context_str = context_str[:max_context_chars] + "..."
-        prompt = f"Company Context: {context_str}\n\n{prompt}"
+        s3_context_str = f"Company Context: {context_str}\n\n"
+    
+    # Combine: conversation context + S3 context + prompt
+    if conversation_context or s3_context_str:
+        prompt = f"{conversation_context}{s3_context_str}{prompt}"
     
     # Aggressive truncation: Reserve ~300 tokens for response, so max prompt ~700 tokens (~2800 chars)
     # This prevents Ollama from truncating and losing critical information

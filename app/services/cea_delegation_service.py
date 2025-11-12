@@ -4,6 +4,12 @@ from services.local_cea_client import call_local_cea
 import logging
 import os
 
+def _call_local_cea_with_context(user_message, context, num_predict=None, stream=True, timeout=300, temperature=None):
+    """Helper to call local CEA with conversation context."""
+    from services.local_cea_client import call_local_cea
+    return call_local_cea(user_message, stream=stream, timeout=timeout, num_predict=num_predict, temperature=temperature, context=context)
+
+
 def _force_truncate_top_n(text: str, target: int) -> str:
     """ABSOLUTE FINAL TRUNCATION: Force truncate to exactly target items, no exceptions."""
     try:
@@ -114,15 +120,24 @@ def delegate_cea_task(user_message, thread_context):
         
         if use_grok_for_short and is_simple_question:
             try:
-                # For simple questions, use Grok directly with a concise prompt
-                grok_text = grok_chat([{"role": "user", "content": f"{user_message}. Provide a concise, factual answer."}], None)
+                # Build conversation history for Grok (it accepts messages list)
+                messages = []
+                # Add previous conversation context (last few messages)
+                if ctx and isinstance(ctx, list):
+                    for msg in ctx[-4:]:  # Last 4 messages for context
+                        if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                            messages.append({"role": msg["role"], "content": msg["content"]})
+                # Add current user message
+                messages.append({"role": "user", "content": f"{user_message}. Provide a concise, factual answer."})
+                
+                grok_text = grok_chat(messages, None)
                 # Pass Grok output through completion logic; use local CEA for continuations
                 grok_text = _maybe_continue_list(user_message, grok_text)
                 grok_text = _ensure_complete(user_message, grok_text)
                 return grok_text
             except Exception:
-                # fall back to local CEA
-                base = call_local_cea(user_message)
+                # fall back to local CEA with context
+                base = _call_local_cea_with_context(user_message, ctx)
                 base = _maybe_continue_list(user_message, base)
                 return _ensure_complete(user_message, base)
 
@@ -201,7 +216,7 @@ def delegate_cea_task(user_message, thread_context):
         else:
             # Direct single-shot local CEA without orchestration
             first_pass_tokens = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "500")))
-            base = call_local_cea(user_message, num_predict=first_pass_tokens, stream=True)
+            base = _call_local_cea_with_context(user_message, ctx, num_predict=first_pass_tokens)
             cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "0"))
             if cont_max > 0:
                 # 🔧 FIX: Check if this is a "top N" request BEFORE calling _ensure_complete

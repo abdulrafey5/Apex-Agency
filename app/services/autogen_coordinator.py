@@ -45,10 +45,23 @@ def run_autogen_task(user_message, context=None, timeout_total=120, max_turns=3)
     while turn_count < max_turns:
         turn_count += 1
         # 1. Ask CEA to analyze & delegate with assumption-driven policy (no questions back to user)
-        # Truncate context to prevent prompt overflow
-        context_str = str(context)[:300] if context else 'none'
-        if context and len(str(context)) > 300:
-            context_str += "..."
+        # Format context properly for the prompt
+        context_str = ""
+        if context and isinstance(context, list):
+            context_parts = []
+            for msg in context[-4:]:  # Last 4 messages
+                if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                    role = msg["role"]
+                    content = str(msg["content"])[:150]  # Limit each message
+                    if role == "user":
+                        context_parts.append(f"Previous user: {content}")
+                    elif role == "assistant":
+                        context_parts.append(f"Previous assistant: {content}")
+            if context_parts:
+                context_str = "\n".join(context_parts)
+        
+        if not context_str:
+            context_str = "none"
         
         cea_prompt = f"""You are CEA, a decisive executive agent.
 Analyse the user's task and, if needed, delegate exactly ONE clear instruction to a Worker.
@@ -56,17 +69,20 @@ Analyse the user's task and, if needed, delegate exactly ONE clear instruction t
 Rules:
 1) Do NOT ask the user questions.
 2) If information is missing, make reasonable assumptions and proceed.
-3) Return either JSON with key 'delegation': {{'instruction': <one instruction>, 'deliverable': <what to return>}}
+3) Use the conversation context to understand references like "it", "that", "the waterfall", etc.
+4) Return either JSON with key 'delegation': {{'instruction': <one instruction>, 'deliverable': <what to return>}}
    OR return a single clear instruction string for the Worker.
 
+Conversation context:
+{context_str}
+
 User task: {user_message[:500]}
-Recent context: {context_str}
 """
         import os
         first_pass = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "200")))
         stage_timeout = int(os.getenv("CEA_STAGE_TIMEOUT_S", "300"))
         try:
-            cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True)
+            cea_resp = call_local_cea(cea_prompt, num_predict=first_pass, timeout=stage_timeout, stream=True, context=context)
         except Exception as e:
             logging.error(f"CEA analysis stage failed: {e}")
             # Fallback: use user message directly as instruction
@@ -74,13 +90,20 @@ Recent context: {context_str}
         log_agentops("cea_response", {"cea_text": cea_resp[:200]})
         delegation = parse_delegation_from_cea(cea_resp)
 
-        # 2. Send to worker
+        # 2. Send to worker with context
         worker_instruction = delegation.get("instruction") if isinstance(delegation, dict) and "instruction" in delegation else cea_resp
         log_agentops("delegation_sent", {"instruction": worker_instruction[:200]})
         # Use Grok API for worker with bounded tokens
+        # Include conversation context so worker understands references
+        worker_messages = []
+        if context and isinstance(context, list):
+            for msg in context[-3:]:  # Last 3 messages for context
+                if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                    worker_messages.append({"role": msg["role"], "content": msg["content"]})
+        worker_messages.append({"role": "user", "content": worker_instruction})
         # Allow tuning via env to avoid truncated content
         os.environ.setdefault("GROK_MAX_TOKENS", os.environ.get("GROK_MAX_TOKENS", "300"))
-        worker_resp = grok_chat([{"role": "user", "content": worker_instruction}], None)
+        worker_resp = grok_chat(worker_messages, None)
         log_agentops("worker_response", {"worker_text": worker_resp[:200]})
 
         # 3. Synthesize via CEA with assumption policy and no questions
@@ -89,16 +112,37 @@ Recent context: {context_str}
         if len(worker_resp) > 1500:
             worker_truncated += "\n[Worker output truncated...]"
         
+        # Include context in synthesis so it can understand references
+        synth_context_str = ""
+        if context and isinstance(context, list):
+            context_parts = []
+            for msg in context[-3:]:  # Last 3 messages
+                if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                    role = msg["role"]
+                    content = str(msg["content"])[:150]
+                    if role == "user":
+                        context_parts.append(f"Previous user: {content}")
+                    elif role == "assistant":
+                        context_parts.append(f"Previous assistant: {content}")
+            if context_parts:
+                synth_context_str = "\n".join(context_parts)
+        
+        if not synth_context_str:
+            synth_context_str = "none"
+        
         synth_prompt = f"""You are CEA. Produce the final deliverable for the user.
 
 Rules:
 1) Do NOT ask questions.
 2) If details are missing, state assumptions briefly and deliver a complete, ready-to-use answer.
-3) Prefer structured, skimmable formatting (headings, lists, tables) as appropriate.
+3) Use the conversation context to understand references like "it", "that", "the waterfall", etc.
+4) Prefer structured, skimmable formatting (headings, lists, tables) as appropriate.
+
+Conversation context:
+{synth_context_str}
 
 Worker output: {worker_truncated}
 Original task: {user_message[:500]}
-Context: {str(context)[:200] if context else 'none'}
 """
         try:
             # Use Grok for synthesis (faster than local CEA) - can be overridden via env
@@ -107,11 +151,18 @@ Context: {str(context)[:200] if context else 'none'}
             if use_grok_for_synthesis:
                 # Use Grok for faster synthesis - it's already fast and produces good results
                 logging.info("Using Grok for synthesis (faster than local CEA)")
-                final = grok_chat([{"role": "user", "content": synth_prompt}], None)
+                # Include context in synthesis messages
+                synth_messages = []
+                if context and isinstance(context, list):
+                    for msg in context[-3:]:  # Last 3 messages
+                        if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                            synth_messages.append({"role": msg["role"], "content": msg["content"]})
+                synth_messages.append({"role": "user", "content": synth_prompt})
+                final = grok_chat(synth_messages, None)
             else:
                 # Use local CEA for synthesis (slower but potentially more consistent with CEA style)
                 synthesis_tokens = int(os.getenv("CEA_MAX_TOKENS", os.getenv("CEA_FIRST_PASS_TOKENS", "600")))
-                final = call_local_cea(synth_prompt, num_predict=synthesis_tokens, timeout=stage_timeout, stream=True)
+                final = call_local_cea(synth_prompt, num_predict=synthesis_tokens, timeout=stage_timeout, stream=True, context=context)
             
             if not final or len(final.strip()) == 0:
                 # If synthesis returned empty, return worker output

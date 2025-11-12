@@ -1,4 +1,3 @@
-# /data/inception/app/services/cea_delegation_service.py
 from services.autogen_coordinator import run_autogen_task
 from services.grok_service import grok_chat
 from services.local_cea_client import call_local_cea
@@ -164,13 +163,7 @@ def delegate_cea_task(user_message, thread_context):
                             elif last_item > target:
                                 # Still have too many items - truncate again (shouldn't happen, but safety check)
                                 logging.error(f"delegate_cea_task: 'Top {target}' list still has {last_item} items after _maybe_continue_list, truncating again")
-                                result = _maybe_continue_list(user_message, result)
-                                # Verify again after second truncation
-                                items2 = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
-                                nums2 = sorted({int(n) for n in items2 if n.isdigit()})
-                                if nums2 and nums2[-1] > target:
-                                    logging.error(f"delegate_cea_task: CRITICAL - Still have {nums2[-1]} items after second truncation, forcing absolute truncation")
-                                    result = _force_truncate_top_n(result, target)
+                                result = _force_truncate_top_n(result, target)
                                 return result
                             elif last_item < target:
                                 # Still need more items - but _maybe_continue_list should have handled this
@@ -211,8 +204,39 @@ def delegate_cea_task(user_message, thread_context):
             base = call_local_cea(user_message, num_predict=first_pass_tokens, stream=True)
             cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "0"))
             if cont_max > 0:
+                # 🔧 FIX: Check if this is a "top N" request BEFORE calling _ensure_complete
+                import re
+                is_top_n_check = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
+                
                 base = _maybe_continue_list(user_message, base)
-                base = _ensure_complete(user_message, base, max_iters=cont_max)
+                
+                if is_top_n_check:
+                    # For "top N" requests, DON'T call _ensure_complete if we have correct count
+                    target_check = re.search(r"top\s+(\d+)", (user_message or "").lower())
+                    if target_check:
+                        target = int(target_check.group(1))
+                        items = re.findall(r"^\s*(\d+)\.", base, flags=re.MULTILINE)
+                        nums = sorted({int(n) for n in items if n.isdigit()})
+                        
+                        if nums and nums[-1] == target:
+                            # We have exactly the right number - DON'T call _ensure_complete
+                            logging.info(f"delegate_cea_task: Skipping _ensure_complete for 'top {target}' - already have {target} items")
+                            text_ends_properly = base.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
+                            if not text_ends_properly:
+                                # Only complete the last item if it's incomplete
+                                base = _complete_top_n_item(user_message, base, target)
+                        elif nums and nums[-1] > target:
+                            # Too many items - truncate
+                            logging.warning(f"delegate_cea_task: 'Top {target}' has {nums[-1]} items, truncating")
+                            base = _force_truncate_top_n(base, target)
+                        else:
+                            # Fewer items - only complete if last item is incomplete
+                            text_ends_properly = base.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
+                            if not text_ends_properly and nums:
+                                base = _complete_top_n_item(user_message, base, target)
+                else:
+                    # Not a "top N" request - run _ensure_complete normally
+                    base = _ensure_complete(user_message, base, max_iters=cont_max)
             
             # ABSOLUTE FINAL CHECK for non-autogen path too
             import re
@@ -383,6 +407,7 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
             text_ends_properly = text.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
             if text_ends_properly:
                 # We have exactly target items and they end properly - PERFECT, return as-is
+                logging.info(f"_maybe_continue_list: Have exactly {target} items and ends properly, returning as-is")
                 return text
             # Last item might be incomplete - complete it but don't go beyond
             last_item_marker = f"{last}."
@@ -513,10 +538,27 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
         return text
 
 
-def _looks_truncated(text: str) -> bool:
+def _looks_truncated(text: str, user_message: str = None) -> bool:
     """Detect if text appears truncated. Improved detection for mid-word/sentence cuts."""
     if not text:
         return False
+    
+    # 🔧 NEW: Check if this is a "top N" request and we have N items
+    if user_message:
+        import re
+        m = re.search(r"top\s+(\d+)", (user_message or "").lower())
+        if m:
+            target = int(m.group(1))
+            items = re.findall(r"^\s*(\d+)\.", text, flags=re.MULTILINE)
+            nums = sorted({int(n) for n in items if n.isdigit()})
+            if nums and nums[-1] == target:
+                # We have exactly the target number of items
+                tail = text.rstrip()
+                if tail.endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
+                    # Ends properly with correct count - NOT truncated
+                    logging.info(f"_looks_truncated: 'Top {target}' list has exactly {target} items and ends properly - NOT truncated")
+                    return False
+    
     tail = text.rstrip()
     # If [END] marker is present, consider it complete
     if "[END]" in tail:
@@ -675,13 +717,25 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
     """If output appears truncated, request continuations and append. Uses Grok for faster, more reliable continuations."""
     try:
         import os
+        import re
+        
+        # 🔍 DEBUG: Check if this is being called for "top N" requests
+        is_top_n = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
+        if is_top_n:
+            target_match = re.search(r"top\s+(\d+)", (user_message or "").lower())
+            if target_match:
+                target = int(target_match.group(1))
+                items = re.findall(r"^\s*(\d+)\.", text, flags=re.MULTILINE)
+                nums = sorted({int(n) for n in items if n.isdigit()})
+                logging.warning(f"⚠️ _ensure_complete called for 'top {target}' request with {len(nums)} items: {nums}")
+        
         out = text or ""
         iters = 0
         cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "800"))
         # Use Grok for continuation (faster and more reliable than local CEA)
         use_grok_for_continuation = os.getenv("CEA_USE_GROK_FOR_CONTINUATION", "true").lower() in ("1", "true", "yes")
         
-        while iters < max_iters and _looks_truncated(out):
+        while iters < max_iters and _looks_truncated(out, user_message):
             iters += 1
             logging.info(f"_ensure_complete: iteration {iters}, text length: {len(out)}")
             
@@ -739,7 +793,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                         # Check if it's a connection error (Ollama not running)
                         if "Connection refused" in error_msg or "Failed to reach local CEA model" in error_msg:
                             logging.error(f"_ensure_complete: Both Grok and Ollama unavailable. Cannot complete response.")
-                            if _looks_truncated(out):
+                            if _looks_truncated(out, user_message):
                                 out = out + "\n\n[Note: Response may be incomplete due to service unavailability]"
                             break
                         # For other errors, try again if we have iterations left
@@ -750,7 +804,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                     # Local CEA failed - check if it's a connection error
                     if "Connection refused" in error_msg or "Failed to reach local CEA model" in error_msg:
                         logging.error(f"_ensure_complete: Ollama appears to be unavailable. Cannot complete response.")
-                        if _looks_truncated(out):
+                        if _looks_truncated(out, user_message):
                             out = out + "\n\n[Note: Response may be incomplete due to Ollama service unavailability]"
                         break
                     # For other errors, try again if we have iterations left
@@ -769,7 +823,6 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             cont_clean = cont.strip().replace("[END]", "").strip()
             
             # IMPROVED De-duplication: Check multiple ways to detect duplicate content
-            import re
             should_skip = False
             
             # 1. Check for exact duplicate sentences (if continuation is mostly duplicate sentences, skip)
@@ -815,7 +868,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             
             if should_skip:
                 # Skip this continuation, but check if output is complete
-                if not _looks_truncated(out):
+                if not _looks_truncated(out, user_message):
                     logging.info(f"_ensure_complete: Output appears complete after skipping duplicate continuation")
                     break
                 # Output still looks truncated but continuation is duplicate - try one more time
@@ -841,7 +894,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             if "[END]" in cont:
                 logging.info(f"_ensure_complete: [END] marker found, checking if output is complete...")
                 # Even with [END], verify the output doesn't look truncated
-                if not _looks_truncated(out):
+                if not _looks_truncated(out, user_message):
                     logging.info(f"_ensure_complete: Output appears complete with [END], stopping")
                     break
                 else:
@@ -850,7 +903,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             
             # CRITICAL: Always check if the FULL output looks truncated, regardless of how continuation ended
             # This ensures we continue even if continuation ends properly but full output is still incomplete
-            if _looks_truncated(out):
+            if _looks_truncated(out, user_message):
                 logging.info(f"_ensure_complete: Full output still looks truncated after continuation, continuing...")
                 continue
             
@@ -867,7 +920,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
         
         # FINAL CHECK: Before returning, verify the output is actually complete
         # If it still looks truncated after all iterations, log a warning
-        if _looks_truncated(out):
+        if _looks_truncated(out, user_message):
             logging.warning(f"_ensure_complete: Output still appears truncated after {iters} iterations. Length: {len(out)}")
             # Don't add a note here - let it return as-is, but log the issue
         
@@ -875,4 +928,3 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
     except Exception as e:
         logging.warning(f"_ensure_complete error: {e}")
         return text
-

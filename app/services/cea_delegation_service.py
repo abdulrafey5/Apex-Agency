@@ -5,6 +5,38 @@ from services.local_cea_client import call_local_cea
 import logging
 import os
 
+def _force_truncate_top_n(text: str, target: int) -> str:
+    """ABSOLUTE FINAL TRUNCATION: Force truncate to exactly target items, no exceptions."""
+    try:
+        import re
+        lines = text.split("\n")
+        result_lines = []
+        for line in lines:
+            item_match = re.match(r"^\s*(\d+)\.", line)
+            if item_match:
+                item_num = int(item_match.group(1))
+                if item_num > target:
+                    break
+            result_lines.append(line)
+        truncated = "\n".join(result_lines).rstrip()
+        # Verify
+        final_items = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
+        final_nums = sorted({int(n) for n in final_items if n.isdigit()})
+        if final_nums and final_nums[-1] > target:
+            # Still failed - use even more aggressive approach
+            result_lines = []
+            for line in lines:
+                if re.match(r"^\s*(\d+)\.", line):
+                    if int(re.match(r"^\s*(\d+)\.", line).group(1)) > target:
+                        break
+                result_lines.append(line)
+            truncated = "\n".join(result_lines).rstrip()
+        return truncated
+    except Exception as e:
+        logging.error(f"_force_truncate_top_n error: {e}")
+        return text
+
+
 def delegate_cea_task(user_message, thread_context):
     """
     Main entry point used by routes/chat.py
@@ -73,8 +105,8 @@ def delegate_cea_task(user_message, thread_context):
                                 final_verify_items = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
                                 final_verify_nums = sorted({int(n) for n in final_verify_items if n.isdigit()})
                                 if final_verify_nums and final_verify_nums[-1] > target:
-                                    logging.error(f"delegate_cea_task: CRITICAL - Found {final_verify_nums[-1]} items in final result, forcing truncation")
-                                    result = _maybe_continue_list(user_message, result)
+                                    logging.error(f"delegate_cea_task: CRITICAL - Found {final_verify_nums[-1]} items in final result, forcing absolute truncation")
+                                    result = _force_truncate_top_n(result, target)
                                 return result
                             elif last_item > target:
                                 # Still have too many items - truncate again (shouldn't happen, but safety check)
@@ -84,17 +116,8 @@ def delegate_cea_task(user_message, thread_context):
                                 items2 = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
                                 nums2 = sorted({int(n) for n in items2 if n.isdigit()})
                                 if nums2 and nums2[-1] > target:
-                                    logging.error(f"delegate_cea_task: CRITICAL - Still have {nums2[-1]} items after second truncation, forcing manual truncation")
-                                    # Force manual truncation - cut at item #(target+1)
-                                    lines = result.split("\n")
-                                    result_lines = []
-                                    for line in lines:
-                                        item_match = re.match(r"^\s*(\d+)\.", line)
-                                        if item_match:
-                                            if int(item_match.group(1)) > target:
-                                                break
-                                        result_lines.append(line)
-                                    result = "\n".join(result_lines).rstrip()
+                                    logging.error(f"delegate_cea_task: CRITICAL - Still have {nums2[-1]} items after second truncation, forcing absolute truncation")
+                                    result = _force_truncate_top_n(result, target)
                                 return result
                             elif last_item < target:
                                 # Still need more items - but _maybe_continue_list should have handled this
@@ -115,6 +138,19 @@ def delegate_cea_task(user_message, thread_context):
                     result = _maybe_continue_list(user_message, result)
                     result = _ensure_complete(user_message, result, max_iters=cont_max)
             
+            # ABSOLUTE FINAL CHECK: For "top N" requests, force truncation one more time before returning
+            import re
+            is_top_n_final = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
+            if is_top_n_final:
+                target_match_final = re.search(r"top\s+(\d+)", (user_message or "").lower())
+                if target_match_final:
+                    target_final = int(target_match_final.group(1))
+                    final_items_check = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
+                    final_nums_check = sorted({int(n) for n in final_items_check if n.isdigit()})
+                    if final_nums_check and final_nums_check[-1] > target_final:
+                        logging.error(f"delegate_cea_task: ABSOLUTE FINAL - Found {final_nums_check[-1]} items, forcing truncation to {target_final}")
+                        result = _force_truncate_top_n(result, target_final)
+            
             return result
         else:
             # Direct single-shot local CEA without orchestration
@@ -124,6 +160,20 @@ def delegate_cea_task(user_message, thread_context):
             if cont_max > 0:
                 base = _maybe_continue_list(user_message, base)
                 base = _ensure_complete(user_message, base, max_iters=cont_max)
+            
+            # ABSOLUTE FINAL CHECK for non-autogen path too
+            import re
+            is_top_n_final = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
+            if is_top_n_final:
+                target_match_final = re.search(r"top\s+(\d+)", (user_message or "").lower())
+                if target_match_final:
+                    target_final = int(target_match_final.group(1))
+                    final_items_check = re.findall(r"^\s*(\d+)\.", base, flags=re.MULTILINE)
+                    final_nums_check = sorted({int(n) for n in final_items_check if n.isdigit()})
+                    if final_nums_check and final_nums_check[-1] > target_final:
+                        logging.error(f"delegate_cea_task: ABSOLUTE FINAL (non-autogen) - Found {final_nums_check[-1]} items, forcing truncation to {target_final}")
+                        base = _force_truncate_top_n(base, target_final)
+            
             return base
     except Exception as e:
         logging.exception("CEA delegation failed")

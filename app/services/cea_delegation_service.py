@@ -9,28 +9,79 @@ def _force_truncate_top_n(text: str, target: int) -> str:
     """ABSOLUTE FINAL TRUNCATION: Force truncate to exactly target items, no exceptions."""
     try:
         import re
+        if not text or not text.strip():
+            return text
+        
+        # Find all numbered items
         lines = text.split("\n")
         result_lines = []
+        items_found = []
+        
         for line in lines:
+            # Check if this line starts a numbered item
             item_match = re.match(r"^\s*(\d+)\.", line)
             if item_match:
                 item_num = int(item_match.group(1))
+                items_found.append(item_num)
+                
                 if item_num > target:
+                    # Found item beyond target - STOP HERE, don't include this line
+                    logging.warning(f"_force_truncate_top_n: Stopping at item {item_num} (target is {target})")
                     break
-            result_lines.append(line)
+                else:
+                    # Item is target or less - include it
+                    result_lines.append(line)
+            else:
+                # Not a numbered item - include it if we haven't exceeded target
+                if not items_found or items_found[-1] <= target:
+                    result_lines.append(line)
+                else:
+                    # We've already exceeded target - stop
+                    break
+        
         truncated = "\n".join(result_lines).rstrip()
-        # Verify
+        
+        # AGGRESSIVE VERIFICATION: Count items and verify
         final_items = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
         final_nums = sorted({int(n) for n in final_items if n.isdigit()})
+        
         if final_nums and final_nums[-1] > target:
-            # Still failed - use even more aggressive approach
+            # Still failed - this should never happen, but force it anyway
+            logging.error(f"_force_truncate_top_n: CRITICAL - Still have {final_nums[-1]} items after truncation, forcing again")
+            # Find the position of item #target and cut everything after it
+            target_marker = f"{target}."
+            target_pos = truncated.find(target_marker)
+            if target_pos >= 0:
+                # Find where item #target ends (next item marker or end of text)
+                next_marker = f"{target + 1}."
+                next_pos = truncated.find(next_marker, target_pos)
+                if next_pos >= 0:
+                    truncated = truncated[:next_pos].rstrip()
+                else:
+                    # Item #(target+1) not found, but we know it exists
+                    # Find it by looking for any number > target
+                    for i, line in enumerate(lines):
+                        item_match = re.match(r"^\s*(\d+)\.", line)
+                        if item_match and int(item_match.group(1)) > target:
+                            # Found it - truncate before this line
+                            truncated = "\n".join(lines[:i]).rstrip()
+                            break
+        
+        # Final check - if still wrong, use nuclear option
+        final_check = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
+        final_check_nums = sorted({int(n) for n in final_check if n.isdigit()})
+        if final_check_nums and final_check_nums[-1] > target:
+            logging.error(f"_force_truncate_top_n: NUCLEAR OPTION - Manually removing all items > {target}")
             result_lines = []
             for line in lines:
-                if re.match(r"^\s*(\d+)\.", line):
-                    if int(re.match(r"^\s*(\d+)\.", line).group(1)) > target:
+                item_match = re.match(r"^\s*(\d+)\.", line)
+                if item_match:
+                    if int(item_match.group(1)) > target:
                         break
                 result_lines.append(line)
             truncated = "\n".join(result_lines).rstrip()
+        
+        logging.info(f"_force_truncate_top_n: Final result has items: {re.findall(r'^\s*(\d+)\.', truncated, flags=re.MULTILINE)}")
         return truncated
     except Exception as e:
         logging.error(f"_force_truncate_top_n error: {e}")
@@ -41,6 +92,8 @@ def delegate_cea_task(user_message, thread_context):
     """
     Main entry point used by routes/chat.py
     """
+    import re
+    result = None
     try:
         # Tunables
         max_ctx = int(os.getenv("CEA_MAX_CONTEXT_MESSAGES", "6"))
@@ -174,14 +227,32 @@ def delegate_cea_task(user_message, thread_context):
                         logging.error(f"delegate_cea_task: ABSOLUTE FINAL (non-autogen) - Found {final_nums_check[-1]} items, forcing truncation to {target_final}")
                         base = _force_truncate_top_n(base, target_final)
             
-            return base
+            result = base
     except Exception as e:
         logging.exception("CEA delegation failed")
         # fallback: quick local CEA answer to not break UI
         try:
-            return call_local_cea(user_message)
+            result = call_local_cea(user_message)
         except Exception:
-            return "Sorry — CEA failed to process the request."
+            result = "Sorry — CEA failed to process the request."
+    
+    # ABSOLUTE FINAL CHECK: ALWAYS apply truncation for "top N" requests, no matter what path was taken
+    if result:
+        is_top_n = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
+        if is_top_n:
+            target_match = re.search(r"top\s+(\d+)", (user_message or "").lower())
+            if target_match:
+                target = int(target_match.group(1))
+                items_before = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
+                nums_before = sorted({int(n) for n in items_before if n.isdigit()})
+                if nums_before and nums_before[-1] > target:
+                    logging.warning(f"delegate_cea_task: FINAL CHECK - Found {nums_before[-1]} items for 'top {target}', forcing truncation")
+                    result = _force_truncate_top_n(result, target)
+                    items_after = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
+                    nums_after = sorted({int(n) for n in items_after if n.isdigit()})
+                    logging.info(f"delegate_cea_task: After final truncation, result has {len(nums_after)} items: {nums_after}")
+    
+    return result
 
 
 def _complete_top_n_item(user_message: str, text: str, target: int) -> str:

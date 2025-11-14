@@ -113,6 +113,25 @@ def run_agent_analysis(
                     time.sleep(2)  # Brief delay before retry
                     continue
                 else:
+                    # Final fallback: Try Grok if local CEA failed
+                    if not INCUBATOR_USE_GROK_FOR_AGENTS:
+                        logging.warning(f"{agent_def.name} failed with local CEA, trying Grok as fallback...")
+                        try:
+                            prompt = build_agent_prompt(
+                                agent_def=agent_def,
+                                business_idea=business_idea,
+                                previous_insights=previous_insights if previous_insights else None,
+                                time_remaining_minutes=time_remaining_minutes
+                            )
+                            messages = [{"role": "user", "content": prompt}]
+                            insight = grok_chat(messages, None)
+                            if insight and len(insight.strip()) >= 50:
+                                logging.info(f"{agent_def.name} succeeded with Grok fallback")
+                                insight = insight.replace("[AGENT_COMPLETE]", "").strip()
+                                return insight, True
+                        except Exception as e:
+                            logging.error(f"Grok fallback also failed for {agent_def.name}: {e}")
+                    
                     return f"Error: {agent_def.name} returned empty or insufficient response after {max_retries + 1} attempts", False
             
             # Remove completion markers if present
@@ -260,6 +279,10 @@ Continue and complete the business plan. Make sure to finish the current section
                             messages = [{"role": "user", "content": cont_prompt}]
                             continuation = grok_chat(messages, None)
                             if continuation and len(continuation.strip()) > 50:
+                                # Check if continuation itself is truncated
+                                if _looks_truncated(continuation, business_idea):
+                                    logging.warning(f"Continuation itself appears truncated, may need another iteration")
+                                
                                 # Check for duplication before appending
                                 last_100_chars = business_plan.rstrip()[-100:].lower()
                                 first_100_chars = continuation.strip()[:100].lower()
@@ -268,8 +291,15 @@ Continue and complete the business plan. Make sure to finish the current section
                                 if last_100_chars not in first_100_chars and first_100_chars not in last_100_chars:
                                     business_plan = business_plan.rstrip() + "\n\n" + continuation.strip()
                                 else:
-                                    # If there's overlap, just append the new part
-                                    business_plan = business_plan + continuation.strip()
+                                    # If there's overlap, find the unique part
+                                    overlap_found = False
+                                    for i in range(50, min(len(continuation), 200)):
+                                        if business_plan.rstrip()[-i:].lower() == continuation.strip()[:i].lower():
+                                            business_plan = business_plan.rstrip() + continuation.strip()[i:]
+                                            overlap_found = True
+                                            break
+                                    if not overlap_found:
+                                        business_plan = business_plan + continuation.strip()
                         else:
                             # Use local completion logic with more iterations
                             business_plan = _ensure_complete(business_idea, business_plan, max_iters=3)

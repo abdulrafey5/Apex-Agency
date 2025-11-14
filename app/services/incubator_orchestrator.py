@@ -63,10 +63,11 @@ def run_agent_analysis(
     agent_role: AgentRole,
     business_idea: str,
     previous_insights: Dict[AgentRole, str],
-    time_remaining_minutes: Optional[int] = None
+    time_remaining_minutes: Optional[int] = None,
+    max_retries: int = 2
 ) -> Tuple[str, bool]:
     """
-    Run analysis for a single agent.
+    Run analysis for a single agent with retry logic.
     
     Returns:
         Tuple of (insight_text, success_flag)
@@ -75,47 +76,61 @@ def run_agent_analysis(
     if not agent_def:
         return f"Error: Agent definition not found for {agent_role}", False
     
-    try:
-        # Build agent prompt
-        prompt = build_agent_prompt(
-            agent_def=agent_def,
-            business_idea=business_idea,
-            previous_insights=previous_insights if previous_insights else None,
-            time_remaining_minutes=time_remaining_minutes
-        )
-        
-        # Determine which model to use
-        if INCUBATOR_USE_GROK_FOR_AGENTS:
-            # Use Grok for faster agent responses
-            logging.info(f"Running {agent_def.name} analysis using Grok")
-            messages = [{"role": "user", "content": prompt}]
-            insight = grok_chat(messages, None)
-        else:
-            # Use local CEA model
-            logging.info(f"Running {agent_def.name} analysis using local CEA")
-            agent_tokens = int(os.getenv("CEA_MAX_TOKENS", "600"))
-            # Cap tokens for local model context window
-            agent_tokens = min(agent_tokens, 500)
-            insight = call_local_cea(
-                prompt=prompt,
-                num_predict=agent_tokens,
-                timeout=INCUBATOR_AGENT_TIMEOUT_SECONDS,
-                stream=True,
-                context=None
+    for attempt in range(max_retries + 1):
+        try:
+            # Build agent prompt
+            prompt = build_agent_prompt(
+                agent_def=agent_def,
+                business_idea=business_idea,
+                previous_insights=previous_insights if previous_insights else None,
+                time_remaining_minutes=time_remaining_minutes
             )
-        
-        if not insight or len(insight.strip()) == 0:
-            return f"Error: {agent_def.name} returned empty response", False
-        
-        # Remove completion markers if present
-        insight = insight.replace("[AGENT_COMPLETE]", "").strip()
-        
-        return insight, True
-        
-    except Exception as e:
-        error_msg = f"Error running {agent_def.name}: {str(e)}"
-        logging.exception(error_msg)
-        return error_msg, False
+            
+            # Determine which model to use
+            if INCUBATOR_USE_GROK_FOR_AGENTS:
+                # Use Grok for faster agent responses
+                logging.info(f"Running {agent_def.name} analysis using Grok (attempt {attempt + 1}/{max_retries + 1})")
+                messages = [{"role": "user", "content": prompt}]
+                insight = grok_chat(messages, None)
+            else:
+                # Use local CEA model
+                logging.info(f"Running {agent_def.name} analysis using local CEA (attempt {attempt + 1}/{max_retries + 1})")
+                agent_tokens = int(os.getenv("CEA_MAX_TOKENS", "600"))
+                # Cap tokens for local model context window
+                agent_tokens = min(agent_tokens, 500)
+                insight = call_local_cea(
+                    prompt=prompt,
+                    num_predict=agent_tokens,
+                    timeout=INCUBATOR_AGENT_TIMEOUT_SECONDS,
+                    stream=True,
+                    context=None
+                )
+            
+            # Check if response is empty or too short
+            if not insight or len(insight.strip()) < 50:
+                if attempt < max_retries:
+                    logging.warning(f"{agent_def.name} returned empty/short response (attempt {attempt + 1}), retrying...")
+                    time.sleep(2)  # Brief delay before retry
+                    continue
+                else:
+                    return f"Error: {agent_def.name} returned empty or insufficient response after {max_retries + 1} attempts", False
+            
+            # Remove completion markers if present
+            insight = insight.replace("[AGENT_COMPLETE]", "").strip()
+            
+            return insight, True
+            
+        except Exception as e:
+            error_msg = f"Error running {agent_def.name} (attempt {attempt + 1}): {str(e)}"
+            logging.exception(error_msg)
+            if attempt < max_retries:
+                logging.warning(f"Retrying {agent_def.name} after error...")
+                time.sleep(2)
+                continue
+            else:
+                return error_msg, False
+    
+    return f"Error: {agent_def.name} failed after {max_retries + 1} attempts", False
 
 
 def run_incubator_session(business_idea: str, session_id: str) -> Dict:
@@ -195,7 +210,7 @@ def run_incubator_session(business_idea: str, session_id: str) -> Dict:
             time_elapsed_minutes=time_elapsed
         )
         
-        # Run synthesis
+        # Run synthesis with truncation detection and completion
         try:
             if INCUBATOR_USE_GROK_FOR_SYNTHESIS:
                 logging.info("Running synthesis using Grok")
@@ -216,6 +231,36 @@ def run_incubator_session(business_idea: str, session_id: str) -> Dict:
             if business_plan and len(business_plan.strip()) > 0:
                 # Remove completion markers
                 business_plan = business_plan.replace("[SYNTHESIS_COMPLETE]", "").strip()
+                
+                # Check for truncation and complete if needed (using same logic as CEA delegation)
+                from services.cea_delegation_service import _looks_truncated, _ensure_complete
+                
+                if _looks_truncated(business_plan, business_idea):
+                    session.add_progress("⚠️ Business plan appears truncated, attempting completion...")
+                    try:
+                        # Use Grok for continuation if available, otherwise local CEA
+                        use_grok_cont = os.getenv("CEA_USE_GROK_FOR_CONTINUATION", "true").lower() in ("1", "true", "yes")
+                        if use_grok_cont:
+                            # Build continuation prompt
+                            cont_prompt = f"""The following business plan is incomplete. Please complete it from where it left off. Do not repeat any content.
+
+Incomplete business plan:
+{business_plan[-800:]}
+
+Continue and complete the business plan:"""
+                            messages = [{"role": "user", "content": cont_prompt}]
+                            continuation = grok_chat(messages, None)
+                            if continuation and len(continuation.strip()) > 50:
+                                # Append continuation, avoiding duplication
+                                if not business_plan.rstrip().endswith(continuation[:100].strip()):
+                                    business_plan = business_plan + "\n\n" + continuation.strip()
+                        else:
+                            # Use local completion logic
+                            business_plan = _ensure_complete(business_idea, business_plan, max_iters=2)
+                    except Exception as e:
+                        logging.warning(f"Failed to complete truncated business plan: {e}")
+                        session.add_progress("⚠️ Could not complete truncated plan, using partial result")
+                
                 session.final_business_plan = business_plan
                 session.status = "completed"
                 session.add_progress(f"✅ Synthesis completed - Business plan generated ({len(business_plan)} chars)")

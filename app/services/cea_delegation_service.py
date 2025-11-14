@@ -754,19 +754,30 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             iters += 1
             logging.info(f"_ensure_complete: iteration {iters}, text length: {len(out)}")
             
-            # Smart truncation: Keep only the last ~1000 chars of previous text to preserve token budget for continuation
-            # This ensures we have room for the continuation prompt + actual continuation content
-            # ~1000 chars ≈ ~250 tokens, leaving ~750 tokens for continuation in a 1024 token context
-            # More aggressive truncation to ensure continuation has enough room
-            max_context_chars = 1000
+            # Smart truncation: For 1024 token context window, we need to be very aggressive
+            # Prompt takes ~150 tokens, context needs ~200 tokens, leaving ~650 tokens for continuation
+            # But if using local CEA (1024 ctx), we need even more aggressive truncation
+            # ~600 chars ≈ ~150 tokens for context, leaving ~700 tokens for prompt + continuation
+            if use_grok_for_continuation:
+                # Grok has larger context - can use more context
+                max_context_chars = 1000
+            else:
+                # Local CEA has 1024 token limit - be very aggressive
+                max_context_chars = 600  # ~150 tokens
+            
             if len(out) > max_context_chars:
-                # Keep the beginning (first 150 chars for context) and the end (last portion)
-                # This gives better context while preserving more tokens for continuation
-                context_start = out[:150] + "\n[... earlier content ...]\n"
-                remaining_chars = max_context_chars - len(context_start)
-                context_end = out[-remaining_chars:] if remaining_chars > 0 else out[-800:]
-                truncated_context = context_start + context_end
-                logging.info(f"_ensure_complete: truncated context from {len(out)} to {len(truncated_context)} chars")
+                # Keep only the last portion (most recent context is most important for continuation)
+                # For local CEA, keep even less to ensure continuation has room
+                if use_grok_for_continuation:
+                    # Grok: Keep beginning + end
+                    context_start = out[:150] + "\n[... earlier content ...]\n"
+                    remaining_chars = max_context_chars - len(context_start)
+                    context_end = out[-remaining_chars:] if remaining_chars > 0 else out[-800:]
+                    truncated_context = context_start + context_end
+                else:
+                    # Local CEA: Keep only the end (most recent context)
+                    truncated_context = out[-max_context_chars:]
+                logging.info(f"_ensure_complete: truncated context from {len(out)} to {len(truncated_context)} chars (using {'Grok' if use_grok_for_continuation else 'Local CEA'})")
             else:
                 truncated_context = out
             
@@ -776,15 +787,24 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             if is_table_context:
                 table_instruction = "CRITICAL: The previous content ends in an incomplete table row. You MUST complete that table row first (match the number of columns in the header), then complete any remaining table rows, then finish the section. "
             
-            continuation_prompt = (
-                f"You previously wrote the following answer (showing last portion for context):\n\n{truncated_context}\n\n"
-                f"Continue the answer from where it was cut off. Do not repeat content. Keep the same format and "
-                f"finish any incomplete bullets, sentences, sections, or tables. Complete the answer fully. "
-                f"{table_instruction}"
-                f"IMPORTANT: If the previous content ends mid-table, complete that table row first (ensure it has the same number of columns as the header), then complete any remaining table rows and sections. "
-                f"Provide a complete continuation that finishes the current section and completes the entire answer. "
-                f"When you are fully finished, append the token [END] at the end."
-            )
+            # More efficient prompt for local CEA (shorter = more tokens for continuation)
+            if use_grok_for_continuation:
+                continuation_prompt = (
+                    f"You previously wrote the following answer (showing last portion for context):\n\n{truncated_context}\n\n"
+                    f"Continue the answer from where it was cut off. Do not repeat content. Keep the same format and "
+                    f"finish any incomplete bullets, sentences, sections, or tables. Complete the answer fully. "
+                    f"{table_instruction}"
+                    f"IMPORTANT: If the previous content ends mid-table, complete that table row first (ensure it has the same number of columns as the header), then complete any remaining table rows and sections. "
+                    f"Provide a complete continuation that finishes the current section and completes the entire answer. "
+                    f"When you are fully finished, append the token [END] at the end."
+                )
+            else:
+                # Shorter prompt for local CEA to save tokens
+                continuation_prompt = (
+                    f"Previous answer (last portion):\n\n{truncated_context}\n\n"
+                    f"Continue from where it was cut off. Don't repeat. Keep format. {table_instruction}"
+                    f"Complete the answer. When finished, append [END]."
+                )
             
             try:
                 # Use Grok for continuation (faster and more reliable)
@@ -793,7 +813,10 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                     cont = grok_chat([{"role": "user", "content": continuation_prompt}], None)
                 else:
                     # Fallback to local CEA if Grok is disabled
-                    cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
+                    # For local CEA with 1024 token context, use smaller continuation tokens
+                    local_cont_tokens = min(cont_tokens, 400)  # Cap at 400 for local CEA
+                    logging.info(f"_ensure_complete: Using local CEA for continuation with {local_cont_tokens} tokens (iteration {iters})")
+                    cont = call_local_cea(continuation_prompt, num_predict=local_cont_tokens, temperature=0.2, stream=True)
             except Exception as e:
                 error_msg = str(e)
                 logging.warning(f"_ensure_complete: continuation call failed at iteration {iters}: {error_msg}")
@@ -801,7 +824,8 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 if use_grok_for_continuation:
                     try:
                         logging.info(f"_ensure_complete: Grok failed, trying local CEA as fallback")
-                        cont = call_local_cea(continuation_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
+                        local_cont_tokens = min(cont_tokens, 400)  # Cap at 400 for local CEA
+                        cont = call_local_cea(continuation_prompt, num_predict=local_cont_tokens, temperature=0.2, stream=True)
                     except Exception as e2:
                         error_msg = str(e2)
                         logging.warning(f"_ensure_complete: Local CEA fallback also failed: {error_msg}")

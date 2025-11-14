@@ -107,9 +107,17 @@ User task: {user_message[:500]}
         log_agentops("worker_response", {"worker_text": worker_resp[:200]})
 
         # 3. Synthesize via CEA with assumption policy and no questions
-        # Truncate worker output to fit in context window (max ~1500 chars = ~375 tokens)
-        worker_truncated = worker_resp[:1500] if len(worker_resp) > 1500 else worker_resp
-        if len(worker_resp) > 1500:
+        # For local CEA with 1024 token context: prompt ~200 tokens, context ~100 tokens, leaving ~724 tokens
+        # But we need room for synthesis output, so truncate worker output more aggressively
+        use_grok_for_synthesis = os.getenv("CEA_USE_GROK_FOR_SYNTHESIS", "true").lower() in ("1", "true", "yes")
+        if use_grok_for_synthesis:
+            # Grok has larger context - can use more worker output
+            worker_truncated = worker_resp[:1500] if len(worker_resp) > 1500 else worker_resp
+        else:
+            # Local CEA: Truncate more aggressively to leave room for synthesis output
+            # ~1000 chars ≈ ~250 tokens for worker output, leaving ~474 tokens for synthesis
+            worker_truncated = worker_resp[:1000] if len(worker_resp) > 1000 else worker_resp
+        if len(worker_resp) > len(worker_truncated):
             worker_truncated += "\n[Worker output truncated...]"
         
         # Include context in synthesis so it can understand references
@@ -161,7 +169,13 @@ Original task: {user_message[:500]}
                 final = grok_chat(synth_messages, None)
             else:
                 # Use local CEA for synthesis (slower but potentially more consistent with CEA style)
+                logging.info("Using LOCAL CEA model (gpt-oss:20b) for synthesis")
                 synthesis_tokens = int(os.getenv("CEA_MAX_TOKENS", os.getenv("CEA_FIRST_PASS_TOKENS", "600")))
+                # For local CEA with 1024 token context, cap synthesis tokens to fit
+                # Input: ~350 tokens (prompt + worker + context), leaving ~674 tokens for output
+                # But be conservative - cap at 500 to ensure we don't hit context limit
+                synthesis_tokens = min(synthesis_tokens, 500)
+                logging.info(f"Synthesis using {synthesis_tokens} tokens (capped for 1024 token context window)")
                 final = call_local_cea(synth_prompt, num_predict=synthesis_tokens, timeout=stage_timeout, stream=True, context=context)
             
             if not final or len(final.strip()) == 0:

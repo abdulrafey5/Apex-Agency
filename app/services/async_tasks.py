@@ -101,3 +101,34 @@ def start_chat_task(message: str, thread_id: str, chat_dir: str) -> str:
     return task_id
 
 
+def _run_incubator_task(task_id: str, business_idea: str) -> None:
+    """Run incubator session in background thread."""
+    try:
+        _set_task(task_id, {"status": "processing", "response": None, "error": None, "type": "incubator"})
+        from services.incubator_orchestrator import run_incubator_session
+        session_id = task_id  # Use task_id as session_id
+        result = run_incubator_session(business_idea, session_id)
+        _set_task(task_id, {
+            "status": result.get("status", "error"),
+            "response": result.get("business_plan"),
+            "error": result.get("error"),
+            "type": "incubator",
+            "agent_insights": result.get("agent_insights"),
+            "progress_log": result.get("progress_log"),
+            "duration_minutes": result.get("duration_minutes"),
+            "completed_agents": result.get("completed_agents")
+        })
+    except Exception as e:
+        logging.exception(f"Incubator task {task_id} failed")
+        _set_task(task_id, {"status": "error", "error": str(e), "response": None, "type": "incubator"})
+
+
+def start_incubator_task(business_idea: str) -> str:
+    """Start incubator session asynchronously."""
+    task_id = str(uuid.uuid4())
+    _set_task(task_id, {"status": "pending", "type": "incubator"})
+    t = threading.Thread(target=_run_incubator_task, args=(task_id, business_idea), daemon=True)
+    t.start()
+    return task_id
+
+

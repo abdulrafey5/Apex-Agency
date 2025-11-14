@@ -1,0 +1,279 @@
+# /data/inception/app/services/incubator_orchestrator.py
+"""
+AI Incubator Orchestrator - Coordinates multi-agent collaboration for business idea evaluation.
+Manages time-based execution (1 hour) with graceful wrap-up and final synthesis.
+"""
+
+import logging
+import time
+import os
+from typing import Dict, List, Optional, Tuple
+from datetime import datetime, timedelta
+from services.incubator_agents import (
+    AgentRole, get_agent_definition, get_all_agent_roles,
+    build_agent_prompt, build_synthesis_prompt
+)
+from services.local_cea_client import call_local_cea
+from services.grok_service import grok_chat
+
+
+# Configuration
+INCUBATOR_DURATION_MINUTES = int(os.getenv("INCUBATOR_DURATION_MINUTES", "60"))
+INCUBATOR_WRAP_UP_MINUTES = int(os.getenv("INCUBATOR_WRAP_UP_MINUTES", "5"))  # Start wrap-up 5 min before end
+INCUBATOR_AGENT_TIMEOUT_SECONDS = int(os.getenv("INCUBATOR_AGENT_TIMEOUT_SECONDS", "300"))  # 5 min per agent
+INCUBATOR_USE_GROK_FOR_AGENTS = os.getenv("INCUBATOR_USE_GROK_FOR_AGENTS", "false").lower() in ("1", "true", "yes")
+INCUBATOR_USE_GROK_FOR_SYNTHESIS = os.getenv("INCUBATOR_USE_GROK_FOR_SYNTHESIS", "false").lower() in ("1", "true", "yes")
+
+
+class IncubatorSession:
+    """Represents an active incubator session with state tracking."""
+    
+    def __init__(self, business_idea: str, session_id: str):
+        self.business_idea = business_idea
+        self.session_id = session_id
+        self.start_time = datetime.now()
+        self.end_time = self.start_time + timedelta(minutes=INCUBATOR_DURATION_MINUTES)
+        self.agent_insights: Dict[AgentRole, str] = {}
+        self.agent_status: Dict[AgentRole, str] = {}  # "pending", "processing", "completed", "failed"
+        self.final_business_plan: Optional[str] = None
+        self.status: str = "initialized"  # "initialized", "running", "wrapping_up", "synthesizing", "completed", "failed"
+        self.progress_log: List[str] = []
+        
+    def add_progress(self, message: str):
+        """Add progress message to log."""
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        self.progress_log.append(f"[{timestamp}] {message}")
+        logging.info(f"Incubator {self.session_id}: {message}")
+    
+    def get_time_remaining_minutes(self) -> int:
+        """Get remaining time in minutes."""
+        remaining = (self.end_time - datetime.now()).total_seconds() / 60
+        return max(0, int(remaining))
+    
+    def is_wrap_up_time(self) -> bool:
+        """Check if it's time to start wrap-up phase."""
+        return self.get_time_remaining_minutes() <= INCUBATOR_WRAP_UP_MINUTES
+    
+    def is_time_expired(self) -> bool:
+        """Check if session time has expired."""
+        return datetime.now() >= self.end_time
+
+
+def run_agent_analysis(
+    agent_role: AgentRole,
+    business_idea: str,
+    previous_insights: Dict[AgentRole, str],
+    time_remaining_minutes: Optional[int] = None
+) -> Tuple[str, bool]:
+    """
+    Run analysis for a single agent.
+    
+    Returns:
+        Tuple of (insight_text, success_flag)
+    """
+    agent_def = get_agent_definition(agent_role)
+    if not agent_def:
+        return f"Error: Agent definition not found for {agent_role}", False
+    
+    try:
+        # Build agent prompt
+        prompt = build_agent_prompt(
+            agent_def=agent_def,
+            business_idea=business_idea,
+            previous_insights=previous_insights if previous_insights else None,
+            time_remaining_minutes=time_remaining_minutes
+        )
+        
+        # Determine which model to use
+        if INCUBATOR_USE_GROK_FOR_AGENTS:
+            # Use Grok for faster agent responses
+            logging.info(f"Running {agent_def.name} analysis using Grok")
+            messages = [{"role": "user", "content": prompt}]
+            insight = grok_chat(messages, None)
+        else:
+            # Use local CEA model
+            logging.info(f"Running {agent_def.name} analysis using local CEA")
+            agent_tokens = int(os.getenv("CEA_MAX_TOKENS", "600"))
+            # Cap tokens for local model context window
+            agent_tokens = min(agent_tokens, 500)
+            insight = call_local_cea(
+                prompt=prompt,
+                num_predict=agent_tokens,
+                timeout=INCUBATOR_AGENT_TIMEOUT_SECONDS,
+                stream=True,
+                context=None
+            )
+        
+        if not insight or len(insight.strip()) == 0:
+            return f"Error: {agent_def.name} returned empty response", False
+        
+        # Remove completion markers if present
+        insight = insight.replace("[AGENT_COMPLETE]", "").strip()
+        
+        return insight, True
+        
+    except Exception as e:
+        error_msg = f"Error running {agent_def.name}: {str(e)}"
+        logging.exception(error_msg)
+        return error_msg, False
+
+
+def run_incubator_session(business_idea: str, session_id: str) -> Dict:
+    """
+    Main orchestrator function - runs the full incubator session.
+    
+    Args:
+        business_idea: The business idea to evaluate
+        session_id: Unique session identifier
+        
+    Returns:
+        Dict with session results
+    """
+    session = IncubatorSession(business_idea, session_id)
+    session.add_progress(f"Starting incubator session for business idea evaluation")
+    session.status = "running"
+    
+    try:
+        # Get list of agents to run (excluding CEA coordinator)
+        agent_roles = get_all_agent_roles()
+        session.add_progress(f"Initialized {len(agent_roles)} specialized agents")
+        
+        # Phase 1: Run agents in parallel (or sequential if needed for resource constraints)
+        # For now, run sequentially to avoid overwhelming the local model
+        # In production, could run in parallel with proper resource management
+        
+        for agent_role in agent_roles:
+            if session.is_time_expired():
+                session.add_progress("⚠️ Time expired before all agents completed")
+                break
+            
+            agent_def = get_agent_definition(agent_role)
+            session.agent_status[agent_role] = "processing"
+            session.add_progress(f"Running {agent_def.name} analysis...")
+            
+            # Check time remaining for wrap-up signal
+            time_remaining = session.get_time_remaining_minutes()
+            if session.is_wrap_up_time():
+                session.add_progress(f"⚠️ Wrap-up phase: {time_remaining} minutes remaining")
+            
+            # Run agent analysis
+            insight, success = run_agent_analysis(
+                agent_role=agent_role,
+                business_idea=business_idea,
+                previous_insights=session.agent_insights,
+                time_remaining_minutes=time_remaining if session.is_wrap_up_time() else None
+            )
+            
+            if success:
+                session.agent_insights[agent_role] = insight
+                session.agent_status[agent_role] = "completed"
+                session.add_progress(f"✅ {agent_def.name} analysis completed ({len(insight)} chars)")
+            else:
+                session.agent_status[agent_role] = "failed"
+                session.agent_insights[agent_role] = insight  # Store error message
+                session.add_progress(f"❌ {agent_def.name} analysis failed: {insight[:100]}")
+        
+        # Phase 2: Synthesis - CEA coordinator compiles final business plan
+        if len(session.agent_insights) == 0:
+            session.status = "failed"
+            session.add_progress("❌ No agent insights collected - cannot synthesize")
+            return {
+                "status": "failed",
+                "error": "No agent insights collected",
+                "session_id": session_id,
+                "progress_log": session.progress_log
+            }
+        
+        session.status = "synthesizing"
+        time_elapsed = int((datetime.now() - session.start_time).total_seconds() / 60)
+        session.add_progress(f"Starting synthesis phase ({time_elapsed} minutes elapsed)")
+        
+        # Build synthesis prompt
+        synthesis_prompt = build_synthesis_prompt(
+            business_idea=business_idea,
+            all_insights=session.agent_insights,
+            time_elapsed_minutes=time_elapsed
+        )
+        
+        # Run synthesis
+        try:
+            if INCUBATOR_USE_GROK_FOR_SYNTHESIS:
+                logging.info("Running synthesis using Grok")
+                messages = [{"role": "user", "content": synthesis_prompt}]
+                business_plan = grok_chat(messages, None)
+            else:
+                logging.info("Running synthesis using local CEA")
+                synthesis_tokens = int(os.getenv("CEA_MAX_TOKENS", "700"))
+                synthesis_tokens = min(synthesis_tokens, 500)  # Cap for context window
+                business_plan = call_local_cea(
+                    prompt=synthesis_prompt,
+                    num_predict=synthesis_tokens,
+                    timeout=INCUBATOR_AGENT_TIMEOUT_SECONDS * 2,  # Give synthesis more time
+                    stream=True,
+                    context=None
+                )
+            
+            if business_plan and len(business_plan.strip()) > 0:
+                # Remove completion markers
+                business_plan = business_plan.replace("[SYNTHESIS_COMPLETE]", "").strip()
+                session.final_business_plan = business_plan
+                session.status = "completed"
+                session.add_progress(f"✅ Synthesis completed - Business plan generated ({len(business_plan)} chars)")
+            else:
+                session.status = "failed"
+                session.add_progress("❌ Synthesis returned empty response")
+                return {
+                    "status": "failed",
+                    "error": "Synthesis returned empty response",
+                    "session_id": session_id,
+                    "agent_insights": {role.value: insight for role, insight in session.agent_insights.items()},
+                    "progress_log": session.progress_log
+                }
+                
+        except Exception as e:
+            session.status = "failed"
+            error_msg = f"Synthesis failed: {str(e)}"
+            session.add_progress(f"❌ {error_msg}")
+            logging.exception(error_msg)
+            return {
+                "status": "failed",
+                "error": error_msg,
+                "session_id": session_id,
+                "agent_insights": {role.value: insight for role, insight in session.agent_insights.items()},
+                "progress_log": session.progress_log
+            }
+        
+        # Success - return complete results
+        total_time = int((datetime.now() - session.start_time).total_seconds() / 60)
+        session.add_progress(f"🎉 Incubator session completed successfully in {total_time} minutes")
+        
+        return {
+            "status": "completed",
+            "session_id": session_id,
+            "business_idea": business_idea,
+            "agent_insights": {
+                role.value: {
+                    "agent_name": get_agent_definition(role).name,
+                    "status": session.agent_status.get(role, "unknown"),
+                    "insight": insight
+                }
+                for role, insight in session.agent_insights.items()
+            },
+            "business_plan": session.final_business_plan,
+            "progress_log": session.progress_log,
+            "duration_minutes": total_time,
+            "completed_agents": len([s for s in session.agent_status.values() if s == "completed"])
+        }
+        
+    except Exception as e:
+        session.status = "failed"
+        error_msg = f"Incubator session failed: {str(e)}"
+        session.add_progress(f"❌ {error_msg}")
+        logging.exception(error_msg)
+        return {
+            "status": "failed",
+            "error": error_msg,
+            "session_id": session_id,
+            "progress_log": session.progress_log
+        }
+

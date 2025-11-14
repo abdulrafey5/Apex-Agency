@@ -6,7 +6,7 @@ import json
 from services.grok_service import grok_chat
 from services.thread_service import load_thread, save_thread, get_thread_id
 from services.cea_delegation_service import delegate_cea_task
-from services.async_tasks import start_chat_task, get_task
+from services.async_tasks import start_chat_task, get_task, start_incubator_task
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -208,5 +208,129 @@ def debug_delegation():
     except Exception as e:
         logging.exception("Debug delegation failed")
         return jsonify({"status": "failed", "error": str(e)}), 500
+
+
+@chat_bp.route("/incubator", methods=["POST"], strict_slashes=False)
+def incubator_start():
+    """
+    Start an AI Incubator session to evaluate a business idea.
+    
+    Request body (JSON):
+    {
+        "business_idea": "Description of the business idea to evaluate"
+    }
+    
+    Returns:
+    {
+        "task_id": "uuid",
+        "status": "queued",
+        "message": "Incubator session started. Use /incubator-result/<task_id> to check progress."
+    }
+    """
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    # Parse request
+    payload = {}
+    if request.is_json:
+        payload = request.get_json(silent=True) or {}
+    else:
+        try:
+            raw = request.get_data(as_text=True)
+            if raw:
+                payload = json.loads(raw)
+        except Exception:
+            payload = {}
+    
+    business_idea = payload.get("business_idea") or payload.get("idea") or request.form.get("business_idea")
+    
+    if not business_idea or len(business_idea.strip()) == 0:
+        return jsonify({"error": "Missing 'business_idea' parameter"}), 400
+    
+    # Start incubator session
+    try:
+        task_id = start_incubator_task(business_idea.strip())
+        return jsonify({
+            "task_id": task_id,
+            "status": "queued",
+            "message": "Incubator session started. Use /incubator-result/<task_id> to check progress.",
+            "estimated_duration_minutes": int(os.getenv("INCUBATOR_DURATION_MINUTES", "60"))
+        })
+    except Exception as e:
+        logging.exception("Failed to start incubator session")
+        return jsonify({"error": f"Failed to start incubator session: {str(e)}"}), 500
+
+
+@chat_bp.route("/incubator-result/<task_id>", methods=["GET"], strict_slashes=False)
+def incubator_result(task_id):
+    """
+    Get the status and results of an incubator session.
+    
+    Returns:
+    {
+        "status": "pending|processing|completed|failed",
+        "business_plan": "...",  // Only present when status="completed"
+        "agent_insights": {...},  // Individual agent analyses
+        "progress_log": [...],    // Session progress log
+        "duration_minutes": 60,
+        "completed_agents": 5,
+        "error": "..."  // Only present when status="failed"
+    }
+    """
+    data = get_task(task_id)
+    
+    # Verify this is an incubator task
+    if data.get("type") != "incubator" and data.get("status") != "not_found":
+        return jsonify({"error": "Task ID is not an incubator session"}), 400
+    
+    return jsonify(data)
+
+
+@chat_bp.route("/incubator-status", methods=["GET"], strict_slashes=False)
+def incubator_status():
+    """
+    Get general incubator system status and configuration.
+    
+    Returns:
+    {
+        "status": "operational",
+        "configuration": {
+            "duration_minutes": 60,
+            "wrap_up_minutes": 5,
+            "agent_timeout_seconds": 300,
+            "available_agents": [...]
+        }
+    }
+    """
+    try:
+        from services.incubator_agents import get_all_agent_roles, get_agent_definition
+        
+        agent_roles = get_all_agent_roles()
+        agents_info = []
+        for role in agent_roles:
+            agent_def = get_agent_definition(role)
+            if agent_def:
+                agents_info.append({
+                    "role": role.value,
+                    "name": agent_def.name,
+                    "expertise": agent_def.expertise
+                })
+        
+        return jsonify({
+            "status": "operational",
+            "configuration": {
+                "duration_minutes": int(os.getenv("INCUBATOR_DURATION_MINUTES", "60")),
+                "wrap_up_minutes": int(os.getenv("INCUBATOR_WRAP_UP_MINUTES", "5")),
+                "agent_timeout_seconds": int(os.getenv("INCUBATOR_AGENT_TIMEOUT_SECONDS", "300")),
+                "use_grok_for_agents": os.getenv("INCUBATOR_USE_GROK_FOR_AGENTS", "false").lower() in ("1", "true", "yes"),
+                "use_grok_for_synthesis": os.getenv("INCUBATOR_USE_GROK_FOR_SYNTHESIS", "false").lower() in ("1", "true", "yes"),
+                "available_agents": agents_info,
+                "total_agents": len(agents_info)
+            }
+        })
+    except Exception as e:
+        logging.exception("Failed to get incubator status")
+        return jsonify({"status": "error", "error": str(e)}), 500
 
 

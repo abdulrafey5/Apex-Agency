@@ -5,8 +5,6 @@ app/.env
 .env.*.local
 
 # === Virtual Environments ===
-venv/
-app/venv/
 **/venv/
 .venv/
 env/
@@ -28,7 +26,6 @@ build/
 app/logs/
 **/logs/
 *.log
-*.log.*
 
 # === Storage & User Data ===
 # Chat history and task files (contains user data)
@@ -43,34 +40,17 @@ storage/instructions/dms/
 *.swp
 *.swo
 *~
-.project
-.pydevproject
-.settings/
 
 # === OS Files ===
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 Desktop.ini
 
 # === Temporary Files ===
 *.tmp
-*.temp
 *.bak
-*.cache
 
 # === Package Files ===
 *.deb
-*.rpm
-*.tar.gz
 *.zip
 !requirements*.txt
-
-# === AWS & Cloud ===
-.aws/
-*.pem
-*.key

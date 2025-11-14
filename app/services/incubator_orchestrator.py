@@ -235,31 +235,54 @@ def run_incubator_session(business_idea: str, session_id: str) -> Dict:
                 # Check for truncation and complete if needed (using same logic as CEA delegation)
                 from services.cea_delegation_service import _looks_truncated, _ensure_complete
                 
-                if _looks_truncated(business_plan, business_idea):
-                    session.add_progress("⚠️ Business plan appears truncated, attempting completion...")
+                # Use iterative completion to ensure full completion
+                max_completion_iterations = 3
+                for completion_iter in range(max_completion_iterations):
+                    if not _looks_truncated(business_plan, business_idea):
+                        break  # Plan is complete
+                    
+                    if completion_iter == 0:
+                        session.add_progress("⚠️ Business plan appears truncated, attempting completion...")
+                    else:
+                        session.add_progress(f"⚠️ Still truncated after iteration {completion_iter}, continuing...")
+                    
                     try:
                         # Use Grok for continuation if available, otherwise local CEA
                         use_grok_cont = os.getenv("CEA_USE_GROK_FOR_CONTINUATION", "true").lower() in ("1", "true", "yes")
                         if use_grok_cont:
-                            # Build continuation prompt
-                            cont_prompt = f"""The following business plan is incomplete. Please complete it from where it left off. Do not repeat any content.
+                            # Build continuation prompt with more context
+                            cont_prompt = f"""The following business plan is incomplete. Please complete it from where it left off. Do not repeat any content. Ensure you complete the current section and any remaining sections.
 
-Incomplete business plan:
-{business_plan[-800:]}
+Incomplete business plan (last 1000 chars):
+{business_plan[-1000:]}
 
-Continue and complete the business plan:"""
+Continue and complete the business plan. Make sure to finish the current section and include any remaining sections (e.g., Financial Projections, Risk Analysis, Implementation Roadmap, Conclusion)."""
                             messages = [{"role": "user", "content": cont_prompt}]
                             continuation = grok_chat(messages, None)
                             if continuation and len(continuation.strip()) > 50:
-                                # Append continuation, avoiding duplication
-                                if not business_plan.rstrip().endswith(continuation[:100].strip()):
-                                    business_plan = business_plan + "\n\n" + continuation.strip()
+                                # Check for duplication before appending
+                                last_100_chars = business_plan.rstrip()[-100:].lower()
+                                first_100_chars = continuation.strip()[:100].lower()
+                                
+                                # Avoid duplication
+                                if last_100_chars not in first_100_chars and first_100_chars not in last_100_chars:
+                                    business_plan = business_plan.rstrip() + "\n\n" + continuation.strip()
+                                else:
+                                    # If there's overlap, just append the new part
+                                    business_plan = business_plan + continuation.strip()
                         else:
-                            # Use local completion logic
-                            business_plan = _ensure_complete(business_idea, business_plan, max_iters=2)
+                            # Use local completion logic with more iterations
+                            business_plan = _ensure_complete(business_idea, business_plan, max_iters=3)
                     except Exception as e:
-                        logging.warning(f"Failed to complete truncated business plan: {e}")
-                        session.add_progress("⚠️ Could not complete truncated plan, using partial result")
+                        logging.warning(f"Failed to complete truncated business plan (iteration {completion_iter + 1}): {e}")
+                        if completion_iter == max_completion_iterations - 1:
+                            session.add_progress("⚠️ Could not complete truncated plan after multiple attempts, using partial result")
+                        continue
+                
+                # Final check - if still truncated, add a note
+                if _looks_truncated(business_plan, business_idea):
+                    session.add_progress("⚠️ Business plan may still be incomplete after completion attempts")
+                    business_plan = business_plan + "\n\n[Note: Business plan generation was limited by token constraints. Some sections may be abbreviated.]"
                 
                 session.final_business_plan = business_plan
                 session.status = "completed"

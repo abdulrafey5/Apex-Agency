@@ -33,6 +33,8 @@ storage/chat_history/
 # Keep instructions directory structure but ignore user-generated content
 storage/instructions/agents/
 storage/instructions/dms/
+# Runtime memory file (updated by application)
+storage/instructions/memory.yaml
 
 # === IDE & Editor ===
 .vscode/

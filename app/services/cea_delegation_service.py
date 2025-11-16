@@ -142,7 +142,7 @@ def delegate_cea_task(user_message, thread_context):
                 return _ensure_complete(user_message, base)
 
         if use_autogen:
-            result = run_autogen_task(user_message, context=ctx)
+        result = run_autogen_task(user_message, context=ctx)
             # Always run completion logic to ensure responses are complete
             cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "5"))
             if cont_max > 0:
@@ -212,7 +212,7 @@ def delegate_cea_task(user_message, thread_context):
                         logging.error(f"delegate_cea_task: ABSOLUTE FINAL - Found {final_nums_check[-1]} items, forcing truncation to {target_final}")
                         result = _force_truncate_top_n(result, target_final)
             
-            return result
+        return result
         else:
             # Direct single-shot local CEA without orchestration
             first_pass_tokens = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "500")))

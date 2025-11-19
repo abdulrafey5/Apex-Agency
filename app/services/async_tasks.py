@@ -46,13 +46,27 @@ def get_task(task_id: str) -> Dict[str, Any]:
         if p.exists():
             with open(p, "r") as f:
                 data = json.load(f)
-                # Normalize
+                # Return the full payload that was persisted (minus duplicate id)
                 status = data.get("status") or "pending"
-                resp = data.get("response")
-                err = data.get("error")
-                return {"status": status, "response": resp, "error": err}
-    except Exception:
-        pass
+                response = data.get("response")
+                error = data.get("error")
+                task_type = data.get("type")
+                progress_log = data.get("progress_log")
+                agent_insights = data.get("agent_insights")
+                duration_minutes = data.get("duration_minutes")
+                completed_agents = data.get("completed_agents")
+                return {
+                    "status": status,
+                    "response": response,
+                    "error": error,
+                    "type": task_type,
+                    "progress_log": progress_log,
+                    "agent_insights": agent_insights,
+                    "duration_minutes": duration_minutes,
+                    "completed_agents": completed_agents
+                }
+    except Exception as e:
+        logging.error(f"Failed to read task {task_id} from disk: {e}")
     return {"status": "not_found"}
 
 

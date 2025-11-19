@@ -309,10 +309,12 @@ Continue and complete the business plan. Make sure to finish the current section
                             session.add_progress("⚠️ Could not complete truncated plan after multiple attempts, using partial result")
                         continue
                 
-                # Final check - if still truncated, add a note
+                # Final check - if still truncated, add a note (only once)
                 if _looks_truncated(business_plan, business_idea):
                     session.add_progress("⚠️ Business plan may still be incomplete after completion attempts")
-                    business_plan = business_plan + "\n\n[Note: Business plan generation was limited by token constraints. Some sections may be abbreviated.]"
+                    note = "[Note: Business plan generation was limited by token constraints. Some sections may be abbreviated.]"
+                    if note not in business_plan:
+                        business_plan = business_plan.rstrip() + f"\n\n{note}"
                 
                 session.final_business_plan = business_plan
                 session.status = "completed"

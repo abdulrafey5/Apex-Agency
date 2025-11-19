@@ -573,6 +573,13 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                     return False
     
     tail = text.rstrip()
+    # Treat our own completion note as a valid ending (prevents false positives)
+    completion_note = "[Note: Business plan generation was limited by token constraints. Some sections may be abbreviated.]"
+    if tail.endswith(completion_note):
+        tail_before_note = tail[: -len(completion_note)].rstrip()
+        if tail_before_note and tail_before_note.endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
+            return False
+    
     # If [END] marker is present, consider it complete
     if "[END]" in tail:
         return False

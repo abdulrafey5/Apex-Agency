@@ -942,6 +942,23 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 if len(cont_head) > 50 and out_tail[-50:] == cont_head[:50]:
                     logging.warning(f"_ensure_complete: Continuation head exactly matches output tail, skipping")
                     should_skip = True
+
+            # 5. Prevent restart of previously completed sections (e.g., duplication of ## 1, ## 2, etc.)
+            if not should_skip and len(cont_clean) > 120:
+                heading_pattern = r"^(#{1,3}\s+[^\n]+)"
+                existing_headings = re.findall(heading_pattern, out, flags=re.MULTILINE)
+                existing_heading_set = {h.strip().lower() for h in existing_headings}
+                last_heading = existing_headings[-1].strip().lower() if existing_headings else None
+                cont_headings = re.findall(heading_pattern, cont_clean, flags=re.MULTILINE)
+                if cont_headings:
+                    for heading in cont_headings:
+                        heading_norm = heading.strip().lower()
+                        if heading_norm in existing_heading_set and heading_norm != last_heading:
+                            logging.warning(
+                                f"_ensure_complete: Continuation restarts previously completed section '{heading.strip()}', skipping"
+                            )
+                            should_skip = True
+                            break
             
             if should_skip:
                 # Skip this continuation, but check if output is complete

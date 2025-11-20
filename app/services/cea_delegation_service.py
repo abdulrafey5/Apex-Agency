@@ -593,6 +593,16 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
             last_word = words[-1].rstrip(".,!?;:)\"]}")
             if len(last_word) < 4:  # Very short word before punctuation might indicate truncation
                 return True
+        
+        # SPECIAL CASE: For business plans and structured documents, check if it ends with a complete milestone/roadmap statement
+        # This is a common and valid ending pattern (e.g., "Milestone: $6M ARR; 50,000 users.")
+        last_200_chars = tail[-200:].lower()
+        milestone_indicators = ["milestone:", "goal:", "target:", "objective:", "kpi:", "metric:", "users.", "revenue.", "arr.", "mrr."]
+        if any(indicator in last_200_chars for indicator in milestone_indicators):
+            # Ends with a milestone statement - this is a valid complete ending for business plans
+            logging.info(f"_looks_truncated: Ends with milestone/roadmap statement - NOT truncated")
+            return False
+        
         # If it ends with proper punctuation, check if it looks like a complete thought
         # For longer responses (like guides), check if the last sentence is complete
         if len(tail) > 500:  # Longer responses should have more structure
@@ -637,6 +647,18 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                     # Found a header - check if there's enough content after it
                     header_pos = tail.rfind(line_stripped)
                     content_after = tail[header_pos + len(line_stripped):].strip()
+                    
+                    # SPECIAL CASE: For business plans and structured documents, check if the last line ends with a complete milestone/roadmap item
+                    # This is a valid ending pattern (e.g., "Milestone: $6M ARR; 50,000 users.")
+                    last_line_after_header = content_after.split("\n")[-1].strip() if "\n" in content_after else content_after.strip()
+                    if last_line_after_header and last_line_after_header.endswith((".", "!", "?")):
+                        # Check if it looks like a complete milestone/roadmap item
+                        milestone_indicators = ["milestone", "goal", "target", "objective", "kpi", "metric", "users", "revenue", "arr", "mrr"]
+                        if any(indicator in last_line_after_header.lower() for indicator in milestone_indicators):
+                            # This looks like a complete milestone statement - valid ending
+                            logging.info(f"_looks_truncated: Ends with complete milestone/roadmap item - NOT truncated")
+                            return False
+                    
                     # If there's a header but less than 100 chars of content after, likely incomplete
                     # Also check if the header suggests multiple items (e.g., "Cadence", "Timeline", "Steps") but only one item exists
                     header_lower = line_stripped.lower()
@@ -646,10 +668,21 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                         bullets_after = content_after.count("-") + content_after.count("*") + content_after.count("•")
                         numbered_items = len([l for l in content_after.split("\n") if l.strip() and (l.strip()[0].isdigit() or l.strip().startswith(("-", "*", "•")))])
                         # If header suggests multiple items but we only see 1-2 items, likely incomplete
+                        # BUT: If the last item ends with proper punctuation and looks complete, it's OK
                         if numbered_items <= 2 and bullets_after <= 2:
-                            return True
+                            # Check if the last item ends properly
+                            if not last_line_after_header.endswith((".", "!", "?")):
+                                return True
+                            # If it ends properly, it might be a complete short list - don't flag as truncated
+                            logging.info(f"_looks_truncated: Header suggests multiple items but last item ends properly - NOT truncated")
+                            return False
                     # If there's a header but less than 100 chars of content after, likely incomplete
+                    # BUT: If it ends with proper punctuation, it might be a complete short section
                     if len(content_after) < 100:
+                        if last_line_after_header and last_line_after_header.endswith((".", "!", "?")):
+                            # Short but complete - don't flag as truncated
+                            logging.info(f"_looks_truncated: Short section but ends properly - NOT truncated")
+                            return False
                         return True
                     break
         return False

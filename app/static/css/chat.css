@@ -13,7 +13,7 @@ html, body {
 
 /* ===== BACKGROUND IMAGE ===== */
 body {
-  background: url("img/image.avif") no-repeat;
+  background: url("img/image.avif") no-repeat center;
 }
 
 /* ===== OVERLAY ===== */

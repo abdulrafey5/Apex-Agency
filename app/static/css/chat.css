@@ -14,8 +14,7 @@ html, body {
 /* ===== BACKGROUND IMAGE ===== */
 body {
   background: url("img/image.avif") no-repeat center center fixed;
-  background-size: contain;
-  width: 100%;
+  background-size: cover;
 }
 
 /* ===== OVERLAY ===== */

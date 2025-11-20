@@ -16,19 +16,19 @@ def _force_truncate_top_n(text: str, target: int) -> str:
         import re
         if not text or not text.strip():
             return text
-        
+
         # Find all numbered items
         lines = text.split("\n")
         result_lines = []
         items_found = []
-        
+
         for line in lines:
             # Check if this line starts a numbered item
             item_match = re.match(r"^\s*(\d+)\.", line)
             if item_match:
                 item_num = int(item_match.group(1))
                 items_found.append(item_num)
-                
+
                 if item_num > target:
                     # Found item beyond target - STOP HERE, don't include this line
                     logging.warning(f"_force_truncate_top_n: Stopping at item {item_num} (target is {target})")
@@ -43,13 +43,13 @@ def _force_truncate_top_n(text: str, target: int) -> str:
                 else:
                     # We've already exceeded target - stop
                     break
-        
+
         truncated = "\n".join(result_lines).rstrip()
-        
+
         # AGGRESSIVE VERIFICATION: Count items and verify
         final_items = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
         final_nums = sorted({int(n) for n in final_items if n.isdigit()})
-        
+
         if final_nums and final_nums[-1] > target:
             # Still failed - this should never happen, but force it anyway
             logging.error(f"_force_truncate_top_n: CRITICAL - Still have {final_nums[-1]} items after truncation, forcing again")
@@ -71,7 +71,7 @@ def _force_truncate_top_n(text: str, target: int) -> str:
                             # Found it - truncate before this line
                             truncated = "\n".join(lines[:i]).rstrip()
                             break
-        
+
         # Final check - if still wrong, use nuclear option
         final_check = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
         final_check_nums = sorted({int(n) for n in final_check if n.isdigit()})
@@ -85,7 +85,7 @@ def _force_truncate_top_n(text: str, target: int) -> str:
                         break
                 result_lines.append(line)
             truncated = "\n".join(result_lines).rstrip()
-        
+
         logging.info(f"_force_truncate_top_n: Final result has items: {re.findall(r'^\s*(\d+)\.', truncated, flags=re.MULTILINE)}")
         return truncated
     except Exception as e:
@@ -117,7 +117,7 @@ def delegate_cea_task(user_message, thread_context):
             # Simple questions: "What is X?", "Population of X", "Capital of X", etc.
             (not any(word in user_msg_clean.lower() for word in ["help", "create", "launch", "plan", "campaign", "strategy", "guide", "how to", "step"]))
         )
-        
+
         if use_grok_for_short and is_simple_question:
             try:
                 # Build conversation history for Grok (it accepts messages list)
@@ -129,7 +129,7 @@ def delegate_cea_task(user_message, thread_context):
                             messages.append({"role": msg["role"], "content": msg["content"]})
                 # Add current user message
                 messages.append({"role": "user", "content": f"{user_message}. Provide a concise, factual answer."})
-                
+
                 grok_text = grok_chat(messages, None)
                 # Pass Grok output through completion logic; use local CEA for continuations
                 grok_text = _maybe_continue_list(user_message, grok_text)
@@ -149,7 +149,7 @@ def delegate_cea_task(user_message, thread_context):
                 # First, handle "top N" lists - this respects the exact number requested
                 import re
                 is_top_n_request = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
-                
+
                 if is_top_n_request:
                     # For "top N" requests, handle truncation/continuation first
                     result = _maybe_continue_list(user_message, result)
@@ -162,7 +162,7 @@ def delegate_cea_task(user_message, thread_context):
                         if nums:
                             last_item = nums[-1]
                             logging.info(f"delegate_cea_task: After _maybe_continue_list, 'Top {target}' list has {last_item} items")
-                            
+
                             # If we have exactly target items and it ends properly, we're done
                             text_ends_properly = result.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
                             if last_item == target and text_ends_properly:
@@ -198,7 +198,7 @@ def delegate_cea_task(user_message, thread_context):
                     # Not a "top N" request - run both functions normally
                     result = _maybe_continue_list(user_message, result)
                     result = _ensure_complete(user_message, result, max_iters=cont_max)
-            
+
             # ABSOLUTE FINAL CHECK: For "top N" requests, force truncation one more time before returning
             import re
             is_top_n_final = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
@@ -220,9 +220,9 @@ def delegate_cea_task(user_message, thread_context):
                 # 🔧 FIX: Check if this is a "top N" request BEFORE calling _ensure_complete
                 import re
                 is_top_n_check = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
-                
+
                 base = _maybe_continue_list(user_message, base)
-                
+
                 if is_top_n_check:
                     # For "top N" requests, DON'T call _ensure_complete if we have correct count
                     target_check = re.search(r"top\s+(\d+)", (user_message or "").lower())
@@ -230,7 +230,7 @@ def delegate_cea_task(user_message, thread_context):
                         target = int(target_check.group(1))
                         items = re.findall(r"^\s*(\d+)\.", base, flags=re.MULTILINE)
                         nums = sorted({int(n) for n in items if n.isdigit()})
-                        
+
                         if nums and nums[-1] == target:
                             # We have exactly the right number - DON'T call _ensure_complete
                             logging.info(f"delegate_cea_task: Skipping _ensure_complete for 'top {target}' - already have {target} items")
@@ -250,7 +250,7 @@ def delegate_cea_task(user_message, thread_context):
                 else:
                     # Not a "top N" request - run _ensure_complete normally
                     base = _ensure_complete(user_message, base, max_iters=cont_max)
-            
+
             # ABSOLUTE FINAL CHECK for non-autogen path too
             import re
             is_top_n_final = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
@@ -263,7 +263,7 @@ def delegate_cea_task(user_message, thread_context):
                     if final_nums_check and final_nums_check[-1] > target_final:
                         logging.error(f"delegate_cea_task: ABSOLUTE FINAL (non-autogen) - Found {final_nums_check[-1]} items, forcing truncation to {target_final}")
                         base = _force_truncate_top_n(base, target_final)
-            
+
             result = base
     except Exception as e:
         logging.exception("CEA delegation failed")
@@ -272,7 +272,7 @@ def delegate_cea_task(user_message, thread_context):
             result = call_local_cea(user_message)
         except Exception:
             result = "Sorry — CEA failed to process the request."
-    
+
     # ABSOLUTE FINAL CHECK: ALWAYS apply truncation for "top N" requests, no matter what path was taken
     if result:
         is_top_n = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
@@ -288,7 +288,7 @@ def delegate_cea_task(user_message, thread_context):
                     items_after = re.findall(r"^\s*(\d+)\.", result, flags=re.MULTILINE)
                     nums_after = sorted({int(n) for n in items_after if n.isdigit()})
                     logging.info(f"delegate_cea_task: After final truncation, result has {len(nums_after)} items: {nums_after}")
-    
+
     return result
 
 
@@ -301,10 +301,10 @@ def _complete_top_n_item(user_message: str, text: str, target: int) -> str:
         if not nums:
             return text
         last = nums[-1]
-        
+
         if last >= target:
             return text  # Already have enough items
-        
+
         # Complete the last item only
         last_item_marker = f"{last}."
         last_marker_pos = text.rfind(last_item_marker)
@@ -345,14 +345,14 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
         if not nums:
             return text
         last = nums[-1]
-        
+
         # CRITICAL: If we have MORE items than requested, TRUNCATE to exactly target
         if last > target:
             logging.warning(f"_maybe_continue_list: Found {last} items but target is {target}, truncating to {target}")
             # BULLETPROOF APPROACH: Find the exact position where item #(target+1) starts and cut there
             lines = text.split("\n")
             result_lines = []
-            
+
             # Go through each line and stop when we see item #(target+1) or higher
             for line in lines:
                 # Check if this line starts a numbered item
@@ -369,14 +369,14 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
                 else:
                     # Not a numbered item - include it (it's part of a previous item's description)
                     result_lines.append(line)
-            
+
             # Join and clean up
             truncated = "\n".join(result_lines).rstrip()
-            
+
             # AGGRESSIVE VERIFICATION: Count items and force truncation if needed
             final_items = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
             final_nums = sorted({int(n) for n in final_items if n.isdigit()})
-            
+
             if final_nums and final_nums[-1] > target:
                 # Still have too many - this means our truncation failed, force it
                 logging.error(f"_maybe_continue_list: CRITICAL - Still have {final_nums[-1]} items, forcing truncation")
@@ -390,12 +390,12 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
                             break
                     result_lines.append(line)
                 truncated = "\n".join(result_lines).rstrip()
-            
+
             # Remove any trailing blank lines and ensure proper ending
             truncated = truncated.rstrip()
             if truncated and not truncated.endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
                 truncated = truncated + "."
-            
+
             # Final verification - count again
             final_check = re.findall(r"^\s*(\d+)\.", truncated, flags=re.MULTILINE)
             final_check_nums = sorted({int(n) for n in final_check if n.isdigit()})
@@ -411,10 +411,10 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
                             break
                     result_final.append(line)
                 truncated = "\n".join(result_final).rstrip()
-            
+
             logging.info(f"_maybe_continue_list: After truncation, returning text with items: {re.findall(r'^\s*(\d+)\.', truncated, flags=re.MULTILINE)}")
             return truncated
-        
+
         # If we have exactly target items, check if the last one is complete
         if last == target:
             text_ends_properly = text.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
@@ -445,11 +445,11 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
                             text_before_last = text[:last_item_start].rstrip()
                             return text_before_last + "\n\n" + continuation.strip().replace("[END]", "").strip()
             return text
-        
+
         # We have fewer than target items - continue to reach target
         text_ends_properly = text.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}"))
         last_item_incomplete = False
-        
+
         # Check if the last numbered item's description seems incomplete
         last_item_marker = f"{last}."
         last_marker_pos = text.rfind(last_item_marker)
@@ -457,10 +457,10 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
             after_marker = text[last_marker_pos + len(last_item_marker):].strip()
             if after_marker and not text_ends_properly:
                 last_item_incomplete = True
-        
+
         # Determine starting point: if last item is incomplete, complete it first, then continue
         start_from = last if last_item_incomplete else (last + 1)
-        
+
         # Ask model to continue from start_from to target (exactly target, no more)
         remaining_prompt = (
             "You previously wrote the following answer.\n\n" +
@@ -475,30 +475,30 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
         import os
         cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "600"))
         continuation = call_local_cea(remaining_prompt, num_predict=cont_tokens, temperature=0.2, stream=True)
-        
+
         if not continuation or not continuation.strip():
             return text
-        
+
         # Remove [END] marker
         continuation = continuation.strip().replace("[END]", "").strip()
-        
+
         # Check for duplicates: if continuation contains items that already exist in text, skip them
         existing_items = set(re.findall(r"^\s*(\d+)\.", text, flags=re.MULTILINE))
         continuation_items = re.findall(r"^\s*(\d+)\.", continuation, flags=re.MULTILINE)
-        
+
         # Filter out items that already exist
         new_items = [item for item in continuation_items if item not in existing_items]
         if not new_items:
             # All items in continuation already exist - don't append
             logging.warning(f"_maybe_continue_list: Continuation contains only duplicate items, skipping")
             return text
-        
+
         # If continuation starts at expected number or completes the last item, append it
         continuation_starts_correctly = (
-            (str(start_from) + "." in continuation) or 
+            (str(start_from) + "." in continuation) or
             (last_item_incomplete and (str(last) + "." in continuation or continuation.strip().startswith(str(last))))
         )
-        
+
         if continuation_starts_correctly:
             sep = "\n\n" if not text.rstrip().endswith(("\n", "\n\n")) else "\n"
             # If last item was incomplete, we might need to replace it rather than append
@@ -544,7 +544,7 @@ def _maybe_continue_list(user_message: str, text: str) -> str:
                     if not combined.rstrip().endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
                         combined = combined.rstrip() + "."
             return combined
-        
+
         return text
     except Exception as e:
         logging.warning(f"_maybe_continue_list error: {e}")
@@ -555,7 +555,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
     """Detect if text appears truncated. Improved detection for mid-word/sentence cuts."""
     if not text:
         return False
-    
+
     # 🔧 NEW: Check if this is a "top N" request and we have N items
     if user_message:
         import re
@@ -571,7 +571,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                     # Ends properly with correct count - NOT truncated
                     logging.info(f"_looks_truncated: 'Top {target}' list has exactly {target} items and ends properly - NOT truncated")
                     return False
-    
+
     tail = text.rstrip()
     # Treat our own completion note as a valid ending (prevents false positives)
     completion_note = "[Note: Business plan generation was limited by token constraints. Some sections may be abbreviated.]"
@@ -579,11 +579,11 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
         tail_before_note = tail[: -len(completion_note)].rstrip()
         if tail_before_note and tail_before_note.endswith((".", "!", "?", ":", "\"", ")", "]", "}")):
             return False
-    
+
     # If [END] marker is present, consider it complete
     if "[END]" in tail:
         return False
-    
+
     # Check if it ends with proper sentence-ending punctuation
     if tail.endswith((".", "!", "?")):
         # Additional check: if it ends with punctuation but the last word is suspiciously short,
@@ -593,7 +593,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
             last_word = words[-1].rstrip(".,!?;:)\"]}")
             if len(last_word) < 4:  # Very short word before punctuation might indicate truncation
                 return True
-        
+
         # SPECIAL CASE: For business plans and structured documents, check if it ends with a complete milestone/roadmap statement
         # This is a common and valid ending pattern (e.g., "Milestone: $6M ARR; 50,000 users.")
         last_200_chars = tail[-200:].lower()
@@ -602,7 +602,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
             # Ends with a milestone statement - this is a valid complete ending for business plans
             logging.info(f"_looks_truncated: Ends with milestone/roadmap statement - NOT truncated")
             return False
-        
+
         # If it ends with proper punctuation, check if it looks like a complete thought
         # For longer responses (like guides), check if the last sentence is complete
         if len(tail) > 500:  # Longer responses should have more structure
@@ -611,7 +611,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
             # If last "sentence" is very short or looks incomplete, might be truncated
             if len(last_sentence.strip()) < 20:
                 return True
-            
+
             # Check if response ends with a table but no closing statement
             # For comprehensive guides/campaigns, they usually end with a summary or conclusion
             if "|" in tail[-300:]:  # Table in last 300 chars
@@ -622,7 +622,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                     if "|" in lines[i]:
                         last_table_line_idx = i
                         break
-                
+
                 if last_table_line_idx is not None:
                     # Found a table - check if there's substantial content after it
                     content_after_table = "\n".join(lines[last_table_line_idx + 1:]).strip()
@@ -636,7 +636,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                         # Only flag as incomplete if the response is very long (suggests it should have a closing)
                         if len(tail) > 3000:  # Very long response should have a closing statement
                             return True
-            
+
             # Check if it ends mid-section (e.g., "### 7.4 Daily Optimization Cadence" followed by incomplete content)
             # Look for section headers (###, ##, #) near the end - if there's a header but no content after, it's incomplete
             last_lines = tail.split("\n")[-10:] if "\n" in tail else [tail]  # Check last 10 lines for better detection
@@ -647,7 +647,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                     # Found a header - check if there's enough content after it
                     header_pos = tail.rfind(line_stripped)
                     content_after = tail[header_pos + len(line_stripped):].strip()
-                    
+
                     # SPECIAL CASE: For business plans and structured documents, check if the last line ends with a complete milestone/roadmap item
                     # This is a valid ending pattern (e.g., "Milestone: $6M ARR; 50,000 users.")
                     last_line_after_header = content_after.split("\n")[-1].strip() if "\n" in content_after else content_after.strip()
@@ -658,7 +658,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                             # This looks like a complete milestone statement - valid ending
                             logging.info(f"_looks_truncated: Ends with complete milestone/roadmap item - NOT truncated")
                             return False
-                    
+
                     # If there's a header but less than 100 chars of content after, likely incomplete
                     # Also check if the header suggests multiple items (e.g., "Cadence", "Timeline", "Steps") but only one item exists
                     header_lower = line_stripped.lower()
@@ -686,16 +686,16 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                         return True
                     break
         return False
-    
+
     # If it ends with mid-sentence punctuation (comma, colon, semicolon, etc.), it's likely truncated
     if tail.endswith((",", ":", ";", ")", "]", "}", "\"", "+", "-", "|")):
         return True
-    
+
     # Check for incomplete table cells or markdown structures
     # If it ends with "|" or "+" or "-" (common in tables), it's likely truncated
     if tail.rstrip().endswith(("|", "+", "-")) and not tail.rstrip().endswith(("---", "===")):
         return True
-    
+
     # If it doesn't end with any punctuation, it's likely truncated
     # Check if last word is suspiciously short (mid-word cut)
     words = tail.split()
@@ -705,7 +705,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
         # Also check for symbols like "+", "-", "|" which indicate incomplete content
         if len(last_word) < 4 or last_word in ("+", "-", "|"):
             return True
-    
+
     # Check if it ends mid-table (common pattern: ends with "|" or incomplete cell)
     if "|" in tail[-200:]:  # If there's a pipe in the last 200 chars, might be a table (increased range)
         # Check if it ends with incomplete table cell or row
@@ -728,15 +728,15 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
                     # Found a potential header - count pipes
                     header_pipe_count = line_stripped.count("|")
                     break
-            
+
             # Count pipes in the last row
             last_pipe_count = last_line.count("|")
-            
+
             # If we found a header and the last row has fewer pipes, it's incomplete
             if header_pipe_count is not None and last_pipe_count < header_pipe_count:
                 logging.info(f"_looks_truncated: Table row has {last_pipe_count} pipes but header has {header_pipe_count} - incomplete")
                 return True
-            
+
             # Even if it ends with "|", check if the row looks complete (has enough cells)
             # A complete table row typically has multiple "|" separators
             if last_pipe_count < 2:  # Less than 2 pipes suggests incomplete row
@@ -744,15 +744,15 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
         # Check if it ends with markdown formatting that suggests incomplete content
         if last_line.endswith(("*", "**", "***", "`", "```")):
             return True
-    
+
     # Check for incomplete markdown structures (bold, italic, code blocks)
     # Also check if it ends with incomplete markdown like "**Data Quality" (starts with ** but incomplete)
     if tail.rstrip().endswith(("*", "**", "***", "`", "```", "|")):
         return True
-    
+
     # Get last line for markdown checks (avoid duplicate)
     last_line_for_md = tail.split("\n")[-1].strip() if "\n" in tail else tail.strip()
-    
+
     # Check if last line starts with markdown but is incomplete (e.g., "**Data Quality" without closing)
     if last_line_for_md.startswith(("**", "***", "`", "```")) and not last_line_for_md.endswith(("**", "***", "`", "```")):
         # Started markdown formatting but didn't close it - likely truncated
@@ -761,7 +761,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
     if last_line_for_md.startswith("**") and len(last_line_for_md.split()) <= 3:
         # Looks like a markdown header that was cut off
         return True
-    
+
     # Default: if no proper ending punctuation, consider truncated
     return True
 
@@ -771,7 +771,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
     try:
         import os
         import re
-        
+
         # 🔍 DEBUG: Check if this is being called for "top N" requests
         is_top_n = bool(re.search(r"top\s+(\d+)", (user_message or "").lower()))
         if is_top_n:
@@ -781,17 +781,17 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 items = re.findall(r"^\s*(\d+)\.", text, flags=re.MULTILINE)
                 nums = sorted({int(n) for n in items if n.isdigit()})
                 logging.warning(f"⚠️ _ensure_complete called for 'top {target}' request with {len(nums)} items: {nums}")
-        
+
         out = text or ""
         iters = 0
         cont_tokens = int(os.getenv("CEA_CONTINUE_TOKENS", "800"))
         # Use Grok for continuation (faster and more reliable than local CEA)
         use_grok_for_continuation = os.getenv("CEA_USE_GROK_FOR_CONTINUATION", "true").lower() in ("1", "true", "yes")
-        
+
         while iters < max_iters and _looks_truncated(out, user_message):
             iters += 1
             logging.info(f"_ensure_complete: iteration {iters}, text length: {len(out)}")
-            
+
             # Smart truncation: For 1024 token context window, we need to be very aggressive
             # Prompt takes ~150 tokens, context needs ~200 tokens, leaving ~650 tokens for continuation
             # But if using local CEA (1024 ctx), we need even more aggressive truncation
@@ -802,7 +802,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
             else:
                 # Local CEA has 1024 token limit - be very aggressive
                 max_context_chars = 600  # ~150 tokens
-            
+
             if len(out) > max_context_chars:
                 # Keep only the last portion (most recent context is most important for continuation)
                 # For local CEA, keep even less to ensure continuation has room
@@ -818,13 +818,13 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 logging.info(f"_ensure_complete: truncated context from {len(out)} to {len(truncated_context)} chars (using {'Grok' if use_grok_for_continuation else 'Local CEA'})")
             else:
                 truncated_context = out
-            
+
             # Detect if we're in a table context
             is_table_context = "|" in truncated_context[-200:]
             table_instruction = ""
             if is_table_context:
                 table_instruction = "CRITICAL: The previous content ends in an incomplete table row. You MUST complete that table row first (match the number of columns in the header), then complete any remaining table rows, then finish the section. "
-            
+
             # More efficient prompt for local CEA (shorter = more tokens for continuation)
             if use_grok_for_continuation:
                 continuation_prompt = (
@@ -843,7 +843,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                     f"Continue from where it was cut off. Don't repeat. Keep format. {table_instruction}"
                     f"Complete the answer. When finished, append [END]."
                 )
-            
+
             try:
                 # Use Grok for continuation (faster and more reliable)
                 if use_grok_for_continuation:
@@ -888,20 +888,20 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                     if iters >= max_iters:
                         break
                     continue
-                
+
             if not cont or not cont.strip():
                 logging.warning(f"_ensure_complete: empty continuation at iteration {iters}")
                 # If we have more iterations, try again
                 if iters >= max_iters:
                     break
                 continue
-            
+
             # Remove [END] marker if present
             cont_clean = cont.strip().replace("[END]", "").strip()
-            
+
             # IMPROVED De-duplication: Check multiple ways to detect duplicate content
             should_skip = False
-            
+
             # 1. Check for exact duplicate sentences (if continuation is mostly duplicate sentences, skip)
             if len(out) > 200 and len(cont_clean) > 100:
                 out_sentences = set(re.split(r'[.!?]\s+', out[-1500:].lower()))
@@ -911,7 +911,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                     if duplicate_sentences / len(cont_sentences) > 0.6:
                         logging.warning(f"_ensure_complete: Continuation contains {duplicate_sentences}/{len(cont_sentences)} duplicate sentences, skipping")
                         should_skip = True
-            
+
             # 2. Check for duplicate numbered items (if continuation repeats numbered items, skip)
             if not should_skip and len(cont_clean) > 50:
                 existing_items = set(re.findall(r"^\s*(\d+)\.", out, flags=re.MULTILINE))
@@ -921,7 +921,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                     if duplicate_items / len(continuation_items) > 0.5:
                         logging.warning(f"_ensure_complete: Continuation contains {duplicate_items}/{len(continuation_items)} duplicate numbered items, skipping")
                         should_skip = True
-            
+
             # 3. Check for substantial text overlap (if >70% of continuation matches existing content, skip)
             if not should_skip and len(out) > 500 and len(cont_clean) > 100:
                 last_1500 = out[-1500:].lower()
@@ -934,7 +934,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                     if matching_words / len(cont_words) > 0.7:
                         logging.warning(f"_ensure_complete: Continuation has {matching_words}/{len(cont_words)} words overlapping with existing content, skipping")
                         should_skip = True
-            
+
             # 4. Check for exact duplicate at the end (if continuation head matches output tail exactly)
             if not should_skip and len(out) > 100 and len(cont_clean) > 50:
                 out_tail = out[-100:].lower().strip()
@@ -959,7 +959,7 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                             )
                             should_skip = True
                             break
-            
+
             if should_skip:
                 # Skip this continuation, but check if output is complete
                 if not _looks_truncated(out, user_message):
@@ -969,21 +969,21 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 if iters >= max_iters:
                     break
                 continue
-            
+
             # Append continuation
             sep = "\n\n" if not out.rstrip().endswith(("\n", "\n\n")) else "\n"
             out = out + sep + cont_clean
-            
+
             # Check if continuation ended with [END] or proper sentence-ending punctuation (likely complete)
             # Don't stop if it ends with comma, colon, etc. - those indicate it's still incomplete
             cont_ends_properly = cont_clean.rstrip().endswith((".", "!", "?"))
-            
+
             # If continuation is very short (< 100 chars), it's likely incomplete or cut off
             if len(cont_clean.strip()) < 100:
                 logging.info(f"_ensure_complete: continuation is very short ({len(cont_clean)} chars), likely incomplete, continuing...")
                 # Don't break - continue to next iteration
                 continue
-            
+
             # Check if [END] marker is present
             if "[END]" in cont:
                 logging.info(f"_ensure_complete: [END] marker found, checking if output is complete...")
@@ -994,13 +994,13 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 else:
                     logging.info(f"_ensure_complete: [END] found but output still looks truncated, continuing...")
                     continue
-            
+
             # CRITICAL: Always check if the FULL output looks truncated, regardless of how continuation ended
             # This ensures we continue even if continuation ends properly but full output is still incomplete
             if _looks_truncated(out, user_message):
                 logging.info(f"_ensure_complete: Full output still looks truncated after continuation, continuing...")
                 continue
-            
+
             # If we get here, the full output doesn't look truncated
             # But also check if continuation ends properly as a secondary check
             if cont_ends_properly:
@@ -1011,13 +1011,13 @@ def _ensure_complete(user_message: str, text: str, max_iters: int = 3) -> str:
                 # This might be a false negative - continue to be safe
                 logging.info(f"_ensure_complete: Full output doesn't look truncated but continuation ends oddly, continuing to be safe...")
                 continue
-        
+
         # FINAL CHECK: Before returning, verify the output is actually complete
         # If it still looks truncated after all iterations, log a warning
         if _looks_truncated(out, user_message):
             logging.warning(f"_ensure_complete: Output still appears truncated after {iters} iterations. Length: {len(out)}")
             # Don't add a note here - let it return as-is, but log the issue
-        
+
         return out
     except Exception as e:
         logging.warning(f"_ensure_complete error: {e}")

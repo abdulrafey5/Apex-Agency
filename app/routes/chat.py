@@ -334,3 +334,169 @@ def incubator_status():
         return jsonify({"status": "error", "error": str(e)}), 500
 
 
+@chat_bp.route("/vectorize/query", methods=["POST"], strict_slashes=False)
+def vectorize_query():
+    """
+    Query Cloudflare Vectorize index for product information.
+    
+    Request body (JSON):
+    {
+        "query": "green tea benefits",
+        "top_k": 5,
+        "filter": {"category": "tea"}  // Optional
+    }
+    
+    Returns:
+    {
+        "results": [...],
+        "count": 5
+    }
+    """
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        payload = request.get_json(silent=True) or {}
+        query_text = payload.get("query") or payload.get("text")
+        top_k = payload.get("top_k", 5)
+        filter_dict = payload.get("filter")
+        
+        if not query_text:
+            return jsonify({"error": "Missing 'query' parameter"}), 400
+        
+        from services.cloudflare_vectorize_service import query_product_info
+        
+        results = query_product_info(query_text, top_k=top_k, filter=filter_dict)
+        
+        return jsonify({
+            "results": results,
+            "count": len(results),
+            "query": query_text
+        })
+    except Exception as e:
+        logging.exception("Vectorize query failed")
+        return jsonify({"error": f"Query failed: {str(e)}"}), 500
+
+
+@chat_bp.route("/vectorize/upsert", methods=["POST"], strict_slashes=False)
+def vectorize_upsert():
+    """
+    Upsert product information into Cloudflare Vectorize index.
+    This allows AutoGen to dynamically update the product knowledge base.
+    
+    Request body (JSON):
+    {
+        "product_id": "tea-001",
+        "product_text": "Organic green tea with antioxidants...",
+        "metadata": {
+            "category": "tea",
+            "price": 29.99,
+            "brand": "Wellness In Vogue"
+        }
+    }
+    
+    Returns:
+    {
+        "success": true,
+        "product_id": "tea-001"
+    }
+    """
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        payload = request.get_json(silent=True) or {}
+        product_id = payload.get("product_id")
+        product_text = payload.get("product_text") or payload.get("text")
+        metadata = payload.get("metadata", {})
+        
+        if not product_id or not product_text:
+            return jsonify({"error": "Missing 'product_id' or 'product_text' parameter"}), 400
+        
+        from services.cloudflare_vectorize_service import upsert_product
+        
+        success = upsert_product(product_id, product_text, metadata)
+        
+        if success:
+            return jsonify({
+                "success": True,
+                "product_id": product_id,
+                "message": "Product successfully added to vector index"
+            })
+        else:
+            return jsonify({"error": "Failed to upsert product"}), 500
+            
+    except Exception as e:
+        logging.exception("Vectorize upsert failed")
+        return jsonify({"error": f"Upsert failed: {str(e)}"}), 500
+
+
+@chat_bp.route("/vectorize/batch-upsert", methods=["POST"], strict_slashes=False)
+def vectorize_batch_upsert():
+    """
+    Batch upsert multiple products into Vectorize index.
+    Useful for bulk updates or initial indexing.
+    
+    Request body (JSON):
+    {
+        "products": [
+            {
+                "product_id": "tea-001",
+                "product_text": "...",
+                "metadata": {...}
+            },
+            ...
+        ]
+    }
+    
+    Returns:
+    {
+        "success": true,
+        "count": 10,
+        "failed": []
+    }
+    """
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        payload = request.get_json(silent=True) or {}
+        products = payload.get("products", [])
+        
+        if not products or not isinstance(products, list):
+            return jsonify({"error": "Missing 'products' array"}), 400
+        
+        from services.cloudflare_vectorize_service import upsert_product, get_vectorize_service
+        
+        success_count = 0
+        failed = []
+        
+        for product in products:
+            product_id = product.get("product_id")
+            product_text = product.get("product_text") or product.get("text")
+            metadata = product.get("metadata", {})
+            
+            if not product_id or not product_text:
+                failed.append({"product_id": product_id, "error": "Missing required fields"})
+                continue
+            
+            if upsert_product(product_id, product_text, metadata):
+                success_count += 1
+            else:
+                failed.append({"product_id": product_id, "error": "Upsert failed"})
+        
+        return jsonify({
+            "success": True,
+            "count": success_count,
+            "total": len(products),
+            "failed": failed
+        })
+        
+    except Exception as e:
+        logging.exception("Vectorize batch upsert failed")
+        return jsonify({"error": f"Batch upsert failed: {str(e)}"}), 500
+
+

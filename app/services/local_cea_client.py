@@ -94,9 +94,35 @@ def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperatu
             context_str = context_str[:max_context_chars] + "..."
         s3_context_str = f"Company Context: {context_str}\n\n"
     
-    # Combine: conversation context + S3 context + prompt
-    if conversation_context or s3_context_str:
-        prompt = f"{conversation_context}{s3_context_str}{prompt}"
+    # Query Cloudflare Vectorize for relevant product information (RAG)
+    vectorize_context_str = ""
+    try:
+        from services.cloudflare_vectorize_service import query_product_info
+        # Extract potential product-related queries from the prompt
+        # Simple heuristic: if prompt mentions products, tea, wellness, etc.
+        product_keywords = ["product", "tea", "wellness", "item", "buy", "price", "review", "benefit"]
+        if any(keyword in prompt.lower() for keyword in product_keywords):
+            # Query Vectorize for relevant product info
+            product_results = query_product_info(prompt, top_k=3)
+            if product_results:
+                # Format product results for context
+                product_info_parts = []
+                for result in product_results[:3]:  # Top 3 results
+                    metadata = result.get("metadata", {})
+                    score = result.get("score", 0)
+                    # Extract relevant product info from metadata
+                    product_text = metadata.get("text", metadata.get("description", ""))
+                    if product_text:
+                        product_info_parts.append(f"- {product_text[:150]}")  # Limit each to 150 chars
+                
+                if product_info_parts:
+                    vectorize_context_str = f"Relevant Product Information:\n" + "\n".join(product_info_parts) + "\n\n"
+    except Exception as e:
+        logging.warning(f"Failed to query Cloudflare Vectorize: {e}")
+    
+    # Combine: conversation context + S3 context + Vectorize product context + prompt
+    if conversation_context or s3_context_str or vectorize_context_str:
+        prompt = f"{conversation_context}{s3_context_str}{vectorize_context_str}{prompt}"
     
     # Aggressive truncation: Reserve ~300 tokens for response, so max prompt ~700 tokens (~2800 chars)
     # This prevents Ollama from truncating and losing critical information

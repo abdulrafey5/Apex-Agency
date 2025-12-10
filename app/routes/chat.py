@@ -500,3 +500,125 @@ def vectorize_batch_upsert():
         return jsonify({"error": f"Batch upsert failed: {str(e)}"}), 500
 
 
+@chat_bp.route("/vectorize/document", methods=["POST"], strict_slashes=False)
+def vectorize_document():
+    """
+    Vectorize a document and store in both Vectorize and PostgreSQL.
+    
+    Request body (JSON):
+    {
+        "document_text": "...",
+        "document_id": "marketing_department_v1",
+        "document_type": "agent_library",
+        "metadata": {...},
+        "parse_structure": true
+    }
+    
+    Returns:
+    {
+        "success": true,
+        "chunks_created": 15,
+        "vectors_stored": 15
+    }
+    """
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        payload = request.get_json(silent=True) or {}
+        document_text = payload.get("document_text")
+        document_id = payload.get("document_id", "document_1")
+        document_type = payload.get("document_type", "agent_library")
+        metadata = payload.get("metadata", {})
+        parse_structure = payload.get("parse_structure", False)
+        
+        if not document_text:
+            return jsonify({"error": "Missing 'document_text' parameter"}), 400
+        
+        from services.document_ingestion_service import get_ingestion_service
+        
+        ingestion_service = get_ingestion_service()
+        chunks, vectors = ingestion_service.vectorize_document(
+            document_text=document_text,
+            document_id=document_id,
+            document_type=document_type,
+            metadata=metadata,
+            parse_structure=parse_structure
+        )
+        
+        if chunks > 0:
+            return jsonify({
+                "success": True,
+                "chunks_created": chunks,
+                "vectors_stored": vectors,
+                "document_id": document_id
+            })
+        else:
+            return jsonify({"error": "Failed to vectorize document"}), 500
+            
+    except Exception as e:
+        logging.exception("Document vectorization failed")
+        return jsonify({"error": f"Vectorization failed: {str(e)}"}), 500
+
+
+@chat_bp.route("/vectorize/query-agent", methods=["GET", "POST"], strict_slashes=False)
+def query_agent():
+    """
+    Query for agent/role information using RAG.
+    
+    GET params or POST body:
+    {
+        "query": "who is Sophie?",
+        "top_k": 5
+    }
+    
+    Returns:
+    {
+        "success": true,
+        "query": "who is Sophie?",
+        "results": [
+            {
+                "content": "...",
+                "metadata": {...},
+                "similarity": 0.85
+            }
+        ],
+        "formatted_context": "..."
+    }
+    """
+    allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
+    if not allow_unauth and "id_token" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        if request.method == "GET":
+            query = request.args.get("query")
+            top_k = int(request.args.get("top_k", "5"))
+        else:
+            payload = request.get_json(silent=True) or {}
+            query = payload.get("query")
+            top_k = payload.get("top_k", 5)
+        
+        if not query:
+            return jsonify({"error": "Missing 'query' parameter"}), 400
+        
+        from services.document_ingestion_service import get_ingestion_service
+        from services.rag_service import query_agent_info
+        
+        ingestion_service = get_ingestion_service()
+        results = ingestion_service.query_agent_info(query, top_k=top_k)
+        formatted_context = query_agent_info(query, top_k=top_k)
+        
+        return jsonify({
+            "success": True,
+            "query": query,
+            "results": results,
+            "formatted_context": formatted_context
+        })
+            
+    except Exception as e:
+        logging.exception("Agent query failed")
+        return jsonify({"error": f"Query failed: {str(e)}"}), 500
+
+

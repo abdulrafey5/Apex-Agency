@@ -154,7 +154,7 @@
         }
 
         if (kickoff.error) {
-          loadingDiv.remove();
+        loadingDiv.remove();
           addMessage(`Error: ${kickoff.error}`, 'ai');
           return;
         }
@@ -206,7 +206,7 @@
       if (isHtml) {
         messageDiv.innerHTML = content;
       } else {
-        messageDiv.textContent = content;
+      messageDiv.textContent = content;
       }
       if (isLoading) messageDiv.id = 'loading-message';
 

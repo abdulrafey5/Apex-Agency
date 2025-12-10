@@ -142,7 +142,7 @@ def delegate_cea_task(user_message, thread_context):
                 return _ensure_complete(user_message, base)
 
         if use_autogen:
-            result = run_autogen_task(user_message, context=ctx)
+        result = run_autogen_task(user_message, context=ctx)
             # Always run completion logic to ensure responses are complete
             cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "5"))
             if cont_max > 0:
@@ -193,7 +193,7 @@ def delegate_cea_task(user_message, thread_context):
                         else:
                             # No items found - this shouldn't happen, but return as-is
                             logging.warning(f"delegate_cea_task: 'Top {target}' request but no numbered items found in result")
-                            return result
+        return result
                 else:
                     # Not a "top N" request - run both functions normally
                     result = _maybe_continue_list(user_message, result)

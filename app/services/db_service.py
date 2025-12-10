@@ -11,7 +11,34 @@ from psycopg2.extras import RealDictCursor, Json
 from psycopg2.pool import ThreadedConnectionPool
 from contextlib import contextmanager
 from typing import List, Dict, Any, Optional, Tuple
+from pathlib import Path
 import json
+
+# Load .env file BEFORE reading environment variables
+try:
+    from dotenv import load_dotenv
+    # Load .env from app directory (parent of services directory)
+    # Use .resolve() to get absolute path like main.py does
+    app_dir = Path(__file__).resolve().parent.parent
+    env_path = app_dir / ".env"
+    print(f"[DB_SERVICE] Looking for .env at: {env_path}")
+    print(f"[DB_SERVICE] .env exists: {env_path.exists()}")
+    if env_path.exists():
+        load_dotenv(env_path)
+        # Debug: verify it loaded
+        db_host_check = os.getenv("DB_HOST")
+        print(f"[DB_SERVICE] After load_dotenv(), DB_HOST={db_host_check}")
+        if db_host_check and db_host_check != "localhost":
+            print(f"[DB_SERVICE] ✅ Successfully loaded .env from {env_path}")
+        else:
+            print(f"[DB_SERVICE] ⚠️ Loaded .env but DB_HOST is still '{db_host_check}'")
+    else:
+        print(f"[DB_SERVICE] ❌ .env file not found at {env_path}")
+except ImportError:
+    # python-dotenv not installed, skip
+    print("[DB_SERVICE] ❌ python-dotenv not installed, .env file will not be loaded")
+except Exception as e:
+    print(f"[DB_SERVICE] ❌ Failed to load .env file: {e}")
 
 
 class DatabaseService:
@@ -23,20 +50,33 @@ class DatabaseService:
         self.db_name = os.getenv("DB_NAME", "inception")
         self.db_user = os.getenv("DB_USER", "postgres")
         self.db_password = os.getenv("DB_PASSWORD", "")
+        # SSL mode: disable, allow, prefer, require, verify-ca, verify-full
+        self.ssl_mode = os.getenv("DB_SSLMODE", "prefer")
+        
+        # Debug output - will show in logs
+        print(f"[DB_SERVICE] Connecting to: host={self.db_host}, port={self.db_port}, db={self.db_name}, user={self.db_user}, sslmode={self.ssl_mode}")
+        logging.info(f"DatabaseService initializing: host={self.db_host}, port={self.db_port}, db={self.db_name}, user={self.db_user}, sslmode={self.ssl_mode}")
+        
         self.pool = None
         self._init_pool()
     
     def _init_pool(self):
         """Initialize connection pool."""
         try:
+            # Build connection parameters
+            conn_params = {
+                "host": self.db_host,
+                "port": self.db_port,
+                "database": self.db_name,
+                "user": self.db_user,
+                "password": self.db_password,
+                "sslmode": self.ssl_mode
+            }
+            
             self.pool = ThreadedConnectionPool(
                 minconn=1,
                 maxconn=10,
-                host=self.db_host,
-                port=self.db_port,
-                database=self.db_name,
-                user=self.db_user,
-                password=self.db_password
+                **conn_params
             )
             logging.info(f"Database connection pool initialized: {self.db_name}@{self.db_host}")
         except Exception as e:

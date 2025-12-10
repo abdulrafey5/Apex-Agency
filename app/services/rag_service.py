@@ -2,12 +2,14 @@
 """
 RAG (Retrieval-Augmented Generation) service for querying semantic memory.
 Integrates with database semantic_memory table and embedding generation.
+Also supports querying agent/role information from vectorized documents.
 """
 
 import logging
 from typing import List, Dict, Any, Optional
 from services.db_service import get_db_service
 from services.embedding_service import generate_embedding
+from services.document_ingestion_service import get_ingestion_service
 
 
 def query_semantic_memory(
@@ -93,4 +95,49 @@ def index_content(
     except Exception as e:
         logging.exception(f"Failed to index content: {e}")
         return None
+
+
+def query_agent_info(
+    query: str,
+    top_k: int = 5
+) -> str:
+    """
+    Query for agent/role information using RAG.
+    Returns formatted context string for use in prompts.
+    
+    Args:
+        query: Natural language query (e.g., "who is Sophie?", "what does Colby do?")
+        top_k: Number of results to return
+        
+    Returns:
+        Formatted context string with agent information, or empty string if not found
+    """
+    try:
+        ingestion_service = get_ingestion_service()
+        results = ingestion_service.query_agent_info(query, top_k=top_k)
+        
+        if not results:
+            return ""
+        
+        # Format results as context
+        context_parts = ["## Agent/Role Information:"]
+        for i, result in enumerate(results, 1):
+            content = result.get("content", "")
+            metadata = result.get("metadata", {})
+            
+            if content:
+                context_parts.append(f"\n### Result {i}:")
+                context_parts.append(content)
+                
+                # Add metadata if available
+                if metadata.get("agent_name"):
+                    context_parts.append(f"Agent: {metadata['agent_name']}")
+                if metadata.get("role"):
+                    context_parts.append(f"Role: {metadata['role']}")
+        
+        return "\n".join(context_parts)
+        
+    except Exception as e:
+        logging.exception(f"Failed to query agent info: {e}")
+        return ""
 

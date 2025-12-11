@@ -160,6 +160,32 @@ class DatabaseService:
         results = self.execute_query(query, (thread_id, count))
         return list(reversed(results))  # Return in chronological order
     
+    def replace_thread_messages(
+        self,
+        thread_id: str,
+        messages: List[Dict[str, Any]],
+        user_id: Optional[str] = None,
+        agent_id: str = "cea"
+    ) -> int:
+        """Replace all messages for a thread (keeps order as provided)."""
+        total = 0
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM agent_messages WHERE thread_id = %s", (thread_id,))
+                for msg in messages:
+                    role = msg.get("role", "assistant")
+                    text = msg.get("content") or msg.get("message_text") or ""
+                    metadata = msg.get("metadata") or {}
+                    cur.execute(
+                        """
+                        INSERT INTO agent_messages (thread_id, role, message_text, user_id, agent_id, metadata)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        """,
+                        (thread_id, role, text, user_id, agent_id, Json(metadata))
+                    )
+                    total += 1
+        return total
+    
     # ============================================================================
     # Semantic Memory (RAG / Knowledge Base)
     # ============================================================================

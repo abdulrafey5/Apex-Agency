@@ -17,23 +17,10 @@ import json
 # Load .env file BEFORE reading environment variables
 try:
     from dotenv import load_dotenv
-    # Load .env from app directory (parent of services directory)
-    # Use .resolve() to get absolute path like main.py does
     app_dir = Path(__file__).resolve().parent.parent
     env_path = app_dir / ".env"
-    print(f"[DB_SERVICE] Looking for .env at: {env_path}")
-    print(f"[DB_SERVICE] .env exists: {env_path.exists()}")
     if env_path.exists():
         load_dotenv(env_path)
-        # Debug: verify it loaded
-        db_host_check = os.getenv("DB_HOST")
-        print(f"[DB_SERVICE] After load_dotenv(), DB_HOST={db_host_check}")
-        if db_host_check and db_host_check != "localhost":
-            print(f"[DB_SERVICE] ✅ Successfully loaded .env from {env_path}")
-        else:
-            print(f"[DB_SERVICE] ⚠️ Loaded .env but DB_HOST is still '{db_host_check}'")
-    else:
-        print(f"[DB_SERVICE] ❌ .env file not found at {env_path}")
 except ImportError:
     # python-dotenv not installed, skip
     print("[DB_SERVICE] ❌ python-dotenv not installed, .env file will not be loaded")

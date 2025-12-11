@@ -9,6 +9,7 @@ import requests
 import logging
 from typing import List, Dict, Optional, Any
 import json
+from services.embedding_service import generate_embedding
 
 
 class CloudflareVectorizeService:
@@ -18,18 +19,14 @@ class CloudflareVectorizeService:
         self.api_key = os.getenv("CLOUDFLARE_API_KEY")
         self.account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID")
         self.index_name = os.getenv("CLOUDFLARE_VECTORIZE_INDEX_NAME", "product-index")
-        # Cloudflare Vectorize can be accessed via:
-        # 1. Direct REST API (if available)
-        # 2. Cloudflare Worker proxy (recommended for production)
-        self.worker_url = os.getenv("CLOUDFLARE_WORKER_URL")  # Optional: Worker proxy URL
+        self.worker_url = os.getenv("CLOUDFLARE_WORKER_URL")
         if self.account_id:
             self.api_base = f"https://api.cloudflare.com/client/v4/accounts/{self.account_id}/vectorize/indexes/{self.index_name}"
         else:
             self.api_base = None
-        self.enabled = bool(self.api_key and self.account_id) or bool(self.worker_url)
+        self.enabled = False  # Explicitly disabled for now
         
-        if not self.enabled:
-            logging.warning("Cloudflare Vectorize not configured (missing API key/account ID or Worker URL)")
+        logging.info("Cloudflare Vectorize is disabled (deferred configuration)")
     
     def _get_headers(self) -> Dict[str, str]:
         """Get authentication headers for Cloudflare API."""
@@ -58,7 +55,7 @@ class CloudflareVectorizeService:
             List of matching vectors with scores and metadata
         """
         if not self.enabled:
-            logging.warning("Cloudflare Vectorize query skipped - service not configured")
+            logging.info("Cloudflare Vectorize query skipped - disabled")
             return []
         
         try:
@@ -127,7 +124,7 @@ class CloudflareVectorizeService:
             True if successful, False otherwise
         """
         if not self.enabled:
-            logging.warning("Cloudflare Vectorize upsert skipped - service not configured")
+            logging.info("Cloudflare Vectorize upsert skipped - disabled")
             return False
         
         try:
@@ -178,7 +175,7 @@ class CloudflareVectorizeService:
             True if successful, False otherwise
         """
         if not self.enabled:
-            logging.warning("Cloudflare Vectorize delete skipped - service not configured")
+            logging.info("Cloudflare Vectorize delete skipped - disabled")
             return False
         
         try:
@@ -213,7 +210,6 @@ class CloudflareVectorizeService:
             return False
 
 
-# Global service instance
 _vectorize_service = None
 
 
@@ -223,119 +219,4 @@ def get_vectorize_service() -> CloudflareVectorizeService:
     if _vectorize_service is None:
         _vectorize_service = CloudflareVectorizeService()
     return _vectorize_service
-
-
-def query_product_info(
-    query_text: str,
-    top_k: int = 5,
-    filter: Optional[Dict[str, Any]] = None
-) -> List[Dict[str, Any]]:
-    """
-    Query product information from Vectorize index using text query.
-    This function generates embeddings for the query text and searches the index.
-    
-    Args:
-        query_text: Natural language query (e.g., "green tea benefits")
-        top_k: Number of results to return
-        filter: Optional metadata filter
-        
-    Returns:
-        List of product information matches
-    """
-    # Generate embedding for query text
-    embedding = generate_embedding(query_text)
-    if not embedding:
-        logging.warning(f"Failed to generate embedding for query: {query_text}")
-        return []
-    
-    # Query Vectorize index
-    service = get_vectorize_service()
-    results = service.query(
-        query_vector=embedding,
-        top_k=top_k,
-        filter=filter,
-        return_metadata=True
-    )
-    
-    return results
-
-
-def generate_embedding(text: str) -> Optional[List[float]]:
-    """
-    Generate embedding vector for text using OpenAI or local model.
-    
-    Args:
-        text: Text to embed
-        
-    Returns:
-        Embedding vector or None if generation fails
-    """
-    try:
-        # Try OpenAI embeddings first (if configured)
-        openai_key = os.getenv("OPENAI_API_KEY")
-        if openai_key:
-            import openai
-            client = openai.OpenAI(api_key=openai_key)
-            response = client.embeddings.create(
-                model="text-embedding-3-small",  # or text-embedding-ada-002
-                input=text
-            )
-            return response.data[0].embedding
-        
-        # Fallback: Use local embedding model (Ollama with embedding model)
-        # This requires an embedding model to be available via Ollama
-        embedding_model = os.getenv("OLLAMA_EMBEDDING_MODEL", "nomic-embed-text")
-        ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
-        
-        response = requests.post(
-            f"{ollama_url}/api/embeddings",
-            json={
-                "model": embedding_model,
-                "prompt": text
-            },
-            timeout=10
-        )
-        response.raise_for_status()
-        data = response.json()
-        return data.get("embedding")
-        
-    except Exception as e:
-        logging.error(f"Failed to generate embedding: {e}")
-        return None
-
-
-def upsert_product(
-    product_id: str,
-    product_text: str,
-    metadata: Optional[Dict[str, Any]] = None
-) -> bool:
-    """
-    Upsert a product into the Vectorize index.
-    
-    Args:
-        product_id: Unique product identifier
-        product_text: Product description/content to embed
-        metadata: Optional metadata (e.g., {"category": "tea", "price": 29.99})
-        
-    Returns:
-        True if successful, False otherwise
-    """
-    # Generate embedding
-    embedding = generate_embedding(product_text)
-    if not embedding:
-        logging.warning(f"Failed to generate embedding for product: {product_id}")
-        return False
-    
-    # Prepare vector for upsert
-    vector = {
-        "id": product_id,
-        "values": embedding
-    }
-    
-    if metadata:
-        vector["metadata"] = metadata
-    
-    # Upsert to Vectorize
-    service = get_vectorize_service()
-    return service.upsert([vector])
 

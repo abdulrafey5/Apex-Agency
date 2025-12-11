@@ -68,8 +68,6 @@ app.config.update(
 from utils.logger import setup_logging
 setup_logging(LOG_DIR)
 
-print("Loaded Cognito config:", app.config["COGNITO"])
-
 # === Optional YAML initialization ===========================================
 from utils.yaml_utils import load_yaml, save_yaml
 

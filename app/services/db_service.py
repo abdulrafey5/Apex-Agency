@@ -67,7 +67,10 @@ class DatabaseService:
             )
             logging.info(f"Database connection pool initialized: {self.db_name}@{self.db_host}")
         except Exception as e:
-            logging.error(f"Failed to initialize database pool: {e}")
+            error_msg = f"Failed to initialize database pool: {e}"
+            logging.error(error_msg)
+            print(f"[DB_SERVICE] ERROR: {error_msg}")
+            print(f"[DB_SERVICE] Check: DB_HOST={self.db_host}, DB_PORT={self.db_port}, DB_NAME={self.db_name}, DB_USER={self.db_user}")
             self.pool = None
     
     @contextmanager

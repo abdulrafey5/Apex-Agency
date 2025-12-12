@@ -1,9 +1,21 @@
 from flask import Blueprint, current_app, redirect, request, session, jsonify
 import base64
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import logging
 
 auth_bp = Blueprint("auth", __name__)
+
+# Create a session with connection pooling and retries for faster Cognito calls
+_session = requests.Session()
+retry_strategy = Retry(
+    total=2,
+    backoff_factor=0.3,
+    status_forcelist=[429, 500, 502, 503, 504],
+)
+adapter = HTTPAdapter(max_retries=retry_strategy, pool_connections=2, pool_maxsize=2)
+_session.mount("https://", adapter)
 
 @auth_bp.route("/login")
 def login():
@@ -36,8 +48,12 @@ def callback():
         headers["Authorization"] = f"Basic {auth}"
 
     try:
-        r = requests.post(f"https://{cognito['domain']}/oauth2/token", data=data, headers=headers, timeout=15)
+        # Use session with connection pooling for faster requests
+        r = _session.post(f"https://{cognito['domain']}/oauth2/token", data=data, headers=headers, timeout=10)
         r.raise_for_status()
+    except requests.exceptions.Timeout:
+        logging.error("Cognito token request timed out after 10 seconds")
+        return "Login timeout - Cognito service is slow. Please try again.", 504
     except Exception as e:
         logging.exception("Cognito token error")
         return f"Error retrieving tokens: {e}", 400

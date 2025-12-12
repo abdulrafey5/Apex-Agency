@@ -25,19 +25,38 @@ def load_thread(thread_id, chat_dir=None, limit: int = 200):
     """Load thread messages from Postgres. Falls back to a default system prompt."""
     try:
         db = get_db_service()
+        if not db.pool:
+            import logging
+            logging.warning("Database pool not initialized - using default system prompt. Check database connection.")
+            return [{"role": "system", "content": "You are CEA. Respond concisely."}]
         rows = db.get_thread_messages(thread_id, limit=limit, offset=0)
         if rows:
             return [{"role": r.get("role"), "content": r.get("message_text"), "metadata": r.get("metadata")} for r in rows]
-    except Exception:
-        pass
+    except RuntimeError as e:
+        import logging
+        logging.warning(f"Database error loading thread {thread_id}: {e}. Using default system prompt.")
+    except Exception as e:
+        import logging
+        logging.warning(f"Error loading thread {thread_id}: {e}. Using default system prompt.")
     return [{"role": "system", "content": "You are CEA. Respond concisely."}]
 
 
 def save_thread(thread_id, messages, chat_dir=None, keep_last=200):
     """Persist thread messages to Postgres, truncating to the last keep_last entries."""
-    db = get_db_service()
-    system = [m for m in messages if m.get("role") == "system"][:1]
-    others = [m for m in messages if m.get("role") != "system"]
-    truncated = system + others[-(keep_last - 1):]
-    db.replace_thread_messages(thread_id, truncated)
+    try:
+        db = get_db_service()
+        if not db.pool:
+            import logging
+            logging.error("Database pool not initialized - cannot save thread messages. Check database connection.")
+            return
+        system = [m for m in messages if m.get("role") == "system"][:1]
+        others = [m for m in messages if m.get("role") != "system"]
+        truncated = system + others[-(keep_last - 1):]
+        db.replace_thread_messages(thread_id, truncated)
+    except RuntimeError as e:
+        import logging
+        logging.error(f"Database error saving thread {thread_id}: {e}")
+    except Exception as e:
+        import logging
+        logging.exception(f"Unexpected error saving thread {thread_id}: {e}")
 

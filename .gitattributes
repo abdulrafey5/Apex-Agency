@@ -1,1 +1,4 @@
 app/logs/awscliv2.zip filter=lfs diff=lfs merge=lfs -text
+# Enforce LF for Python files
+*.py text eol=lf
+

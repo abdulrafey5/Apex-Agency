@@ -19,7 +19,7 @@ class AgentConfig:
     tools: List[str] = None
     communication_protocol: Optional[str] = None
     metadata: Dict = None
-    
+
     def __post_init__(self):
         if self.responsibilities is None:
             self.responsibilities = []
@@ -40,7 +40,7 @@ def build_general_agent_prompt(
     """
     Build a prompt for a general-purpose agent.
     Agent details can come from RAG lookup if agent_name/role is provided.
-    
+
     Args:
         agent_name: Name of the agent (e.g., "Sophie", "Colby")
         agent_role: Role of the agent (e.g., "Social Media Specialist")
@@ -48,12 +48,12 @@ def build_general_agent_prompt(
         task_description: The task to perform
         previous_work: Optional dict of previous agent outputs
         time_remaining_minutes: Optional time remaining for graceful wrap-up
-        
+
     Returns:
         Formatted prompt string
     """
     prompt_parts = []
-    
+
     # Add agent identity if available
     if agent_name or agent_role:
         prompt_parts.append("# Agent Identity")
@@ -64,14 +64,14 @@ def build_general_agent_prompt(
         if agent_context:
             prompt_parts.append(f"\nContext:\n{agent_context}")
         prompt_parts.append("")
-    
+
     # Add task
     prompt_parts.extend([
         "## Your Task:",
         task_description,
         ""
     ])
-    
+
     # Add collaboration context if available
     if previous_work:
         prompt_parts.extend([
@@ -84,7 +84,7 @@ def build_general_agent_prompt(
             prompt_parts.append(f"### {agent}:")
             prompt_parts.append(f"{output_preview}")
             prompt_parts.append("")
-    
+
     # Add time awareness
     if time_remaining_minutes is not None and time_remaining_minutes <= 5:
         prompt_parts.extend([
@@ -92,7 +92,7 @@ def build_general_agent_prompt(
             f"⚠️ You have approximately {time_remaining_minutes} minutes remaining. Please provide your final output now.",
             ""
         ])
-    
+
     prompt_parts.extend([
         "## Instructions:",
         "1. Be thorough and actionable.",
@@ -103,7 +103,7 @@ def build_general_agent_prompt(
         "",
         "Begin your work:"
     ])
-    
+
     return "\n".join(prompt_parts)
 
 
@@ -114,12 +114,12 @@ def build_synthesis_prompt(
 ) -> str:
     """
     Build prompt for synthesizing all agent work into final output.
-    
+
     Args:
         master_task: Original master task/project
         all_work: Dict of all agent outputs (agent_name -> output)
         time_elapsed_minutes: Time elapsed in the session
-        
+
     Returns:
         Formatted synthesis prompt
     """
@@ -132,7 +132,7 @@ def build_synthesis_prompt(
         "## Work Completed by Agents:",
         ""
     ]
-    
+
     # Add all agent outputs
     for agent_name, output in all_work.items():
         output_truncated = output[:1200] + "\n[... content truncated for synthesis ...]" if len(output) > 1200 else output
@@ -141,7 +141,7 @@ def build_synthesis_prompt(
             f"{output_truncated}",
             ""
         ])
-    
+
     prompt_parts.extend([
         "## Your Task:",
         "Synthesize all the work above into a comprehensive, cohesive final output.",
@@ -159,5 +159,5 @@ def build_synthesis_prompt(
         "",
         "Begin synthesis:"
     ])
-    
+
     return "\n".join(prompt_parts)

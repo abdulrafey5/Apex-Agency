@@ -30,7 +30,7 @@ if env_path.exists():
                 os.environ[key] = value
                 if key.startswith('DB_'):
                     print(f"  {key} = {value}")
-    
+
     print(f"\nAfter loading:")
     print(f"  DB_HOST = {os.getenv('DB_HOST', 'NOT_SET')}")
     print(f"  DB_USER = {os.getenv('DB_USER', 'NOT_SET')}")

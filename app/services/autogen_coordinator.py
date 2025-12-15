@@ -59,10 +59,10 @@ def run_autogen_task(user_message, context=None, timeout_total=120, max_turns=3)
                         context_parts.append(f"Previous assistant: {content}")
             if context_parts:
                 context_str = "\n".join(context_parts)
-        
+
         if not context_str:
             context_str = "none"
-        
+
         cea_prompt = f"""You are CEA, a decisive executive agent.
 Analyse the user's task and, if needed, delegate exactly ONE clear instruction to a Worker.
 
@@ -119,7 +119,7 @@ User task: {user_message[:500]}
             worker_truncated = worker_resp[:1000] if len(worker_resp) > 1000 else worker_resp
         if len(worker_resp) > len(worker_truncated):
             worker_truncated += "\n[Worker output truncated...]"
-        
+
         # Include context in synthesis so it can understand references
         synth_context_str = ""
         if context and isinstance(context, list):
@@ -134,10 +134,10 @@ User task: {user_message[:500]}
                         context_parts.append(f"Previous assistant: {content}")
             if context_parts:
                 synth_context_str = "\n".join(context_parts)
-        
+
         if not synth_context_str:
             synth_context_str = "none"
-        
+
         synth_prompt = f"""You are CEA. Produce the final deliverable for the user.
 
 Rules:
@@ -155,7 +155,7 @@ Original task: {user_message[:500]}
         try:
             # Use Grok for synthesis (faster than local CEA) - can be overridden via env
             use_grok_for_synthesis = os.getenv("CEA_USE_GROK_FOR_SYNTHESIS", "true").lower() in ("1", "true", "yes")
-            
+
             if use_grok_for_synthesis:
                 # Use Grok for faster synthesis - it's already fast and produces good results
                 logging.info("Using Grok for synthesis (faster than local CEA)")
@@ -177,7 +177,7 @@ Original task: {user_message[:500]}
                 synthesis_tokens = min(synthesis_tokens, 500)
                 logging.info(f"Synthesis using {synthesis_tokens} tokens (capped for 1024 token context window)")
                 final = call_local_cea(synth_prompt, num_predict=synthesis_tokens, timeout=stage_timeout, stream=True, context=context)
-            
+
             if not final or len(final.strip()) == 0:
                 # If synthesis returned empty, return worker output
                 final = worker_resp[:2000] if worker_resp else "Sorry, I couldn't generate a complete response. Please try again."

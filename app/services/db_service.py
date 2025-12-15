@@ -30,7 +30,7 @@ except Exception as e:
 
 class DatabaseService:
     """PostgreSQL database service with connection pooling."""
-    
+
     def __init__(self):
         self.db_host = os.getenv("DB_HOST", "localhost")
         self.db_port = int(os.getenv("DB_PORT", "5432"))
@@ -39,14 +39,14 @@ class DatabaseService:
         self.db_password = os.getenv("DB_PASSWORD", "")
         # SSL mode: disable, allow, prefer, require, verify-ca, verify-full
         self.ssl_mode = os.getenv("DB_SSLMODE", "prefer")
-        
+
         # Debug output - will show in logs
         print(f"[DB_SERVICE] Connecting to: host={self.db_host}, port={self.db_port}, db={self.db_name}, user={self.db_user}, sslmode={self.ssl_mode}")
         logging.info(f"DatabaseService initializing: host={self.db_host}, port={self.db_port}, db={self.db_name}, user={self.db_user}, sslmode={self.ssl_mode}")
-        
+
         self.pool = None
         self._init_pool()
-    
+
     def _init_pool(self):
         """Initialize connection pool."""
         try:
@@ -59,7 +59,7 @@ class DatabaseService:
                 "password": self.db_password,
                 "sslmode": self.ssl_mode
             }
-            
+
             self.pool = ThreadedConnectionPool(
                 minconn=1,
                 maxconn=10,
@@ -72,13 +72,13 @@ class DatabaseService:
             print(f"[DB_SERVICE] ERROR: {error_msg}")
             print(f"[DB_SERVICE] Check: DB_HOST={self.db_host}, DB_PORT={self.db_port}, DB_NAME={self.db_name}, DB_USER={self.db_user}")
             self.pool = None
-    
+
     @contextmanager
     def get_connection(self):
         """Get a database connection from the pool."""
         if not self.pool:
             raise RuntimeError("Database pool not initialized")
-        
+
         conn = self.pool.getconn()
         try:
             yield conn
@@ -88,30 +88,30 @@ class DatabaseService:
             raise
         finally:
             self.pool.putconn(conn)
-    
+
     def execute_query(self, query: str, params: tuple = None) -> List[Dict[str, Any]]:
         """Execute a SELECT query and return results as list of dicts."""
         with self.get_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(query, params)
                 return [dict(row) for row in cur.fetchall()]
-    
+
     def execute_update(self, query: str, params: tuple = None) -> int:
         """Execute an INSERT/UPDATE/DELETE query and return affected rows."""
         with self.get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(query, params)
                 return cur.rowcount
-    
+
     def execute_one(self, query: str, params: tuple = None) -> Optional[Dict[str, Any]]:
         """Execute a query and return a single row."""
         results = self.execute_query(query, params)
         return results[0] if results else None
-    
+
     # ============================================================================
     # Agent Messages (Chat History)
     # ============================================================================
-    
+
     def save_message(
         self,
         thread_id: str,
@@ -130,7 +130,7 @@ class DatabaseService:
         metadata_json = Json(metadata) if metadata else Json({})
         result = self.execute_one(query, (thread_id, role, message_text, user_id, agent_id, metadata_json))
         return result["id"] if result else None
-    
+
     def get_thread_messages(
         self,
         thread_id: str,
@@ -146,7 +146,7 @@ class DatabaseService:
             LIMIT %s OFFSET %s
         """
         return self.execute_query(query, (thread_id, limit, offset))
-    
+
     def get_recent_messages(
         self,
         thread_id: str,
@@ -162,7 +162,7 @@ class DatabaseService:
         """
         results = self.execute_query(query, (thread_id, count))
         return list(reversed(results))  # Return in chronological order
-    
+
     def replace_thread_messages(
         self,
         thread_id: str,
@@ -188,11 +188,11 @@ class DatabaseService:
                     )
                     total += 1
         return total
-    
+
     # ============================================================================
     # Semantic Memory (RAG / Knowledge Base)
     # ============================================================================
-    
+
     def upsert_semantic_memory(
         self,
         content: str,
@@ -204,7 +204,7 @@ class DatabaseService:
         """Upsert a semantic memory entry with embedding."""
         # Convert embedding list to PostgreSQL vector format: '[0.1,0.2,...]'
         embedding_str = '[' + ','.join(map(str, embedding)) + ']'
-        
+
         # Check if entry exists (by source_id if provided)
         if source_id:
             existing = self.execute_one(
@@ -224,7 +224,7 @@ class DatabaseService:
                     (content, embedding_str, Json(metadata) if metadata else Json({}), source_id)
                 )
                 return result["id"] if result else None
-        
+
         # Insert new
         query = """
             INSERT INTO semantic_memory (content, embedding, metadata, source_type, source_id)
@@ -236,7 +236,7 @@ class DatabaseService:
             (content, embedding_str, Json(metadata) if metadata else Json({}), source_type, source_id)
         )
         return result["id"] if result else None
-    
+
     def semantic_search(
         self,
         query_embedding: List[float],
@@ -252,11 +252,11 @@ class DatabaseService:
         """
         filter_json = Json(filter_metadata) if filter_metadata else None
         return self.execute_query(query, (embedding_str, match_threshold, match_count, filter_json))
-    
+
     # ============================================================================
     # Episodic Memory
     # ============================================================================
-    
+
     def save_episodic_memory(
         self,
         user_id: str,
@@ -277,7 +277,7 @@ class DatabaseService:
             (user_id, summary_text, embedding_str, memory_type, Json(metadata) if metadata else Json({}))
         )
         return result["id"] if result else None
-    
+
     def get_user_episodic_memories(
         self,
         user_id: str,
@@ -303,11 +303,11 @@ class DatabaseService:
                 LIMIT %s
             """
             return self.execute_query(query, (user_id, limit))
-    
+
     # ============================================================================
     # Async Tasks
     # ============================================================================
-    
+
     def save_task(
         self,
         task_id: str,
@@ -326,7 +326,7 @@ class DatabaseService:
         """Save or update an async task."""
         # Check if task exists
         existing = self.execute_one("SELECT id FROM async_tasks WHERE id = %s", (task_id,))
-        
+
         if existing:
             # Update existing task
             query = """
@@ -368,7 +368,7 @@ class DatabaseService:
                 )
             )
         return True
-    
+
     def get_task(self, task_id: str) -> Optional[Dict[str, Any]]:
         """Get an async task by ID."""
         query = """

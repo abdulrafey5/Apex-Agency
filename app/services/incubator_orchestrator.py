@@ -27,7 +27,7 @@ INCUBATOR_USE_GROK_FOR_SYNTHESIS = os.getenv("INCUBATOR_USE_GROK_FOR_SYNTHESIS",
 
 class IncubatorSession:
     """Represents an active incubator session with state tracking."""
-    
+
     def __init__(self, business_idea: str, session_id: str):
         self.business_idea = business_idea
         self.session_id = session_id
@@ -38,22 +38,22 @@ class IncubatorSession:
         self.final_business_plan: Optional[str] = None
         self.status: str = "initialized"  # "initialized", "running", "wrapping_up", "synthesizing", "completed", "failed"
         self.progress_log: List[str] = []
-        
+
     def add_progress(self, message: str):
         """Add progress message to log."""
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.progress_log.append(f"[{timestamp}] {message}")
         logging.info(f"Incubator {self.session_id}: {message}")
-    
+
     def get_time_remaining_minutes(self) -> int:
         """Get remaining time in minutes."""
         remaining = (self.end_time - datetime.now()).total_seconds() / 60
         return max(0, int(remaining))
-    
+
     def is_wrap_up_time(self) -> bool:
         """Check if it's time to start wrap-up phase."""
         return self.get_time_remaining_minutes() <= INCUBATOR_WRAP_UP_MINUTES
-    
+
     def is_time_expired(self) -> bool:
         """Check if session time has expired."""
         return datetime.now() >= self.end_time
@@ -68,14 +68,14 @@ def run_agent_analysis(
 ) -> Tuple[str, bool]:
     """
     Run analysis for a single agent with retry logic.
-    
+
     Returns:
         Tuple of (insight_text, success_flag)
     """
     agent_def = get_agent_definition(agent_role)
     if not agent_def:
         return f"Error: Agent definition not found for {agent_role}", False
-    
+
     for attempt in range(max_retries + 1):
         try:
             # Build agent prompt
@@ -85,7 +85,7 @@ def run_agent_analysis(
                 previous_insights=previous_insights if previous_insights else None,
                 time_remaining_minutes=time_remaining_minutes
             )
-            
+
             # Determine which model to use
             if INCUBATOR_USE_GROK_FOR_AGENTS:
                 # Use Grok for faster agent responses
@@ -105,7 +105,7 @@ def run_agent_analysis(
                     stream=True,
                     context=None
                 )
-            
+
             # Check if response is empty or too short
             if not insight or len(insight.strip()) < 50:
                 if attempt < max_retries:
@@ -131,14 +131,14 @@ def run_agent_analysis(
                                 return insight, True
                         except Exception as e:
                             logging.error(f"Grok fallback also failed for {agent_def.name}: {e}")
-                    
+
                     return f"Error: {agent_def.name} returned empty or insufficient response after {max_retries + 1} attempts", False
-            
+
             # Remove completion markers if present
             insight = insight.replace("[AGENT_COMPLETE]", "").strip()
-            
+
             return insight, True
-            
+
         except Exception as e:
             error_msg = f"Error running {agent_def.name} (attempt {attempt + 1}): {str(e)}"
             logging.exception(error_msg)
@@ -148,48 +148,48 @@ def run_agent_analysis(
                 continue
             else:
                 return error_msg, False
-    
+
     return f"Error: {agent_def.name} failed after {max_retries + 1} attempts", False
 
 
 def run_incubator_session(business_idea: str, session_id: str) -> Dict:
     """
     Main orchestrator function - runs the full incubator session.
-    
+
     Args:
         business_idea: The business idea to evaluate
         session_id: Unique session identifier
-        
+
     Returns:
         Dict with session results
     """
     session = IncubatorSession(business_idea, session_id)
     session.add_progress(f"Starting incubator session for business idea evaluation")
     session.status = "running"
-    
+
     try:
         # Get list of agents to run (excluding CEA coordinator)
         agent_roles = get_all_agent_roles()
         session.add_progress(f"Initialized {len(agent_roles)} specialized agents")
-        
+
         # Phase 1: Run agents in parallel (or sequential if needed for resource constraints)
         # For now, run sequentially to avoid overwhelming the local model
         # In production, could run in parallel with proper resource management
-        
+
         for agent_role in agent_roles:
             if session.is_time_expired():
                 session.add_progress("⚠️ Time expired before all agents completed")
                 break
-            
+
             agent_def = get_agent_definition(agent_role)
             session.agent_status[agent_role] = "processing"
             session.add_progress(f"Running {agent_def.name} analysis...")
-            
+
             # Check time remaining for wrap-up signal
             time_remaining = session.get_time_remaining_minutes()
             if session.is_wrap_up_time():
                 session.add_progress(f"⚠️ Wrap-up phase: {time_remaining} minutes remaining")
-            
+
             # Run agent analysis
             insight, success = run_agent_analysis(
                 agent_role=agent_role,
@@ -197,7 +197,7 @@ def run_incubator_session(business_idea: str, session_id: str) -> Dict:
                 previous_insights=session.agent_insights,
                 time_remaining_minutes=time_remaining if session.is_wrap_up_time() else None
             )
-            
+
             if success:
                 session.agent_insights[agent_role] = insight
                 session.agent_status[agent_role] = "completed"
@@ -206,7 +206,7 @@ def run_incubator_session(business_idea: str, session_id: str) -> Dict:
                 session.agent_status[agent_role] = "failed"
                 session.agent_insights[agent_role] = insight  # Store error message
                 session.add_progress(f"❌ {agent_def.name} analysis failed: {insight[:100]}")
-        
+
         # Phase 2: Synthesis - CEA coordinator compiles final business plan
         if len(session.agent_insights) == 0:
             session.status = "failed"
@@ -217,18 +217,18 @@ def run_incubator_session(business_idea: str, session_id: str) -> Dict:
                 "session_id": session_id,
                 "progress_log": session.progress_log
             }
-        
+
         session.status = "synthesizing"
         time_elapsed = int((datetime.now() - session.start_time).total_seconds() / 60)
         session.add_progress(f"Starting synthesis phase ({time_elapsed} minutes elapsed)")
-        
+
         # Build synthesis prompt
         synthesis_prompt = build_synthesis_prompt(
             business_idea=business_idea,
             all_insights=session.agent_insights,
             time_elapsed_minutes=time_elapsed
         )
-        
+
         # Run synthesis with truncation detection and completion
         try:
             if INCUBATOR_USE_GROK_FOR_SYNTHESIS:
@@ -246,25 +246,25 @@ def run_incubator_session(business_idea: str, session_id: str) -> Dict:
                     stream=True,
                     context=None
                 )
-            
+
             if business_plan and len(business_plan.strip()) > 0:
                 # Remove completion markers
                 business_plan = business_plan.replace("[SYNTHESIS_COMPLETE]", "").strip()
-                
+
                 # Check for truncation and complete if needed (using same logic as CEA delegation)
                 from services.cea_delegation_service import _looks_truncated, _ensure_complete
-                
+
                 # Use iterative completion to ensure full completion
                 max_completion_iterations = 3
                 for completion_iter in range(max_completion_iterations):
                     if not _looks_truncated(business_plan, business_idea):
                         break  # Plan is complete
-                    
+
                     if completion_iter == 0:
                         session.add_progress("⚠️ Business plan appears truncated, attempting completion...")
                     else:
                         session.add_progress(f"⚠️ Still truncated after iteration {completion_iter}, continuing...")
-                    
+
                     try:
                         # Use Grok for continuation if available, otherwise local CEA
                         use_grok_cont = os.getenv("CEA_USE_GROK_FOR_CONTINUATION", "true").lower() in ("1", "true", "yes")
@@ -282,11 +282,11 @@ Continue and complete the business plan. Make sure to finish the current section
                                 # Check if continuation itself is truncated
                                 if _looks_truncated(continuation, business_idea):
                                     logging.warning(f"Continuation itself appears truncated, may need another iteration")
-                                
+
                                 # Check for duplication before appending
                                 last_100_chars = business_plan.rstrip()[-100:].lower()
                                 first_100_chars = continuation.strip()[:100].lower()
-                                
+
                                 # Avoid duplication
                                 if last_100_chars not in first_100_chars and first_100_chars not in last_100_chars:
                                     business_plan = business_plan.rstrip() + "\n\n" + continuation.strip()
@@ -308,14 +308,14 @@ Continue and complete the business plan. Make sure to finish the current section
                         if completion_iter == max_completion_iterations - 1:
                             session.add_progress("⚠️ Could not complete truncated plan after multiple attempts, using partial result")
                         continue
-                
+
                 # Final check - if still truncated, add a note (only once)
                 if _looks_truncated(business_plan, business_idea):
                     session.add_progress("⚠️ Business plan may still be incomplete after completion attempts")
                     note = "[Note: Business plan generation was limited by token constraints. Some sections may be abbreviated.]"
                     if note not in business_plan:
                         business_plan = business_plan.rstrip() + f"\n\n{note}"
-                
+
                 session.final_business_plan = business_plan
                 session.status = "completed"
                 session.add_progress(f"✅ Synthesis completed - Business plan generated ({len(business_plan)} chars)")
@@ -329,7 +329,7 @@ Continue and complete the business plan. Make sure to finish the current section
                     "agent_insights": {role.value: insight for role, insight in session.agent_insights.items()},
                     "progress_log": session.progress_log
                 }
-                
+
         except Exception as e:
             session.status = "failed"
             error_msg = f"Synthesis failed: {str(e)}"
@@ -342,11 +342,11 @@ Continue and complete the business plan. Make sure to finish the current section
                 "agent_insights": {role.value: insight for role, insight in session.agent_insights.items()},
                 "progress_log": session.progress_log
             }
-        
+
         # Success - return complete results
         total_time = int((datetime.now() - session.start_time).total_seconds() / 60)
         session.add_progress(f"🎉 Incubator session completed successfully in {total_time} minutes")
-        
+
         return {
             "status": "completed",
             "session_id": session_id,
@@ -364,7 +364,7 @@ Continue and complete the business plan. Make sure to finish the current section
             "duration_minutes": total_time,
             "completed_agents": len([s for s in session.agent_status.values() if s == "completed"])
         }
-        
+
     except Exception as e:
         session.status = "failed"
         error_msg = f"Incubator session failed: {str(e)}"

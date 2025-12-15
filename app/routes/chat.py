@@ -145,7 +145,7 @@ def chat_async():
             # This prevents cross-contamination between different curl requests
             import uuid
             thread_id = f"curl_{uuid.uuid4().hex[:16]}"
-    
+
     task_id = start_chat_task(msg, thread_id, current_app.config.get("CHAT_DIR"))
     return jsonify({"task_id": task_id, "status": "queued", "thread_id": thread_id})
 
@@ -214,12 +214,12 @@ def debug_delegation():
 def incubator_start():
     """
     Start an AI Incubator session to evaluate a business idea.
-    
+
     Request body (JSON):
     {
         "business_idea": "Description of the business idea to evaluate"
     }
-    
+
     Returns:
     {
         "task_id": "uuid",
@@ -230,7 +230,7 @@ def incubator_start():
     allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
     if not allow_unauth and "id_token" not in session:
         return jsonify({"error": "Unauthorized"}), 401
-    
+
     # Parse request
     payload = {}
     if request.is_json:
@@ -242,12 +242,12 @@ def incubator_start():
                 payload = json.loads(raw)
         except Exception:
             payload = {}
-    
+
     business_idea = payload.get("business_idea") or payload.get("idea") or request.form.get("business_idea")
-    
+
     if not business_idea or len(business_idea.strip()) == 0:
         return jsonify({"error": "Missing 'business_idea' parameter"}), 400
-    
+
     # Start incubator session
     try:
         task_id = start_incubator_task(business_idea.strip())
@@ -266,7 +266,7 @@ def incubator_start():
 def incubator_result(task_id):
     """
     Get the status and results of an incubator session.
-    
+
     Returns:
     {
         "status": "pending|processing|completed|failed",
@@ -279,11 +279,11 @@ def incubator_result(task_id):
     }
     """
     data = get_task(task_id)
-    
+
     # Verify this is an incubator task
     if data.get("type") != "incubator" and data.get("status") != "not_found":
         return jsonify({"error": "Task ID is not an incubator session"}), 400
-    
+
     return jsonify(data)
 
 
@@ -291,7 +291,7 @@ def incubator_result(task_id):
 def incubator_status():
     """
     Get general incubator system status and configuration.
-    
+
     Returns:
     {
         "status": "operational",
@@ -305,7 +305,7 @@ def incubator_status():
     """
     try:
         from services.incubator_agents import get_all_agent_roles, get_agent_definition
-        
+
         agent_roles = get_all_agent_roles()
         agents_info = []
         for role in agent_roles:
@@ -316,7 +316,7 @@ def incubator_status():
                     "name": agent_def.name,
                     "expertise": agent_def.expertise
                 })
-        
+
         return jsonify({
             "status": "operational",
             "configuration": {
@@ -338,14 +338,14 @@ def incubator_status():
 def vectorize_query():
     """
     Query Cloudflare Vectorize index for product information.
-    
+
     Request body (JSON):
     {
         "query": "green tea benefits",
         "top_k": 5,
         "filter": {"category": "tea"}  // Optional
     }
-    
+
     Returns:
     {
         "results": [...],
@@ -355,20 +355,20 @@ def vectorize_query():
     allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
     if not allow_unauth and "id_token" not in session:
         return jsonify({"error": "Unauthorized"}), 401
-    
+
     try:
         payload = request.get_json(silent=True) or {}
         query_text = payload.get("query") or payload.get("text")
         top_k = payload.get("top_k", 5)
         filter_dict = payload.get("filter")
-        
+
         if not query_text:
             return jsonify({"error": "Missing 'query' parameter"}), 400
-        
+
         from services.cloudflare_vectorize_service import query_product_info
-        
+
         results = query_product_info(query_text, top_k=top_k, filter=filter_dict)
-        
+
         return jsonify({
             "results": results,
             "count": len(results),
@@ -384,7 +384,7 @@ def vectorize_upsert():
     """
     Upsert product information into Cloudflare Vectorize index.
     This allows AutoGen to dynamically update the product knowledge base.
-    
+
     Request body (JSON):
     {
         "product_id": "tea-001",
@@ -395,7 +395,7 @@ def vectorize_upsert():
             "brand": "Wellness In Vogue"
         }
     }
-    
+
     Returns:
     {
         "success": true,
@@ -405,20 +405,20 @@ def vectorize_upsert():
     allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
     if not allow_unauth and "id_token" not in session:
         return jsonify({"error": "Unauthorized"}), 401
-    
+
     try:
         payload = request.get_json(silent=True) or {}
         product_id = payload.get("product_id")
         product_text = payload.get("product_text") or payload.get("text")
         metadata = payload.get("metadata", {})
-        
+
         if not product_id or not product_text:
             return jsonify({"error": "Missing 'product_id' or 'product_text' parameter"}), 400
-        
+
         from services.cloudflare_vectorize_service import upsert_product
-        
+
         success = upsert_product(product_id, product_text, metadata)
-        
+
         if success:
             return jsonify({
                 "success": True,
@@ -427,7 +427,7 @@ def vectorize_upsert():
             })
         else:
             return jsonify({"error": "Failed to upsert product"}), 500
-            
+
     except Exception as e:
         logging.exception("Vectorize upsert failed")
         return jsonify({"error": f"Upsert failed: {str(e)}"}), 500
@@ -438,7 +438,7 @@ def vectorize_batch_upsert():
     """
     Batch upsert multiple products into Vectorize index.
     Useful for bulk updates or initial indexing.
-    
+
     Request body (JSON):
     {
         "products": [
@@ -450,7 +450,7 @@ def vectorize_batch_upsert():
             ...
         ]
     }
-    
+
     Returns:
     {
         "success": true,
@@ -461,40 +461,40 @@ def vectorize_batch_upsert():
     allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
     if not allow_unauth and "id_token" not in session:
         return jsonify({"error": "Unauthorized"}), 401
-    
+
     try:
         payload = request.get_json(silent=True) or {}
         products = payload.get("products", [])
-        
+
         if not products or not isinstance(products, list):
             return jsonify({"error": "Missing 'products' array"}), 400
-        
+
         from services.cloudflare_vectorize_service import upsert_product, get_vectorize_service
-        
+
         success_count = 0
         failed = []
-        
+
         for product in products:
             product_id = product.get("product_id")
             product_text = product.get("product_text") or product.get("text")
             metadata = product.get("metadata", {})
-            
+
             if not product_id or not product_text:
                 failed.append({"product_id": product_id, "error": "Missing required fields"})
                 continue
-            
+
             if upsert_product(product_id, product_text, metadata):
                 success_count += 1
             else:
                 failed.append({"product_id": product_id, "error": "Upsert failed"})
-        
+
         return jsonify({
             "success": True,
             "count": success_count,
             "total": len(products),
             "failed": failed
         })
-        
+
     except Exception as e:
         logging.exception("Vectorize batch upsert failed")
         return jsonify({"error": f"Batch upsert failed: {str(e)}"}), 500
@@ -504,7 +504,7 @@ def vectorize_batch_upsert():
 def vectorize_document():
     """
     Vectorize a document and store in both Vectorize and PostgreSQL.
-    
+
     Request body (JSON):
     {
         "document_text": "...",
@@ -513,7 +513,7 @@ def vectorize_document():
         "metadata": {...},
         "parse_structure": true
     }
-    
+
     Returns:
     {
         "success": true,
@@ -524,7 +524,7 @@ def vectorize_document():
     allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
     if not allow_unauth and "id_token" not in session:
         return jsonify({"error": "Unauthorized"}), 401
-    
+
     try:
         payload = request.get_json(silent=True) or {}
         document_text = payload.get("document_text")
@@ -532,12 +532,12 @@ def vectorize_document():
         document_type = payload.get("document_type", "agent_library")
         metadata = payload.get("metadata", {})
         parse_structure = payload.get("parse_structure", False)
-        
+
         if not document_text:
             return jsonify({"error": "Missing 'document_text' parameter"}), 400
-        
+
         from services.document_ingestion_service import get_ingestion_service
-        
+
         ingestion_service = get_ingestion_service()
         chunks, vectors = ingestion_service.vectorize_document(
             document_text=document_text,
@@ -546,7 +546,7 @@ def vectorize_document():
             metadata=metadata,
             parse_structure=parse_structure
         )
-        
+
         if chunks > 0:
             return jsonify({
                 "success": True,
@@ -556,7 +556,7 @@ def vectorize_document():
             })
         else:
             return jsonify({"error": "Failed to vectorize document"}), 500
-            
+
     except Exception as e:
         logging.exception("Document vectorization failed")
         return jsonify({"error": f"Vectorization failed: {str(e)}"}), 500
@@ -566,13 +566,13 @@ def vectorize_document():
 def query_agent():
     """
     Query for agent/role information using RAG.
-    
+
     GET params or POST body:
     {
         "query": "who is Sophie?",
         "top_k": 5
     }
-    
+
     Returns:
     {
         "success": true,
@@ -590,7 +590,7 @@ def query_agent():
     allow_unauth = os.getenv("ALLOW_UNAUTH_CHAT", "true").lower() in ("1", "true", "yes")
     if not allow_unauth and "id_token" not in session:
         return jsonify({"error": "Unauthorized"}), 401
-    
+
     try:
         if request.method == "GET":
             query = request.args.get("query")
@@ -599,24 +599,24 @@ def query_agent():
             payload = request.get_json(silent=True) or {}
             query = payload.get("query")
             top_k = payload.get("top_k", 5)
-        
+
         if not query:
             return jsonify({"error": "Missing 'query' parameter"}), 400
-        
+
         from services.document_ingestion_service import get_ingestion_service
         from services.rag_service import query_agent_info
-        
+
         ingestion_service = get_ingestion_service()
         results = ingestion_service.query_agent_info(query, top_k=top_k)
         formatted_context = query_agent_info(query, top_k=top_k)
-        
+
         return jsonify({
             "success": True,
             "query": query,
             "results": results,
             "formatted_context": formatted_context
         })
-            
+
     except Exception as e:
         logging.exception("Agent query failed")
         return jsonify({"error": f"Query failed: {str(e)}"}), 500

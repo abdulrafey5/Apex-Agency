@@ -13,17 +13,17 @@ from typing import List, Optional
 def generate_embedding(text: str) -> Optional[List[float]]:
     """
     Generate embedding vector for text using OpenAI or local Ollama model.
-    
+
     Args:
         text: Text to embed
-        
+
     Returns:
         Embedding vector (list of floats) or None if generation fails
     """
     if not text or not text.strip():
         logging.warning("Empty text provided for embedding generation")
         return None
-    
+
     try:
         # Try OpenAI embeddings first (if configured)
         openai_key = os.getenv("OPENAI_API_KEY")
@@ -42,11 +42,11 @@ def generate_embedding(text: str) -> Optional[List[float]]:
                 logging.warning("openai package not installed, falling back to Ollama")
             except Exception as e:
                 logging.warning(f"OpenAI embedding failed: {e}, falling back to Ollama")
-        
+
         # Fallback: Use local embedding model via Ollama
         embedding_model = os.getenv("OLLAMA_EMBEDDING_MODEL", "nomic-embed-text")
         ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
-        
+
         response = requests.post(
             f"{ollama_url}/api/embeddings",
             json={
@@ -58,14 +58,14 @@ def generate_embedding(text: str) -> Optional[List[float]]:
         response.raise_for_status()
         data = response.json()
         embedding = data.get("embedding")
-        
+
         if embedding:
             logging.debug(f"Generated Ollama embedding: {len(embedding)} dimensions")
             return embedding
         else:
             logging.error("Ollama returned empty embedding")
             return None
-        
+
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to generate embedding via Ollama: {e}")
         return None
@@ -77,10 +77,10 @@ def generate_embedding(text: str) -> Optional[List[float]]:
 def batch_generate_embeddings(texts: List[str]) -> List[Optional[List[float]]]:
     """
     Generate embeddings for multiple texts (batched for efficiency).
-    
+
     Args:
         texts: List of texts to embed
-        
+
     Returns:
         List of embedding vectors (or None for failed generations)
     """

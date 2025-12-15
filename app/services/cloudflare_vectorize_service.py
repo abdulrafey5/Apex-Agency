@@ -14,7 +14,7 @@ from services.embedding_service import generate_embedding
 
 class CloudflareVectorizeService:
     """Service for interacting with Cloudflare Vectorize index."""
-    
+
     def __init__(self):
         self.api_key = os.getenv("CLOUDFLARE_API_KEY")
         self.account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID")
@@ -25,16 +25,16 @@ class CloudflareVectorizeService:
         else:
             self.api_base = None
         self.enabled = False  # Explicitly disabled for now
-        
+
         logging.info("Cloudflare Vectorize is disabled (deferred configuration)")
-    
+
     def _get_headers(self) -> Dict[str, str]:
         """Get authentication headers for Cloudflare API."""
         return {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
-    
+
     def query(
         self,
         query_vector: List[float],
@@ -44,20 +44,20 @@ class CloudflareVectorizeService:
     ) -> List[Dict[str, Any]]:
         """
         Query the Vectorize index for similar vectors.
-        
+
         Args:
             query_vector: Embedding vector to search for
             top_k: Number of results to return
             filter: Optional metadata filter (e.g., {"category": "tea"})
             return_metadata: Whether to return metadata with results
-            
+
         Returns:
             List of matching vectors with scores and metadata
         """
         if not self.enabled:
             logging.info("Cloudflare Vectorize query skipped - disabled")
             return []
-        
+
         try:
             # Use Worker proxy if configured, otherwise try direct API
             if self.worker_url:
@@ -66,16 +66,16 @@ class CloudflareVectorizeService:
             else:
                 url = f"{self.api_base}/query"
                 headers = self._get_headers()
-            
+
             payload = {
                 "vector": query_vector,
                 "topK": top_k,
                 "returnMetadata": return_metadata
             }
-            
+
             if filter:
                 payload["filter"] = filter
-            
+
             response = requests.post(
                 url,
                 json=payload,
@@ -84,7 +84,7 @@ class CloudflareVectorizeService:
             )
             response.raise_for_status()
             data = response.json()
-            
+
             # Extract results from Cloudflare response format
             if "result" in data and "matches" in data["result"]:
                 return data["result"]["matches"]
@@ -93,7 +93,7 @@ class CloudflareVectorizeService:
             else:
                 logging.warning(f"Unexpected Vectorize response format: {data}")
                 return []
-                
+
         except requests.exceptions.RequestException as e:
             logging.error(f"Cloudflare Vectorize query failed: {e}")
             if hasattr(e, 'response') and e.response is not None:
@@ -106,27 +106,27 @@ class CloudflareVectorizeService:
         except Exception as e:
             logging.exception(f"Unexpected error in Vectorize query: {e}")
             return []
-    
+
     def upsert(
         self,
         vectors: List[Dict[str, Any]]
     ) -> bool:
         """
         Upsert vectors into the index.
-        
+
         Args:
             vectors: List of dicts with keys:
                 - id: Unique identifier
                 - values: Embedding vector
                 - metadata: Optional metadata dict
-                
+
         Returns:
             True if successful, False otherwise
         """
         if not self.enabled:
             logging.info("Cloudflare Vectorize upsert skipped - disabled")
             return False
-        
+
         try:
             # Use Worker proxy if configured, otherwise try direct API
             if self.worker_url:
@@ -135,11 +135,11 @@ class CloudflareVectorizeService:
             else:
                 url = f"{self.api_base}/upsert"
                 headers = self._get_headers()
-            
+
             payload = {
                 "vectors": vectors
             }
-            
+
             response = requests.post(
                 url,
                 json=payload,
@@ -147,10 +147,10 @@ class CloudflareVectorizeService:
                 timeout=30
             )
             response.raise_for_status()
-            
+
             logging.info(f"Successfully upserted {len(vectors)} vectors to Vectorize index")
             return True
-            
+
         except requests.exceptions.RequestException as e:
             logging.error(f"Cloudflare Vectorize upsert failed: {e}")
             if hasattr(e, 'response') and e.response is not None:
@@ -163,21 +163,21 @@ class CloudflareVectorizeService:
         except Exception as e:
             logging.exception(f"Unexpected error in Vectorize upsert: {e}")
             return False
-    
+
     def delete(self, vector_ids: List[str]) -> bool:
         """
         Delete vectors from the index by ID.
-        
+
         Args:
             vector_ids: List of vector IDs to delete
-            
+
         Returns:
             True if successful, False otherwise
         """
         if not self.enabled:
             logging.info("Cloudflare Vectorize delete skipped - disabled")
             return False
-        
+
         try:
             # Use Worker proxy if configured, otherwise try direct API
             if self.worker_url:
@@ -186,11 +186,11 @@ class CloudflareVectorizeService:
             else:
                 url = f"{self.api_base}/delete"
                 headers = self._get_headers()
-            
+
             payload = {
                 "ids": vector_ids
             }
-            
+
             response = requests.post(
                 url,
                 json=payload,
@@ -198,10 +198,10 @@ class CloudflareVectorizeService:
                 timeout=10
             )
             response.raise_for_status()
-            
+
             logging.info(f"Successfully deleted {len(vector_ids)} vectors from Vectorize index")
             return True
-            
+
         except requests.exceptions.RequestException as e:
             logging.error(f"Cloudflare Vectorize delete failed: {e}")
             return False

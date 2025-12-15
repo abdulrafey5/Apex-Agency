@@ -86,14 +86,14 @@ MARKETING_DEPARTMENT_DOC = """department:
       must be approved by Maria before launch.
     tool_usage_rules:
       - Tools that directly publish, post, or spend budget require prior approval from Maria.
-      - Logging of communication and approvals is required. 
+      - Logging of communication and approvals is required.
 
   communication:
     internal_channels:
       - [insert communication method]
     reporting:
       - Agents send summaries of progress and feedback requests to Maria at the end of each task cycle.
-      - Maria consolidates updates from its Agents, responds to requests for feedback, and when the work product is deemed sufficient then gives the results the CEA. 
+      - Maria consolidates updates from its Agents, responds to requests for feedback, and when the work product is deemed sufficient then gives the results the CEA.
 
   agents:
     - name: Sofie
@@ -176,7 +176,7 @@ MARKETING_DEPARTMENT_DOC = """department:
         - Track influencer performance and ROI
       tools:
         - Write to Storage and Memory
-        - FB/IG API 
+        - FB/IG API
 
   quality_standards:
     output_format:
@@ -187,9 +187,9 @@ MARKETING_DEPARTMENT_DOC = """department:
 def main():
     """Vectorize the Marketing Department document."""
     logging.info("Starting Marketing Department document vectorization...")
-    
+
     ingestion_service = get_ingestion_service()
-    
+
     # Vectorize the document
     chunks, vectors = ingestion_service.vectorize_document(
         document_text=MARKETING_DEPARTMENT_DOC,
@@ -202,7 +202,7 @@ def main():
         },
         parse_structure=True
     )
-    
+
     if chunks > 0 and vectors > 0:
         logging.info(f"✅ Successfully vectorized Marketing Department document!")
         logging.info(f"   - Created {chunks} chunks")
@@ -215,7 +215,7 @@ def main():
     else:
         logging.error("❌ Failed to vectorize document")
         return 1
-    
+
     return 0
 
 

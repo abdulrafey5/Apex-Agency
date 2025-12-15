@@ -56,7 +56,7 @@ def _format_context_for_prompt(context):
     """Format conversation context into a readable prompt string."""
     if not context or not isinstance(context, list):
         return ""
-    
+
     context_parts = []
     for msg in context[-6:]:  # Last 6 messages
         if isinstance(msg, dict) and "role" in msg and "content" in msg:
@@ -66,7 +66,7 @@ def _format_context_for_prompt(context):
                 context_parts.append(f"User: {content}")
             elif role == "assistant":
                 context_parts.append(f"Assistant: {content}")
-    
+
     if context_parts:
         return "\n".join(context_parts) + "\n\n"
     return ""
@@ -82,7 +82,7 @@ def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperatu
     conversation_context = ""
     if context:
         conversation_context = _format_context_for_prompt(context)
-    
+
     # Read company context from S3
     s3_context = read_s3_context()
     s3_context_str = ""
@@ -93,7 +93,7 @@ def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperatu
         if len(context_str) > max_context_chars:
             context_str = context_str[:max_context_chars] + "..."
         s3_context_str = f"Company Context: {context_str}\n\n"
-    
+
     # Query Cloudflare Vectorize for relevant product information (RAG)
     vectorize_context_str = ""
     try:
@@ -114,16 +114,16 @@ def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperatu
                     product_text = metadata.get("text", metadata.get("description", ""))
                     if product_text:
                         product_info_parts.append(f"- {product_text[:150]}")  # Limit each to 150 chars
-                
+
                 if product_info_parts:
                     vectorize_context_str = f"Relevant Product Information:\n" + "\n".join(product_info_parts) + "\n\n"
     except Exception as e:
         logging.warning(f"Failed to query Cloudflare Vectorize: {e}")
-    
+
     # Combine: conversation context + S3 context + Vectorize product context + prompt
     if conversation_context or s3_context_str or vectorize_context_str:
         prompt = f"{conversation_context}{s3_context_str}{vectorize_context_str}{prompt}"
-    
+
     # Aggressive truncation: Reserve ~300 tokens for response, so max prompt ~700 tokens (~2800 chars)
     # This prevents Ollama from truncating and losing critical information
     max_prompt_chars = 2800
@@ -169,9 +169,9 @@ def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperatu
     # Use lock to prevent concurrent Ollama requests that spawn multiple runners
     # This ensures we always use the single runner with full GPU (25/25 layers)
     with _OLLAMA_LOCK:
-    try:
-        response = requests.post(url, json=payload, timeout=timeout)
-        response.raise_for_status()
+        try:
+            response = requests.post(url, json=payload, timeout=timeout)
+            response.raise_for_status()
 
         # Handle both stream and full responses
         if stream:

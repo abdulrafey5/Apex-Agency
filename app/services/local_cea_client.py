@@ -173,22 +173,22 @@ def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperatu
             response = requests.post(url, json=payload, timeout=timeout)
             response.raise_for_status()
 
-        # Handle both stream and full responses
-        if stream:
-            text_output = ""
-            for line in response.iter_lines():
-                if line:
-                    try:
-                        chunk = json.loads(line.decode("utf-8"))
-                        text_output += chunk.get("response", "")
-                    except json.JSONDecodeError:
-                        continue
-            return text_output.strip()
-        else:
-            data = response.json()
-            return data.get("response", "").strip()
+            # Handle both stream and full responses
+            if stream:
+                text_output = ""
+                for line in response.iter_lines():
+                    if line:
+                        try:
+                            chunk = json.loads(line.decode("utf-8"))
+                            text_output += chunk.get("response", "")
+                        except json.JSONDecodeError:
+                            continue
+                return text_output.strip()
+            else:
+                data = response.json()
+                return data.get("response", "").strip()
 
-    except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as e:
             # Try to include server error body for debugging 400s
             err_text = ""
             try:
@@ -198,7 +198,7 @@ def call_local_cea(prompt, stream=True, timeout=300, num_predict=None, temperatu
             logging.exception(f"Local CEA call failed: {e}{err_text}")
             raise RuntimeError(f"Failed to reach local CEA model: {e}{err_text}")
 
-    except Exception as e:
-        logging.exception(f"Unexpected error in call_local_cea: {e}")
-        raise
+        except Exception as e:
+            logging.exception(f"Unexpected error in call_local_cea: {e}")
+            raise
 

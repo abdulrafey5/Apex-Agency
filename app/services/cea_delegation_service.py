@@ -193,7 +193,6 @@ def delegate_cea_task(user_message, thread_context):
                         else:
                             # No items found - this shouldn't happen, but return as-is
                             logging.warning(f"delegate_cea_task: 'Top {target}' request but no numbered items found in result")
-        return result
                 else:
                     # Not a "top N" request - run both functions normally
                     result = _maybe_continue_list(user_message, result)

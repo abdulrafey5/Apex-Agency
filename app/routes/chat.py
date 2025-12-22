@@ -15,7 +15,7 @@ def healthz():
     return {"status": "ok"}, 200
 
 
-@chat_bp.route("/chat-ui")
+@chat_bp.route("/chat-ui", strict_slashes=False)
 def chat_ui():
     """Render chat UI — supports personal and shared threads."""
     # Skip authentication for testing - remove in production

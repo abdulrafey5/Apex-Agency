@@ -144,7 +144,7 @@ def delegate_cea_task(user_message, thread_context):
         if use_autogen:
             result = run_autogen_task(user_message, context=ctx)
             # Always run completion logic to ensure responses are complete
-            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "5"))
+            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "3"))  # Default to 3 iterations
             if cont_max > 0:
                 # First, handle "top N" lists - this respects the exact number requested
                 import re
@@ -214,7 +214,7 @@ def delegate_cea_task(user_message, thread_context):
             # Direct single-shot local CEA without orchestration
             first_pass_tokens = int(os.getenv("CEA_FIRST_PASS_TOKENS", os.getenv("CEA_MAX_TOKENS", "500")))
             base = _call_local_cea_with_context(user_message, ctx, num_predict=first_pass_tokens)
-            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "0"))
+            cont_max = int(os.getenv("CEA_CONTINUE_MAX_ITERS", "3"))  # Default to 3 iterations for completion
             if cont_max > 0:
                 # 🔧 FIX: Check if this is a "top N" request BEFORE calling _ensure_complete
                 import re
@@ -760,6 +760,22 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
     if last_line_for_md.startswith("**") and len(last_line_for_md.split()) <= 3:
         # Looks like a markdown header that was cut off
         return True
+
+    # Check if it ends with a number or incomplete phrase (e.g., "Days 2", "Step 3", "Item")
+    if words:
+        last_word = words[-1].strip()
+        # If last word is just a number or very short incomplete word, likely truncated
+        if last_word.isdigit() or (len(last_word) < 3 and not last_word.endswith((".", "!", "?", ":", ",", ";"))):
+            logging.info(f"_looks_truncated: Ends with incomplete phrase '{last_word}' - likely truncated")
+            return True
+        # Check if last few words form an incomplete phrase (e.g., "Days 2", "Step 3")
+        if len(words) >= 2:
+            last_two = " ".join(words[-2:]).lower()
+            # Common incomplete patterns
+            incomplete_patterns = ["days", "step", "item", "part", "section", "phase", "stage", "week", "month"]
+            if any(pattern in last_two for pattern in incomplete_patterns) and not tail.endswith((".", "!", "?", ":", ",", ";")):
+                logging.info(f"_looks_truncated: Ends with incomplete phrase pattern '{last_two}' - likely truncated")
+                return True
 
     # Default: if no proper ending punctuation, consider truncated
     return True

@@ -365,15 +365,12 @@ def vectorize_query():
         if not query_text:
             return jsonify({"error": "Missing 'query' parameter"}), 400
 
-        from services.cloudflare_vectorize_service import query_product_info
-
-        results = query_product_info(query_text, top_k=top_k, filter=filter_dict)
-
         return jsonify({
-            "results": results,
-            "count": len(results),
+            "error": "Cloudflare Vectorize is disabled. Use PostgreSQL semantic search instead.",
+            "results": [],
+            "count": 0,
             "query": query_text
-        })
+        }), 503
     except Exception as e:
         logging.exception("Vectorize query failed")
         return jsonify({"error": f"Query failed: {str(e)}"}), 500
@@ -415,18 +412,11 @@ def vectorize_upsert():
         if not product_id or not product_text:
             return jsonify({"error": "Missing 'product_id' or 'product_text' parameter"}), 400
 
-        from services.cloudflare_vectorize_service import upsert_product
-
-        success = upsert_product(product_id, product_text, metadata)
-
-        if success:
-            return jsonify({
-                "success": True,
-                "product_id": product_id,
-                "message": "Product successfully added to vector index"
-            })
-        else:
-            return jsonify({"error": "Failed to upsert product"}), 500
+        return jsonify({
+            "error": "Cloudflare Vectorize is disabled. Use PostgreSQL semantic memory instead.",
+            "success": False,
+            "product_id": product_id
+        }), 503
 
     except Exception as e:
         logging.exception("Vectorize upsert failed")
@@ -469,31 +459,13 @@ def vectorize_batch_upsert():
         if not products or not isinstance(products, list):
             return jsonify({"error": "Missing 'products' array"}), 400
 
-        from services.cloudflare_vectorize_service import upsert_product, get_vectorize_service
-
-        success_count = 0
-        failed = []
-
-        for product in products:
-            product_id = product.get("product_id")
-            product_text = product.get("product_text") or product.get("text")
-            metadata = product.get("metadata", {})
-
-            if not product_id or not product_text:
-                failed.append({"product_id": product_id, "error": "Missing required fields"})
-                continue
-
-            if upsert_product(product_id, product_text, metadata):
-                success_count += 1
-            else:
-                failed.append({"product_id": product_id, "error": "Upsert failed"})
-
         return jsonify({
-            "success": True,
-            "count": success_count,
+            "error": "Cloudflare Vectorize is disabled. Use PostgreSQL semantic memory instead.",
+            "success": False,
+            "count": 0,
             "total": len(products),
-            "failed": failed
-        })
+            "failed": products
+        }), 503
 
     except Exception as e:
         logging.exception("Vectorize batch upsert failed")

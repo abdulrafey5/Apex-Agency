@@ -1,9 +1,9 @@
 from flask import Blueprint, current_app, redirect, request, session, jsonify
 import base64
-import logging
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+import logging
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -14,7 +14,7 @@ retry_strategy = Retry(
     backoff_factor=0.3,
     status_forcelist=[429, 500, 502, 503, 504],
 )
-adapter = HTTPAdapter(max_retries=retry_strategy, pool_connections=10, pool_maxsize=10)
+adapter = HTTPAdapter(max_retries=retry_strategy, pool_connections=2, pool_maxsize=2)
 _session.mount("https://", adapter)
 
 @auth_bp.route("/login")
@@ -59,9 +59,11 @@ def callback():
         return f"Error retrieving tokens: {e}", 400
 
     tokens = r.json()
-    # Avoid storing large tokens in the session cookie; keep a small flag only.
-    session["user_authenticated"] = True
-    logging.info("User logged in via Cognito (tokens not persisted in session)")
+    session.update({
+        "id_token": tokens.get("id_token"),
+        "access_token": tokens.get("access_token"),
+    })
+    logging.info("User logged in via Cognito")
     return redirect("/chat-ui")
 
 @auth_bp.route("/logout")

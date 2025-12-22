@@ -56,6 +56,7 @@ app.config["GROK"] = {
 app.config["SHARED_THREAD"] = (
     os.getenv("SHARED_THREAD", "true").strip().lower() in ("1", "true", "yes")
 )
+
 app.config.update(
     CHAT_DIR=str(CHAT_DIR),
     LOG_DIR=str(LOG_DIR),
@@ -72,30 +73,45 @@ setup_logging(LOG_DIR)
 from utils.yaml_utils import load_yaml, save_yaml
 
 if not MEMORY_FILE.exists():
-    print("Creating empty YAML memory file...")
     save_yaml(MEMORY_FILE, {"shared_context": {}, "conversation": []})
+
+# ============================================================================
+# 🔥 CRITICAL: Warm up services at startup (removes first-login lag)
+# ============================================================================
+try:
+    from services.db_service import get_db_service
+    from services.rag_service import RAGService
+    from services.embedding_service import EmbeddingService
+
+    _db = get_db_service()
+    _rag = RAGService()
+    _embed = EmbeddingService()
+
+    print("✅ Core services warmed at startup")
+except Exception as e:
+    print(f"⚠️ Service warmup failed: {e}")
 
 # === Register blueprints =====================================================
 from routes.auth import auth_bp
 from routes.chat import chat_bp
 
-# Important: no prefix → route is /chat-ui not /chat/chat-ui
 app.register_blueprint(auth_bp)
 app.register_blueprint(chat_bp)
 
 # === Root route ==============================================================
 @app.route("/")
 def root():
-    return "✅ Inception backend running with YAML-ready configuration."
+    return "✅ Inception backend running."
+
+# === Optional warmup endpoint ===============================================
+@app.route("/_warmup")
+def warmup():
+    return {"status": "ok"}
 
 # === Entry point =============================================================
 if __name__ == "__main__":
-    import logging
-    logging.info(f"Starting Inception backend... SHARED_THREAD={app.config['SHARED_THREAD']}")
-    print(app.url_map)  # Debug: show all routes on startup
     app.run(
         host=os.getenv("HOST", "127.0.0.1"),
         port=int(os.getenv("PORT", 3000)),
         debug=os.getenv("DEBUG", "false").lower() in ("1", "true"),
     )
-

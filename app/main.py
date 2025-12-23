@@ -81,11 +81,9 @@ if not MEMORY_FILE.exists():
 try:
     from services.db_service import get_db_service
     from services.rag_service import RAGService
-    from services.embedding_service import EmbeddingService
 
     _db = get_db_service()
     _rag = RAGService()
-    _embed = EmbeddingService()
 
     print("✅ Core services warmed at startup")
 except Exception as e:

@@ -131,21 +131,59 @@ class DatabaseService:
         result = self.execute_one(query, (thread_id, role, message_text, user_id, agent_id, metadata_json))
         return result["id"] if result else None
     
+    # -------------------------------------------------------------------------
+    # Helpers for chats/messages schema (users, chats, messages)
+    # -------------------------------------------------------------------------
+    def _ensure_default_user(self) -> int:
+        """
+        Ensure a default user exists (for anon/shared threads).
+        Returns user_id.
+        """
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT user_id FROM users WHERE email = %s", ("anon@local",))
+                row = cur.fetchone()
+                if row:
+                    return row[0]
+                cur.execute(
+                    "INSERT INTO users (name, email, password) VALUES (%s, %s, %s) RETURNING user_id",
+                    ("Anon", "anon@local", "placeholder")
+                )
+                return cur.fetchone()[0]
+
+    def _ensure_chat(self, thread_id: str, user_id: Optional[int] = None) -> int:
+        """
+        Map thread_id -> chat_id using chats table. Creates a chat if missing.
+        """
+        uid = user_id or self._ensure_default_user()
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT chat_id FROM chats WHERE chat_title = %s", (thread_id,))
+                row = cur.fetchone()
+                if row:
+                    return row[0]
+                cur.execute(
+                    "INSERT INTO chats (user_id, chat_title) VALUES (%s, %s) RETURNING chat_id",
+                    (uid, thread_id)
+                )
+                return cur.fetchone()[0]
+
     def get_thread_messages(
         self,
         thread_id: str,
         limit: int = 20,
         offset: int = 0
     ) -> List[Dict[str, Any]]:
-        """Get messages for a thread, ordered by created_at."""
+        """Get messages for a thread (mapped to chats/messages), ordered by created_at."""
+        chat_id = self._ensure_chat(thread_id)
         query = """
-            SELECT id, role, message_text, metadata, created_at
-            FROM agent_messages
-            WHERE thread_id = %s
+            SELECT message_id AS id, role, content AS message_text, created_at
+            FROM messages
+            WHERE chat_id = %s
             ORDER BY created_at ASC
             LIMIT %s OFFSET %s
         """
-        return self.execute_query(query, (thread_id, limit, offset))
+        return self.execute_query(query, (chat_id, limit, offset))
     
     def get_recent_messages(
         self,
@@ -153,38 +191,41 @@ class DatabaseService:
         count: int = 6
     ) -> List[Dict[str, Any]]:
         """Get the most recent N messages for a thread."""
+        chat_id = self._ensure_chat(thread_id)
         query = """
-            SELECT id, role, message_text, metadata, created_at
-            FROM agent_messages
-            WHERE thread_id = %s
+            SELECT message_id AS id, role, content AS message_text, created_at
+            FROM messages
+            WHERE chat_id = %s
             ORDER BY created_at DESC
             LIMIT %s
         """
-        results = self.execute_query(query, (thread_id, count))
-        return list(reversed(results))  # Return in chronological order
+        results = self.execute_query(query, (chat_id, count))
+        return list(reversed(results))  # chronological
     
     def replace_thread_messages(
         self,
         thread_id: str,
         messages: List[Dict[str, Any]],
-        user_id: Optional[str] = None,
-        agent_id: str = "cea"
+        user_id: Optional[int] = None
     ) -> int:
-        """Replace all messages for a thread (keeps order as provided)."""
+        """
+        Replace all messages for a thread (keeps order as provided) using messages table.
+        Creates a chat for the thread if needed.
+        """
+        chat_id = self._ensure_chat(thread_id, user_id)
         total = 0
         with self.get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("DELETE FROM agent_messages WHERE thread_id = %s", (thread_id,))
+                cur.execute("DELETE FROM messages WHERE chat_id = %s", (chat_id,))
                 for msg in messages:
                     role = msg.get("role", "assistant")
                     text = msg.get("content") or msg.get("message_text") or ""
-                    metadata = msg.get("metadata") or {}
                     cur.execute(
                         """
-                        INSERT INTO agent_messages (thread_id, role, message_text, user_id, agent_id, metadata)
-                        VALUES (%s, %s, %s, %s, %s, %s)
+                        INSERT INTO messages (chat_id, role, content)
+                        VALUES (%s, %s, %s)
                         """,
-                        (thread_id, role, text, user_id, agent_id, Json(metadata))
+                        (chat_id, role, text)
                     )
                     total += 1
         return total

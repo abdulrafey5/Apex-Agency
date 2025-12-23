@@ -775,7 +775,7 @@ def _looks_truncated(text: str, user_message: str = None) -> bool:
             incomplete_patterns = ["days", "step", "item", "part", "section", "phase", "stage", "week", "month"]
             if any(pattern in last_two for pattern in incomplete_patterns) and not tail.endswith((".", "!", "?", ":", ",", ";")):
                 logging.info(f"_looks_truncated: Ends with incomplete phrase pattern '{last_two}' - likely truncated")
-                return True
+        return True
 
     # Default: if no proper ending punctuation, consider truncated
     return True

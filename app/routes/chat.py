@@ -412,7 +412,7 @@ def vectorize_upsert():
         if not product_id or not product_text:
             return jsonify({"error": "Missing 'product_id' or 'product_text' parameter"}), 400
 
-        return jsonify({
+            return jsonify({
             "error": "Cloudflare Vectorize is disabled. Use PostgreSQL semantic memory instead.",
             "success": False,
             "product_id": product_id

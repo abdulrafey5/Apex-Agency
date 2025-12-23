@@ -7,9 +7,11 @@ Run:
     PYTHONPATH=./app python -m scripts.seed_kb
 """
 import os
-from pathlib import Path
-from dotenv import load_dotenv
 import logging
+from pathlib import Path
+from typing import Dict, Any
+
+from dotenv import load_dotenv
 
 from services.embedding_service import generate_embedding
 from services.db_service import get_db_service

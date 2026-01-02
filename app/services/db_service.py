@@ -77,17 +77,55 @@ class DatabaseService:
         # Try Secrets Manager first (production)
         try:
             secret = fetch_db_secret(secret_name, region_name)
-            # RDS secrets use 'host' (not 'hostname'), 'port' (as string or int), 'dbname', 'username', 'password'
-            self.db_host = secret.get("host") or secret.get("hostname", "localhost")
-            port_value = secret.get("port", "5432")
-            self.db_port = int(port_value) if isinstance(port_value, (int, str)) else 5432
-            self.db_name = secret.get("dbname") or secret.get("database", "inception")
-            self.db_user = secret.get("username") or secret.get("user", "postgres")
-            self.db_password = secret.get("password", "")
-            # RDS secrets typically don't include sslmode, default to require for RDS
-            self.ssl_mode = secret.get("sslmode", "require")
+            
+            # Debug: Log secret keys to understand structure (without sensitive values)
+            secret_keys = list(secret.keys())
+            logging.info(f"[DB_SERVICE] Secret keys found: {secret_keys}")
+            
+            # RDS-managed secrets are read-only and may not include all fields
+            # Strategy: Get credentials from secret, connection details from env vars (hybrid approach)
+            
+            # Username and password from Secrets Manager (sensitive data)
+            self.db_user = (
+                secret.get("username") or 
+                secret.get("user") or 
+                secret.get("masterUsername") or
+                os.getenv("DB_USER", "postgres")
+            )
+            
+            self.db_password = secret.get("password") or secret.get("masterPassword") or ""
+            
+            # Connection details: Try secret first, then fall back to environment variables
+            # RDS secrets may include: host, port, dbname, engine, dbInstanceIdentifier
+            self.db_host = (
+                secret.get("host") or 
+                secret.get("hostname") or 
+                secret.get("address") or
+                os.getenv("DB_HOST")  # No default - must be set in env if not in secret
+            )
+            
+            if not self.db_host:
+                raise ValueError("DB_HOST not found in secret and DB_HOST environment variable not set")
+            
+            port_value = secret.get("port") or secret.get("dbPort") or os.getenv("DB_PORT", "5432")
+            self.db_port = int(port_value) if isinstance(port_value, (int, str)) and str(port_value).isdigit() else 5432
+            
+            self.db_name = (
+                secret.get("dbname") or 
+                secret.get("database") or 
+                secret.get("dbInstanceIdentifier") or
+                os.getenv("DB_NAME")  # No default - must be set in env if not in secret
+            )
+            
+            if not self.db_name:
+                raise ValueError("DB_NAME not found in secret and DB_NAME environment variable not set")
+            
+            # SSL mode: RDS secrets typically don't include this, use env var
+            self.ssl_mode = secret.get("sslmode") or os.getenv("DB_SSLMODE", "require")
+            
             self._credentials_source = "secrets_manager"
             logging.info(f"[DB_SERVICE] Using credentials from Secrets Manager: {secret_name}")
+            logging.info(f"[DB_SERVICE] Parsed values - host: {self.db_host}, port: {self.db_port}, db: {self.db_name}, user: {self.db_user}, sslmode: {self.ssl_mode}")
         except Exception as e:
             # Fallback to environment variables (development/local)
             logging.warning(f"[DB_SERVICE] ⚠️ Secrets Manager unavailable, falling back to environment variables: {e}")

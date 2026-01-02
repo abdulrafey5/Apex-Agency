@@ -19,13 +19,20 @@ import boto3
 from botocore.exceptions import ClientError, BotoCoreError
 
 
-def fetch_db_secret(secret_name: str = "inception-db-secret", region_name: str = "eu-north-1") -> dict:
+def fetch_db_secret(secret_name: Optional[str] = None, region_name: str = "eu-north-1") -> dict:
     """
     Fetch DB credentials from AWS Secrets Manager.
     Returns dict with keys: 'username', 'password', 'host', 'dbname'.
     
     This is called at runtime (not at app boot) to support password rotation.
+    
+    Args:
+        secret_name: AWS Secrets Manager secret name/ARN. If None, reads from DB_SECRET_NAME env var.
+        region_name: AWS region for Secrets Manager.
     """
+    if secret_name is None:
+        secret_name = os.getenv("DB_SECRET_NAME", "rds!db-497957fc-371a-40e2-aa21-7fab6082e1e1")
+    
     try:
         client = boto3.client("secretsmanager", region_name=region_name)
         response = client.get_secret_value(SecretId=secret_name)
@@ -55,22 +62,29 @@ class DatabaseService:
     Falls back to environment variables if Secrets Manager is unavailable.
     """
     
-    def __init__(self, secret_name: str = "inception-db-secret", region_name: str = "eu-north-1"):
+    def __init__(self, secret_name: Optional[str] = None, region_name: str = "eu-north-1"):
         """
         Initialize database service.
         
         Args:
-            secret_name: AWS Secrets Manager secret name
-            region_name: AWS region for Secrets Manager
+            secret_name: AWS Secrets Manager secret name/ARN. If None, reads from DB_SECRET_NAME env var.
+            region_name: AWS region for Secrets Manager.
         """
+        # Get secret name from parameter or environment variable
+        if secret_name is None:
+            secret_name = os.getenv("DB_SECRET_NAME", "rds!db-497957fc-371a-40e2-aa21-7fab6082e1e1")
+        
         # Try Secrets Manager first (production)
         try:
             secret = fetch_db_secret(secret_name, region_name)
-            self.db_host = secret.get("host", "localhost")
-            self.db_port = int(secret.get("port", "5432"))
-            self.db_name = secret.get("dbname", "inception")
-            self.db_user = secret.get("username", "postgres")
+            # RDS secrets use 'host' (not 'hostname'), 'port' (as string or int), 'dbname', 'username', 'password'
+            self.db_host = secret.get("host") or secret.get("hostname", "localhost")
+            port_value = secret.get("port", "5432")
+            self.db_port = int(port_value) if isinstance(port_value, (int, str)) else 5432
+            self.db_name = secret.get("dbname") or secret.get("database", "inception")
+            self.db_user = secret.get("username") or secret.get("user", "postgres")
             self.db_password = secret.get("password", "")
+            # RDS secrets typically don't include sslmode, default to require for RDS
             self.ssl_mode = secret.get("sslmode", "require")
             self._credentials_source = "secrets_manager"
             logging.info(f"[DB_SERVICE] Using credentials from Secrets Manager: {secret_name}")

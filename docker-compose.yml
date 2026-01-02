@@ -11,6 +11,46 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: inception-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      # Database (connect to postgres service)
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: inception
+      DB_USER: postgres
+      DB_PASSWORD: user123
+      DB_SSLMODE: disable
+      # Load from .env file (mounted as volume)
+    env_file:
+      - ./app/.env
+    volumes:
+      # Mount .env file
+      - ./app/.env:/app/app/.env:ro
+      # Persistent storage
+      - ./storage:/app/storage
+      - ./app/logs:/app/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   pg_data:

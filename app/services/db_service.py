@@ -167,7 +167,7 @@ class DatabaseService:
                     (uid, thread_id)
                 )
                 return cur.fetchone()[0]
-
+    
     def get_thread_messages(
         self,
         thread_id: str,

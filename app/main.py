@@ -4,11 +4,36 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
+import boto3
+import json
 
 # === Load environment ========================================================
 ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = Path(__file__).resolve().parent
 load_dotenv(APP_DIR / ".env")
+
+# === Fetch DB credentials from AWS Secrets Manager ==========================
+def get_db_credentials(secret_name="inception-db-secret", region_name="eu-north-1"):
+    """
+    Fetches DB credentials from AWS Secrets Manager.
+    Returns a dict with keys: 'username', 'password', 'host', 'dbname'.
+    """
+    client = boto3.client("secretsmanager", region_name=region_name)
+    response = client.get_secret_value(SecretId=secret_name)
+    secret = json.loads(response["SecretString"])
+    return secret
+
+try:
+    db_creds = get_db_credentials()
+    os.environ["DB_HOST"] = db_creds["host"]
+    os.environ["DB_NAME"] = db_creds["dbname"]
+    os.environ["DB_USER"] = db_creds["username"]
+    os.environ["DB_PASSWORD"] = db_creds["password"]
+    os.environ["DB_SSLMODE"] = "require"
+    print("✅ DB credentials loaded from Secrets Manager")
+except Exception as e:
+    print(f"⚠️ Failed to load DB credentials from Secrets Manager: {e}")
+    print("⚠️ Falling back to .env DB settings")
 
 # === Create Flask app ========================================================
 app = Flask(
@@ -75,16 +100,15 @@ from utils.yaml_utils import load_yaml, save_yaml
 if not MEMORY_FILE.exists():
     save_yaml(MEMORY_FILE, {"shared_context": {}, "conversation": []})
 
-# ============================================================================
+# ============================================================================#
 # 🔥 CRITICAL: Warm up services at startup (removes first-login lag)
-# ============================================================================
+# ============================================================================#
 try:
     from services.db_service import get_db_service
     from services.rag_service import RAGService
 
     _db = get_db_service()
     _rag = RAGService()
-
     print("✅ Core services warmed at startup")
 except Exception as e:
     print(f"⚠️ Service warmup failed: {e}")

@@ -82,10 +82,10 @@ def batch_generate_embeddings(texts: List[str]) -> List[Optional[List[float]]]:
 
 class EmbeddingService:
     """Service to create and store embeddings."""
-    
+
     def __init__(self):
         self.db = db_service
-    
+
     def store_embedding(
         self,
         content: str,

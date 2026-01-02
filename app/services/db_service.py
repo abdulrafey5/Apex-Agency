@@ -2,6 +2,9 @@
 """
 Database service for PostgreSQL + pgvector integration.
 Handles all database connections and provides high-level query methods.
+
+🔐 PRODUCTION PATTERN: Fetches credentials from AWS Secrets Manager at runtime.
+This ensures password rotation works correctly and .env files don't override secrets.
 """
 
 import os
@@ -11,44 +14,91 @@ from psycopg2.extras import RealDictCursor, Json
 from psycopg2.pool import ThreadedConnectionPool
 from contextlib import contextmanager
 from typing import List, Dict, Any, Optional, Tuple
-from pathlib import Path
 import json
+import boto3
+from botocore.exceptions import ClientError, BotoCoreError
 
-# Load .env file BEFORE reading environment variables
-try:
-    from dotenv import load_dotenv
-    app_dir = Path(__file__).resolve().parent.parent
-    env_path = app_dir / ".env"
-    if env_path.exists():
-        load_dotenv(env_path)
-except ImportError:
-    # python-dotenv not installed, skip
-    print("[DB_SERVICE] ❌ python-dotenv not installed, .env file will not be loaded")
-except Exception as e:
-    print(f"[DB_SERVICE] ❌ Failed to load .env file: {e}")
+
+def fetch_db_secret(secret_name: str = "inception-db-secret", region_name: str = "eu-north-1") -> dict:
+    """
+    Fetch DB credentials from AWS Secrets Manager.
+    Returns dict with keys: 'username', 'password', 'host', 'dbname'.
+    
+    This is called at runtime (not at app boot) to support password rotation.
+    """
+    try:
+        client = boto3.client("secretsmanager", region_name=region_name)
+        response = client.get_secret_value(SecretId=secret_name)
+        secret = json.loads(response["SecretString"])
+        logging.info(f"[DB_SERVICE] ✅ Secrets fetched from Secrets Manager: {secret_name}")
+        return secret
+    except ClientError as e:
+        error_code = e.response.get("Error", {}).get("Code", "Unknown")
+        if error_code == "ResourceNotFoundException":
+            logging.warning(f"[DB_SERVICE] ⚠️ Secret '{secret_name}' not found in Secrets Manager. Falling back to environment variables.")
+        else:
+            logging.error(f"[DB_SERVICE] ❌ AWS Secrets Manager error: {e}")
+        raise
+    except (BotoCoreError, json.JSONDecodeError, KeyError) as e:
+        logging.error(f"[DB_SERVICE] ❌ Failed to parse secret: {e}")
+        raise
+    except Exception as e:
+        logging.error(f"[DB_SERVICE] ❌ Unexpected error fetching secret: {e}")
+        raise
 
 
 class DatabaseService:
-    """PostgreSQL database service with connection pooling."""
+    """
+    PostgreSQL database service with connection pooling.
     
-    def __init__(self):
-        self.db_host = os.getenv("DB_HOST", "localhost")
-        self.db_port = int(os.getenv("DB_PORT", "5432"))
-        self.db_name = os.getenv("DB_NAME", "inception")
-        self.db_user = os.getenv("DB_USER", "postgres")
-        self.db_password = os.getenv("DB_PASSWORD", "")
-        # SSL mode: disable, allow, prefer, require, verify-ca, verify-full
-        self.ssl_mode = os.getenv("DB_SSLMODE", "prefer")
+    🔐 PRODUCTION: Fetches credentials from AWS Secrets Manager on initialization.
+    Falls back to environment variables if Secrets Manager is unavailable.
+    """
+    
+    def __init__(self, secret_name: str = "inception-db-secret", region_name: str = "eu-north-1"):
+        """
+        Initialize database service.
         
-        # Debug output - will show in logs
-        print(f"[DB_SERVICE] Connecting to: host={self.db_host}, port={self.db_port}, db={self.db_name}, user={self.db_user}, sslmode={self.ssl_mode}")
+        Args:
+            secret_name: AWS Secrets Manager secret name
+            region_name: AWS region for Secrets Manager
+        """
+        # Try Secrets Manager first (production)
+        try:
+            secret = fetch_db_secret(secret_name, region_name)
+            self.db_host = secret.get("host", "localhost")
+            self.db_port = int(secret.get("port", "5432"))
+            self.db_name = secret.get("dbname", "inception")
+            self.db_user = secret.get("username", "postgres")
+            self.db_password = secret.get("password", "")
+            self.ssl_mode = secret.get("sslmode", "require")
+            self._credentials_source = "secrets_manager"
+            logging.info(f"[DB_SERVICE] Using credentials from Secrets Manager: {secret_name}")
+        except Exception as e:
+            # Fallback to environment variables (development/local)
+            logging.warning(f"[DB_SERVICE] ⚠️ Secrets Manager unavailable, falling back to environment variables: {e}")
+            self.db_host = os.getenv("DB_HOST", "localhost")
+            self.db_port = int(os.getenv("DB_PORT", "5432"))
+            self.db_name = os.getenv("DB_NAME", "inception")
+            self.db_user = os.getenv("DB_USER", "postgres")
+            self.db_password = os.getenv("DB_PASSWORD", "")
+            self.ssl_mode = os.getenv("DB_SSLMODE", "prefer")
+            self._credentials_source = "environment"
+            logging.info(f"[DB_SERVICE] Using credentials from environment variables")
+        
+        # Store secret info for rotation-aware recreation
+        self._secret_name = secret_name
+        self._region_name = region_name
+        
+        # Debug output
+        print(f"[DB_SERVICE] Connecting to: host={self.db_host}, port={self.db_port}, db={self.db_name}, user={self.db_user}, sslmode={self.ssl_mode} (source: {self._credentials_source})")
         logging.info(f"DatabaseService initializing: host={self.db_host}, port={self.db_port}, db={self.db_name}, user={self.db_user}, sslmode={self.ssl_mode}")
         
         self.pool = None
         self._init_pool()
     
     def _init_pool(self):
-        """Initialize connection pool."""
+        """Initialize connection pool with current credentials."""
         try:
             # Build connection parameters
             conn_params = {
@@ -66,16 +116,38 @@ class DatabaseService:
                 **conn_params
             )
             logging.info(f"Database connection pool initialized: {self.db_name}@{self.db_host}")
+        except psycopg2.OperationalError as e:
+            error_str = str(e).lower()
+            if "password authentication failed" in error_str or "authentication failed" in error_str:
+                # Password may have rotated - clear pool to force recreation
+                self.pool = None
+                error_msg = f"Database authentication failed - credentials may have rotated. Pool cleared. Error: {e}"
+                logging.error(error_msg)
+                print(f"[DB_SERVICE] ERROR: {error_msg}")
+                print(f"[DB_SERVICE] 💡 If using Secrets Manager, restart the application to fetch new credentials.")
+                raise RuntimeError("DB credentials rotated — restart pool or restart application")
+            else:
+                error_msg = f"Failed to initialize database pool: {e}"
+                logging.error(error_msg)
+                print(f"[DB_SERVICE] ERROR: {error_msg}")
+                print(f"[DB_SERVICE] Check: DB_HOST={self.db_host}, DB_PORT={self.db_port}, DB_NAME={self.db_name}, DB_USER={self.db_user}")
+                self.pool = None
+                raise
         except Exception as e:
             error_msg = f"Failed to initialize database pool: {e}"
             logging.error(error_msg)
             print(f"[DB_SERVICE] ERROR: {error_msg}")
             print(f"[DB_SERVICE] Check: DB_HOST={self.db_host}, DB_PORT={self.db_port}, DB_NAME={self.db_name}, DB_USER={self.db_user}")
             self.pool = None
+            raise
     
     @contextmanager
     def get_connection(self):
-        """Get a database connection from the pool."""
+        """
+        Get a database connection from the pool.
+        
+        Handles authentication failures by detecting password rotation.
+        """
         if not self.pool:
             raise RuntimeError("Database pool not initialized")
         
@@ -83,11 +155,21 @@ class DatabaseService:
         try:
             yield conn
             conn.commit()
+        except psycopg2.OperationalError as e:
+            conn.rollback()
+            error_str = str(e).lower()
+            if "password authentication failed" in error_str or "authentication failed" in error_str:
+                # Credentials rotated - clear pool
+                logging.error(f"[DB_SERVICE] Authentication failed during connection use - credentials may have rotated: {e}")
+                self.pool = None
+                raise RuntimeError("DB credentials rotated — restart application to fetch new credentials")
+            raise
         except Exception as e:
             conn.rollback()
             raise
         finally:
-            self.pool.putconn(conn)
+            if self.pool:  # Only put back if pool still exists
+                self.pool.putconn(conn)
     
     def execute_query(self, query: str, params: tuple = None) -> List[Dict[str, Any]]:
         """Execute a SELECT query and return results as list of dicts."""

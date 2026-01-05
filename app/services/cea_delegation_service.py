@@ -1,6 +1,7 @@
 from services.autogen_coordinator import run_autogen_task
 from services.grok_service import grok_chat
 from services.local_cea_client import call_local_cea
+from services.chunked_generation_service import generate_chunked_content
 import logging
 import os
 
@@ -96,10 +97,21 @@ def _force_truncate_top_n(text: str, target: int) -> str:
 def delegate_cea_task(user_message, thread_context):
     """
     Main entry point used by routes/chat.py
+    
+    🔧 NEW: Uses chunked generation (Option B) for multi-part requests to avoid truncation.
     """
     import re
     result = None
     try:
+        # 🔧 STEP 1: Try chunked generation first (for multi-part requests)
+        use_chunked = os.getenv("CEA_USE_CHUNKED_GENERATION", "true").lower() in ("1", "true", "yes")
+        if use_chunked:
+            chunked_result = generate_chunked_content(user_message, thread_context, use_grok=True)
+            if chunked_result:
+                # Multi-part request detected and handled - return immediately
+                logging.info("✅ Chunked generation completed successfully - skipping continuation logic")
+                return chunked_result
+        
         # Tunables
         max_ctx = int(os.getenv("CEA_MAX_CONTEXT_MESSAGES", "6"))
         use_autogen = os.getenv("CEA_USE_AUTOGEN", "true").lower() in ("1", "true", "yes")

@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS semantic_memory (
     content       TEXT NOT NULL,
     embedding     VECTOR(768) NOT NULL,
     metadata      JSONB DEFAULT '{}'::jsonb,
+    source_type   TEXT DEFAULT 'manual',  -- 'manual', 'agent_library', 'sop', 'document', 'business_plan', etc.
     source_id     TEXT UNIQUE,
     created_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

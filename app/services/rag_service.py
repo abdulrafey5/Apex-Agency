@@ -37,7 +37,7 @@ def query_semantic_memory(
             logging.warning(f"Failed to generate embedding for query: {query_text}")
             return []
 
-        # Query database
+        # Query database (lazy initialization - don't call at module level)
         db = get_db_service()
         results = db.semantic_search(
             query_embedding=query_embedding,
@@ -65,21 +65,21 @@ def index_content(
 
     Args:
         content: Text content to index
-        metadata: Optional metadata (e.g., {"title": "...", "category": "..."})
-        source_type: Type of source ('manual', 'business_plan', 'product', 'document')
+        metadata: Optional metadata dict
+        source_type: Type of source (e.g., "agent_library", "sop", "manual")
         source_id: Unique identifier for the source
 
     Returns:
-        ID of the inserted/updated semantic memory entry, or None if failed
+        ID of the inserted/updated semantic memory entry, or None on failure
     """
     try:
         # Generate embedding
         embedding = generate_embedding(content)
         if not embedding:
-            logging.warning(f"Failed to generate embedding for content indexing")
+            logging.warning(f"Failed to generate embedding for content: {content[:50]}...")
             return None
 
-        # Store in database
+        # Store in database (lazy initialization)
         db = get_db_service()
         memory_id = db.upsert_semantic_memory(
             content=content,
@@ -89,7 +89,7 @@ def index_content(
             source_id=source_id
         )
 
-        logging.info(f"Indexed content into semantic memory (ID: {memory_id})")
+        logging.info(f"Indexed content into semantic memory: id={memory_id}, source_type={source_type}")
         return memory_id
 
     except Exception as e:
@@ -97,47 +97,61 @@ def index_content(
         return None
 
 
-def query_agent_info(
-    query: str,
-    top_k: int = 5
-) -> str:
+def query_agent_info(query_text: str, top_k: int = 5) -> str:
     """
-    Query for agent/role information using RAG.
-    Returns formatted context string for use in prompts.
+    Query for agent/role information and return formatted context string.
 
     Args:
-        query: Natural language query (e.g., "who is Sophie?", "what does Colby do?")
+        query_text: Natural language query about agents/roles
         top_k: Number of results to return
 
     Returns:
-        Formatted context string with agent information, or empty string if not found
+        Formatted string with agent information for use in prompts
     """
     try:
-        ingestion_service = get_ingestion_service()
-        results = ingestion_service.query_agent_info(query, top_k=top_k)
+        results = query_semantic_memory(
+            query_text=query_text,
+            top_k=top_k,
+            match_threshold=0.6,
+            filter_metadata={"source_type": "agent_library"}
+        )
 
         if not results:
             return ""
 
-        # Format results as context
-        context_parts = ["## Agent/Role Information:"]
-        for i, result in enumerate(results, 1):
+        formatted_parts = []
+        for result in results:
             content = result.get("content", "")
             metadata = result.get("metadata", {})
+            agent_name = metadata.get("agent_name", "Unknown")
+            formatted_parts.append(f"{agent_name}: {content[:300]}")
 
-            if content:
-                context_parts.append(f"\n### Result {i}:")
-                context_parts.append(content)
-
-                # Add metadata if available
-                if metadata.get("agent_name"):
-                    context_parts.append(f"Agent: {metadata['agent_name']}")
-                if metadata.get("role"):
-                    context_parts.append(f"Role: {metadata['role']}")
-
-        return "\n".join(context_parts)
+        return "\n".join(formatted_parts)
 
     except Exception as e:
         logging.exception(f"Failed to query agent info: {e}")
         return ""
 
+
+# Legacy class-based interface (for backward compatibility)
+class RAGService:
+    """RAG service to manage embeddings and semantic retrieval."""
+    
+    def __init__(self):
+        # Lazy initialization - don't call get_db_service() at module level
+        self.db = None
+    
+    def _get_db(self):
+        """Lazy getter for database service."""
+        if self.db is None:
+            self.db = get_db_service()
+        return self.db
+
+    def upsert_embedding(self, chat_id: int, content: str, embedding: List[float], metadata: Optional[Dict[str, Any]] = None, source_id: Optional[str] = None) -> int:
+        return self._get_db().upsert_semantic_memory(content, embedding, metadata, "manual", source_id)
+
+    def get_chat_history(self, chat_id: int, limit: int = 50) -> List[Dict[str, Any]]:
+        return self._get_db().get_chat_messages(chat_id, limit)
+
+    def save_chat_message(self, chat_id: int, role: str, content: str) -> int:
+        return self._get_db().save_message(chat_id, role, content)

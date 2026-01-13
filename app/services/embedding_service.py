@@ -11,8 +11,6 @@ import requests
 from typing import List, Optional, Dict, Any
 from services.db_service import get_db_service
 
-db_service = get_db_service()
-
 
 def generate_embedding(text: str) -> Optional[List[float]]:
     """
@@ -84,7 +82,14 @@ class EmbeddingService:
     """Service to create and store embeddings."""
 
     def __init__(self):
-        self.db = db_service
+        # Lazy initialization - don't call get_db_service() at module level
+        self.db = None
+    
+    def _get_db(self):
+        """Lazy getter for database service."""
+        if self.db is None:
+            self.db = get_db_service()
+        return self.db
 
     def store_embedding(
         self,
@@ -95,4 +100,4 @@ class EmbeddingService:
         source_id: Optional[str] = None
     ) -> int:
         """Save embedding into semantic memory."""
-        return self.db.upsert_semantic_memory(content, embedding, metadata, source_type, source_id)
+        return self._get_db().upsert_semantic_memory(content, embedding, metadata, source_type, source_id)

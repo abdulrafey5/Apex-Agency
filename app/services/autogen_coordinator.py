@@ -2,6 +2,7 @@
 import logging, json, time
 from services.local_cea_client import call_local_cea
 from services.grok_service import grok_chat
+from services.rag_service import query_semantic_memory
 from config.agentops_config import init_agentops
 
 # optional: agentops instrumentation
@@ -41,6 +42,34 @@ def run_autogen_task(user_message, context=None, timeout_total=120, max_turns=3)
     """
     logging.info("Autogen run started")
     log_agentops("task_start", {"user_message": user_message})
+    
+    # ============================================================================
+    # STEP 0: Retrieve RAG context from semantic_memory (Issue 3 Fix)
+    # ============================================================================
+    rag_context = ""
+    try:
+        # Query semantic memory for relevant context
+        rag_results = query_semantic_memory(
+            query_text=user_message,
+            top_k=5,
+            match_threshold=0.6
+        )
+        if rag_results:
+            rag_parts = []
+            for result in rag_results:
+                content = result.get("content", "")
+                metadata = result.get("metadata", {})
+                source_type = metadata.get("source_type", "unknown")
+                similarity = result.get("similarity", 0.0)
+                rag_parts.append(f"[Knowledge Base - {source_type}]: {content[:400]}")
+            rag_context = "\n\n".join(rag_parts)
+            logging.info(f"✅ Retrieved {len(rag_results)} RAG context documents from semantic_memory")
+        else:
+            logging.info("No RAG context found for this query")
+    except Exception as e:
+        logging.warning(f"RAG context retrieval failed: {e}")
+        rag_context = ""
+    
     turn_count = 0
     while turn_count < max_turns:
         turn_count += 1
@@ -63,6 +92,9 @@ def run_autogen_task(user_message, context=None, timeout_total=120, max_turns=3)
         if not context_str:
             context_str = "none"
 
+        # Include RAG context in CEA prompt
+        rag_section = f"\n\nRelevant Knowledge Base Context:\n{rag_context}\n" if rag_context else ""
+        
         cea_prompt = f"""You are CEA, a decisive executive agent.
 Analyse the user's task and, if needed, delegate exactly ONE clear instruction to a Worker.
 
@@ -70,12 +102,13 @@ Rules:
 1) Do NOT ask the user questions.
 2) If information is missing, make reasonable assumptions and proceed.
 3) Use the conversation context to understand references like "it", "that", "the waterfall", etc.
-4) Return either JSON with key 'delegation': {{'instruction': <one instruction>, 'deliverable': <what to return>}}
+4) Use the Knowledge Base Context below to inform your analysis and delegation.
+5) Return either JSON with key 'delegation': {{'instruction': <one instruction>, 'deliverable': <what to return>}}
    OR return a single clear instruction string for the Worker.
 
 Conversation context:
 {context_str}
-
+{rag_section}
 User task: {user_message[:500]}
 """
         import os
@@ -90,33 +123,61 @@ User task: {user_message[:500]}
         log_agentops("cea_response", {"cea_text": cea_resp[:200]})
         delegation = parse_delegation_from_cea(cea_resp)
 
-        # 2. Send to worker with context
+        # 2. Send to worker with context (Issue 1 Fix: Use EC2 instead of Grok)
         worker_instruction = delegation.get("instruction") if isinstance(delegation, dict) and "instruction" in delegation else cea_resp
         log_agentops("delegation_sent", {"instruction": worker_instruction[:200]})
-        # Use Grok API for worker with bounded tokens
-        # Include conversation context so worker understands references
-        worker_messages = []
+        
+        # Build worker prompt with context and RAG
+        worker_context_str = ""
         if context and isinstance(context, list):
+            context_parts = []
             for msg in context[-3:]:  # Last 3 messages for context
                 if isinstance(msg, dict) and "role" in msg and "content" in msg:
-                    worker_messages.append({"role": msg["role"], "content": msg["content"]})
-        worker_messages.append({"role": "user", "content": worker_instruction})
-        # Allow tuning via env to avoid truncated content
-        os.environ.setdefault("GROK_MAX_TOKENS", os.environ.get("GROK_MAX_TOKENS", "300"))
-        worker_resp = grok_chat(worker_messages, None)
+                    role = msg["role"]
+                    content = str(msg["content"])[:150]
+                    if role == "user":
+                        context_parts.append(f"Previous user: {content}")
+                    elif role == "assistant":
+                        context_parts.append(f"Previous assistant: {content}")
+            if context_parts:
+                worker_context_str = "\n".join(context_parts)
+        
+        if not worker_context_str:
+            worker_context_str = "none"
+        
+        worker_rag_section = f"\n\nRelevant Knowledge Base Context:\n{rag_context}\n" if rag_context else ""
+        worker_prompt = f"""You are a Worker agent executing a task delegated by CEA.
+
+Conversation context:
+{worker_context_str}
+{worker_rag_section}
+Task instruction: {worker_instruction}
+
+Execute this task completely and provide a detailed response."""
+        
+        # Use EC2 compute (call_local_cea) instead of Grok API
+        logging.info("Using EC2 compute (call_local_cea) for worker execution")
+        worker_tokens = int(os.getenv("CEA_MAX_TOKENS", os.getenv("CEA_FIRST_PASS_TOKENS", "500")))
+        try:
+            worker_resp = call_local_cea(worker_prompt, num_predict=worker_tokens, timeout=stage_timeout, stream=True, context=context)
+        except Exception as e:
+            logging.error(f"Worker execution failed on EC2: {e}, falling back to Grok")
+            # Fallback to Grok only if EC2 fails
+            worker_messages = []
+            if context and isinstance(context, list):
+                for msg in context[-3:]:
+                    if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                        worker_messages.append({"role": msg["role"], "content": msg["content"]})
+            worker_messages.append({"role": "user", "content": worker_instruction})
+            worker_resp = grok_chat(worker_messages, None)
         log_agentops("worker_response", {"worker_text": worker_resp[:200]})
 
-        # 3. Synthesize via CEA with assumption policy and no questions
+        # 3. Synthesize via CEA with assumption policy and no questions (Issue 1 Fix: Use EC2 instead of Grok)
         # For local CEA with 1024 token context: prompt ~200 tokens, context ~100 tokens, leaving ~724 tokens
         # But we need room for synthesis output, so truncate worker output more aggressively
-        use_grok_for_synthesis = os.getenv("CEA_USE_GROK_FOR_SYNTHESIS", "true").lower() in ("1", "true", "yes")
-        if use_grok_for_synthesis:
-            # Grok has larger context - can use more worker output
-            worker_truncated = worker_resp[:1500] if len(worker_resp) > 1500 else worker_resp
-        else:
-            # Local CEA: Truncate more aggressively to leave room for synthesis output
-            # ~1000 chars ≈ ~250 tokens for worker output, leaving ~474 tokens for synthesis
-            worker_truncated = worker_resp[:1000] if len(worker_resp) > 1000 else worker_resp
+        # Local CEA: Truncate more aggressively to leave room for synthesis output
+        # ~1000 chars ≈ ~250 tokens for worker output, leaving ~474 tokens for synthesis
+        worker_truncated = worker_resp[:1000] if len(worker_resp) > 1000 else worker_resp
         if len(worker_resp) > len(worker_truncated):
             worker_truncated += "\n[Worker output truncated...]"
 
@@ -138,27 +199,31 @@ User task: {user_message[:500]}
         if not synth_context_str:
             synth_context_str = "none"
 
+        # Include RAG context in synthesis prompt
+        synth_rag_section = f"\n\nRelevant Knowledge Base Context:\n{rag_context}\n" if rag_context else ""
+        
         synth_prompt = f"""You are CEA. Produce the final deliverable for the user.
 
 Rules:
 1) Do NOT ask questions.
 2) If details are missing, state assumptions briefly and deliver a complete, ready-to-use answer.
 3) Use the conversation context to understand references like "it", "that", "the waterfall", etc.
-4) Prefer structured, skimmable formatting (headings, lists, tables) as appropriate.
+4) Use the Knowledge Base Context below to inform your synthesis.
+5) Prefer structured, skimmable formatting (headings, lists, tables) as appropriate.
 
 Conversation context:
 {synth_context_str}
-
+{synth_rag_section}
 Worker output: {worker_truncated}
 Original task: {user_message[:500]}
 """
         try:
-            # Use Grok for synthesis (faster than local CEA) - can be overridden via env
-            use_grok_for_synthesis = os.getenv("CEA_USE_GROK_FOR_SYNTHESIS", "true").lower() in ("1", "true", "yes")
+            # Issue 1 Fix: Default to EC2 compute (can be overridden via env for testing)
+            use_grok_for_synthesis = os.getenv("CEA_USE_GROK_FOR_SYNTHESIS", "false").lower() in ("1", "true", "yes")
 
             if use_grok_for_synthesis:
-                # Use Grok for faster synthesis - it's already fast and produces good results
-                logging.info("Using Grok for synthesis (faster than local CEA)")
+                # Only use Grok if explicitly enabled (for testing/debugging)
+                logging.info("Using Grok for synthesis (override enabled)")
                 # Include context in synthesis messages
                 synth_messages = []
                 if context and isinstance(context, list):
@@ -168,8 +233,8 @@ Original task: {user_message[:500]}
                 synth_messages.append({"role": "user", "content": synth_prompt})
                 final = grok_chat(synth_messages, None)
             else:
-                # Use local CEA for synthesis (slower but potentially more consistent with CEA style)
-                logging.info("Using LOCAL CEA model (gpt-oss:20b) for synthesis")
+                # Default: Use EC2 compute (local CEA) for synthesis
+                logging.info("✅ Using EC2 compute (LOCAL CEA model gpt-oss:20b) for synthesis")
                 synthesis_tokens = int(os.getenv("CEA_MAX_TOKENS", os.getenv("CEA_FIRST_PASS_TOKENS", "600")))
                 # For local CEA with 1024 token context, cap synthesis tokens to fit
                 # Input: ~350 tokens (prompt + worker + context), leaving ~674 tokens for output

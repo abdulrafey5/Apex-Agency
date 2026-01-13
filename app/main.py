@@ -24,10 +24,13 @@ app = Flask(
 
 # === Security & session configuration =======================================
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback-key")
+# Session persistence: 30 days (for thread history persistence across logins)
+PERMANENT_SESSION_LIFETIME = 30 * 24 * 60 * 60  # 30 days in seconds
 app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
+    PERMANENT_SESSION_LIFETIME=PERMANENT_SESSION_LIFETIME,
 )
 
 # === Reverse proxy fix =======================================================

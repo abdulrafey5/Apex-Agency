@@ -63,7 +63,9 @@ def callback():
         "id_token": tokens.get("id_token"),
         "access_token": tokens.get("access_token"),
     })
-    logging.info("User logged in via Cognito")
+    # Mark session as permanent for thread persistence across logins
+    session.permanent = True
+    logging.info("User logged in via Cognito - session marked as permanent")
     return redirect("/chat-ui")
 
 @auth_bp.route("/logout")
